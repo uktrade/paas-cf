@@ -51,7 +51,6 @@ jobs:
   templates:
   - {name: nats, release: bosh}
   - {name: redis, release: bosh}
-  - {name: postgres, release: bosh}
   - {name: director, release: bosh}
   - {name: health_monitor, release: bosh}
 
