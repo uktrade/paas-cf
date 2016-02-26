@@ -42,15 +42,15 @@ output "infra_subnet_ids" {
   value = "${join(",", aws_subnet.infra.*.id)}"
 }
 
-output "infra_subnet_0_ids" {
+output "infra_subnet_0_id" {
   value = "${aws_subnet.infra.0.id}"
 }
 
-output "infra_subnet_1_ids" {
+output "infra_subnet_1_id" {
   value = "${aws_subnet.infra.1.id}"
 }
 
-output "infra_subnet_2_ids" {
+output "infra_subnet_2_id" {
   value = "${aws_subnet.infra.2.id}"
 }
 

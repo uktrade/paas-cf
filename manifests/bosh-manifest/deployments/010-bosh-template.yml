@@ -49,8 +49,7 @@ jobs:
 
   networks:
   - name: (( concat "private_" meta.deploy_az ))
-    static_ips:
-    - (( static_ips(1) ))
+    static_ips: (( static_ips(1) ))
     default: [dns, gateway]
 
   properties:
