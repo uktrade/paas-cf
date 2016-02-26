@@ -20,7 +20,10 @@ meta:
 
   bosh_private_ip: (( grab terraform_outputs.microbosh_static_private_ip ))
   bosh_service_ip: (( grab meta.bosh_private_ip ))
-  bosh_deploy_address: (( jobs.0.bosh.networks.[0].static_ips.[0] ))
+  # FIXME
+  # bosh_deploy_address: (( grab jobs.0.bosh.networks.[0].static_ips.[0] ))
+  # bosh_deploy_address: (( grab jobs.bosh.networks.private_z1.static_ips ))
+  bosh_deploy_address: 10.0.0.6
   bosh_service_address: (( grab terraform_outputs.bosh_dns_name ))
 
   ntp:
