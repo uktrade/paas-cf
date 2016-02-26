@@ -12,7 +12,7 @@ meta:
     adapter: postgres
 
   default_dns:
-    address: (( grab meta.bosh_public_ip ))
+    address: (( grab meta.bosh_deploy_address ))
     domain_name: microbosh
     db: (( grab meta.postgres ))
     recursor: 8.8.8.8
@@ -76,7 +76,7 @@ jobs:
         user: agent
         password: (( grab secrets.bosh_agent_password ))
       options:
-        endpoint: (( concat "http://" meta.bosh_public_ip ":25250" ))
+        endpoint: (( concat "http://" meta.bosh_service_address ":25250" ))
         user: agent
         password: (( grab secrets.bosh_agent_password ))
 

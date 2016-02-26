@@ -34,10 +34,6 @@ output "microbosh_static_private_ip" {
   value = "${var.microbosh_static_private_ip}"
 }
 
-output "microbosh_static_public_ip" {
-  value = "${aws_eip.bosh.public_ip}"
-}
-
 output "compiled_cache_bucket_host" {
   value = "s3-${var.region}.amazonaws.com"
 }

@@ -19,7 +19,6 @@ meta:
       max_retries: 8
 
   bosh_private_ip: (( grab terraform_outputs.microbosh_static_private_ip ))
-  bosh_public_ip: (( grab terraform_outputs.microbosh_static_public_ip ))
   bosh_service_ip: (( grab meta.bosh_private_ip ))
   bosh_deploy_address: (( static_ip(1) ))
   bosh_service_address: (( grab terraform_outputs.bosh_dns_name ))
