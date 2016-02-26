@@ -19,17 +19,32 @@ disk_pools:
     type: gp2
 
 networks:
-- name: private
+- name: private_z1
   type: manual
   subnets:
   - range: 10.0.0.0/24
+    static:
+    - 10.0.0.6 - 10.0.0.10
     gateway: 10.0.0.1
     dns: [10.0.0.2]
     cloud_properties:
-      subnet: (( grab terraform_outputs.bosh_subnet_id ))
+      subnet: (( grab terraform_outputs.infra_subnet_0_id ))
       security_groups:
       - (( grab terraform_outputs.bosh_security_group ))
       - (( grab terraform_outputs.bosh_client_security_group ))
       - (( grab terraform_outputs.default_security_group ))
-- name: public
-  type: vip
+- name: private_z2
+  type: manual
+  subnets:
+  - range: 10.0.1.0/24
+    static:
+    - 10.0.1.6 - 10.0.1.10
+    gateway: 10.0.1.1
+    dns: [10.0.1.2]
+    cloud_properties:
+      subnet: (( grap terraform_outputs.infra_subnet_1_id ))
+      security_groups:
+      - (( grab terraform_outputs.bosh_security_group ))
+      - (( grab terraform_outputs.bosh_client_security_group ))
+      - (( grab terraform_outputs.default_security_group ))
+

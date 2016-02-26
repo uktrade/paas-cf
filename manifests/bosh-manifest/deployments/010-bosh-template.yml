@@ -2,6 +2,8 @@
 meta:
   environment: (( grab terraform_outputs.environment ))
 
+  deploy_az: z1
+
   postgres:
     host: 127.0.0.1
     user: postgres
@@ -46,13 +48,10 @@ jobs:
   persistent_disk_pool: disks
 
   networks:
-  - name: private
+  - name: (( concat "private_" deploy_az ))
     static_ips:
-    - (( grab meta.bosh_private_ip ))
+    - (( static_ip(1) ))
     default: [dns, gateway]
-  - name: public
-    static_ips:
-    - (( grab meta.bosh_public_ip ))
 
   properties:
     nats:

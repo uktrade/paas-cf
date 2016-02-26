@@ -15,6 +15,7 @@ resource "aws_subnet" "infra" {
   vpc_id            = "${aws_vpc.myvpc.id}"
   cidr_block        = "${lookup(var.infra_cidrs, concat("zone", count.index))}"
   availability_zone = "${lookup(var.zones,       concat("zone", count.index))}"
+  map_public_ip_on_launch = true
   depends_on        = ["aws_internet_gateway.default"]
   tags {
     Name = "${var.env}-infra-${lookup(var.zones, concat("zone", count.index))}"
