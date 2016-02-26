@@ -1,7 +1,7 @@
 ---
 resource_pools:
 - name: vms
-  network: private
+  network: (( concat "private_" meta.deploy_az ))
   stemcell:
     url: https://bosh.io/d/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent?v=3197
     sha1: 89a2210b8caf3884855d7db6d48b8863202c7783
