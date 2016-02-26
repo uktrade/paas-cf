@@ -57,3 +57,11 @@ resource "aws_elb" "bosh" {
     lb_protocol = "tcp"
   }
 }
+
+resource "aws_route53_record" "bosh" {
+  zone_id = "${var.system_dns_zone_id}"
+  name    = "bosh.${var.env}.${var.system_dns_zone_name}."
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${aws_elb.bosh.dns_name}"]
+}

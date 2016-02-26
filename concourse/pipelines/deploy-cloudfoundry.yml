@@ -380,6 +380,9 @@ jobs:
             - -e
             - -c
             - |
+              # FIXME
+              env={{deploy_env}}
+              export BOSH_IP=bosh.${env}.dev.paas.alphagov.co.uk
               ./paas-cf/concourse/scripts/bosh_login.sh bosh-secrets/bosh-secrets.yml
               sed -e "s/^director_uuid:.*/director_uuid: $(bosh status --uuid)/" < cf-manifest/cf-manifest.yml > cf-manifest.yml
               bosh deployment cf-manifest.yml

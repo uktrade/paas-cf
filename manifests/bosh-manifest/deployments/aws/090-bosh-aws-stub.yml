@@ -22,7 +22,7 @@ meta:
   bosh_public_ip: (( grab terraform_outputs.microbosh_static_public_ip ))
   bosh_service_ip: (( grab meta.bosh_private_ip ))
   bosh_deploy_address: (( grab meta.bosh_private_ip ))
-  bosh_service_address: (( grab terraform_outputs.bosh_elb_dns_name ))
+  bosh_service_address: (( grab terraform_outputs.bosh_dns_name ))
 
   ntp:
   - 0.pool.ntp.org

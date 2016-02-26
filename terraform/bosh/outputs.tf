@@ -49,3 +49,7 @@ output "bosh_elb_name" {
 output "bosh_elb_dns_name" {
   value = "${aws_elb.bosh.dns_name}"
 }
+
+output "bosh_dns_name" {
+  value = "${aws_route53_record.bosh.name}"
+}
