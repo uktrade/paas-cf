@@ -29,7 +29,7 @@ networks:
       subnet: (( grab terraform_outputs.bosh_subnet_id ))
       security_groups:
       - (( grab terraform_outputs.bosh_security_group ))
+      - (( grab terraform_outputs.bosh_client_security_group ))
+      - (( grab terraform_outputs.default_security_group ))
 - name: public
   type: vip
-
-
