@@ -41,3 +41,11 @@ output "compiled_cache_bucket_host" {
 output "compiled_cache_bucket_name" {
   value = "shared-cf-bosh-blobstore-${var.aws_account}"
 }
+
+output "bosh_elb_name" {
+  value = "${aws_elb.bosh.name}"
+}
+
+output "bosh_elb_dns_name" {
+  value = "${aws_elb.bosh.dns_name}"
+}

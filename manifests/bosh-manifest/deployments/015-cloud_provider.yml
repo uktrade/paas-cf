@@ -1,6 +1,6 @@
 cloud_provider:
   ssh_tunnel:
-    host: (( grab meta.bosh_service_ip ))
+    host: (( grab terraform_outputs.bosh_elb_dns_name ))
     port: 22
     user: vcap
     private_key: .ssh/id_rsa
