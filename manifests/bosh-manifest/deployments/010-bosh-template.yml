@@ -16,7 +16,7 @@ meta:
     recursor: 8.8.8.8
 
   default_agent:
-    mbus: (( concat "nats://nats:" secrets.bosh_nats_password "@" meta.bosh_service_ip ":4222" ))
+    mbus: (( concat "nats://nats:" secrets.bosh_nats_password "@" meta.bosh_service_address ":4222" ))
 
 name: bosh
 
@@ -68,7 +68,7 @@ jobs:
     postgres: (( grab meta.postgres ))
 
     blobstore:
-      address: (( grab meta.bosh_service_ip ))
+      address: (( grab meta.bosh_service_address ))
       provider: dav
       director:
         user: director
@@ -102,10 +102,10 @@ jobs:
     ntp: (( grab meta.ntp ))
 
     agent:
-      mbus: (( concat "nats://nats:" secrets.bosh_nats_password "@" meta.bosh_service_ip ":4222" ))
+      mbus: (( concat "nats://nats:" secrets.bosh_nats_password "@" meta.bosh_service_address ":4222" ))
 
     registry:
-      host: (( grab meta.bosh_service_ip ))
+      host: (( grab meta.bosh_service_address ))
       db: (( grab meta.postgres ))
       http:
         # Variables used by official job release
