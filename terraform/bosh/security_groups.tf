@@ -16,6 +16,7 @@ resource "aws_security_group" "bosh" {
     protocol  = "tcp"
     security_groups = [
       "${aws_security_group.bosh_elb.id}",
+      "${var.concourse_security_group_id}"
     ]
   }
 
@@ -25,6 +26,7 @@ resource "aws_security_group" "bosh" {
     protocol  = "tcp"
     security_groups = [
       "${aws_security_group.bosh_elb.id}",
+      "${var.concourse_security_group_id}"
     ]
   }
 
@@ -34,6 +36,7 @@ resource "aws_security_group" "bosh" {
     protocol  = "tcp"
     security_groups = [
       "${aws_security_group.bosh_elb.id}",
+      "${var.concourse_security_group_id}"
     ]
   }
 
