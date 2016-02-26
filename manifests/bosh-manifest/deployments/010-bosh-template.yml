@@ -48,9 +48,9 @@ jobs:
   persistent_disk_pool: disks
 
   networks:
-  - name: (( concat "private_" deploy_az ))
+  - name: (( concat "private_" meta.deploy_az ))
     static_ips:
-    - (( static_ip(1) ))
+    - (( static_ips(1) ))
     default: [dns, gateway]
 
   properties:

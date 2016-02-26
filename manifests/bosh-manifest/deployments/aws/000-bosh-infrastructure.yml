@@ -42,7 +42,7 @@ networks:
     gateway: 10.0.1.1
     dns: [10.0.1.2]
     cloud_properties:
-      subnet: (( grap terraform_outputs.infra_subnet_1_id ))
+      subnet: (( grab terraform_outputs.infra_subnet_1_id ))
       security_groups:
       - (( grab terraform_outputs.bosh_security_group ))
       - (( grab terraform_outputs.bosh_client_security_group ))
