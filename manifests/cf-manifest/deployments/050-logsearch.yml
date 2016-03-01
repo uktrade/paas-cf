@@ -59,6 +59,26 @@ resource_pools:
     elbs:
       - (( grab terraform_outputs.ingestor_elb_name ))
 
+- name: kibana_z1
+  network: (( grab resource_pools.small_z1.network ))
+  stemcell: (( grab meta.stemcell ))
+  env: (( grab meta.default_env ))
+  cloud_properties:
+    availability_zone: (( grab resource_pools.small_z1.cloud_properties.availability_zone ))
+    instance_type: (( grab resource_pools.small_z1.cloud_properties.instance_type ))
+    elbs:
+      - (( grab terraform_outputs.kibana_elb_name ))
+
+- name: kibana_z2
+  network: (( grab resource_pools.small_z2.network ))
+  stemcell: (( grab meta.stemcell ))
+  env: (( grab meta.default_env ))
+  cloud_properties:
+    availability_zone: (( grab resource_pools.small_z2.cloud_properties.availability_zone ))
+    instance_type: (( grab resource_pools.small_z2.cloud_properties.instance_type ))
+    elbs:
+      - (( grab terraform_outputs.kibana_elb_name ))
+
 disk_pools:
 - name: elasticsearch_master
   disk_size: 102400
@@ -249,14 +269,24 @@ jobs:
   - name: cf2
   update: (( grab properties.update ))
 
-- name: kibana
+- name: kibana_z1
   release: logsearch
   templates:
   - {name: kibana, release: logsearch}
-  resource_pool: small_z1
+  resource_pool: kibana_z1
   instances: 1
   networks:
   - name: cf1
+  update: (( grab properties.update ))
+
+- name: kibana_z2
+  release: logsearch
+  templates:
+  - {name: kibana, release: logsearch}
+  resource_pool: kibana_z2
+  instances: 1
+  networks:
+  - name: cf2
   update: (( grab properties.update ))
 
 properties:
