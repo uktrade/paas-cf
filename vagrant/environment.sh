@@ -25,7 +25,6 @@ export VAGRANT_DEFAULT_PROVIDER=aws
 export VAGRANT_BOX_NAME=aws_vagrant_box
 export CONCOURSE_ATC_USER=${CONCOURSE_ATC_USER}
 export CONCOURSE_ATC_PASSWORD=${CONCOURSE_ATC_PASSWORD}
-export FLY_CMD=${FLY_CMD:-$PROJECT_DIR/fly}
 EOF
 
 echo "Deploy environment name: $DEPLOY_ENV" 1>&2
