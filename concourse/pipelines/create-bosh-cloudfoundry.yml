@@ -13,6 +13,7 @@ groups:
       - smoke-tests
       - acceptance-tests
       - custom-acceptance-tests
+      - security-scan
       - bosh-cli-test
       - tag-release
   - name: bosh
@@ -46,6 +47,7 @@ groups:
       - acceptance-tests
       - custom-acceptance-tests
       - bosh-cli-test
+      - security-scan
 
 resources:
   - name: pipeline-trigger
@@ -1227,6 +1229,36 @@ jobs:
               export CONCOURSE_ATC_PASSWORD
               ./paas-cf/concourse/scripts/bosh-cli.sh bosh status
 
+  - name: security-scan
+    plan:
+      - aggregate:
+          - get: pipeline-trigger
+            passed: ['cf-deploy']
+            trigger: true
+          - get: paas-cf
+            passed: ['cf-deploy']
+          - get: concourse-manifest
+      - task: nmap-on-cell
+        config:
+          platform: linux
+          image: docker:///ruby#2.2-slim
+          params:
+            SYSTEM_DNS_ZONE_NAME: {{system_dns_zone_name}}
+            DEPLOY_ENV: {{deploy_env}}
+          inputs:
+          - name: paas-cf
+          - name: concourse-manifest
+          run:
+            path: sh
+            args:
+            - -e
+            - -c
+            - |
+              VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+              CONCOURSE_ATC_PASSWORD=$("$VAL_FROM_YAML" jobs.concourse.properties.atc.basic_auth_password concourse-manifest/concourse-manifest.yml)
+              export CONCOURSE_ATC_PASSWORD
+              ./paas-cf/concourse/scripts/bosh-cli.sh bosh ssh cell_z1 0 "$(cat ./paas-cf/concourse/scripts/install-userspace-nmap.sh)
+              nmap -T aggressive -sT -Pn --min-parallelism 10 10.0.16.51-56 -p2222-2232 -oN -"
 
   - name: tag-release
     plan:
