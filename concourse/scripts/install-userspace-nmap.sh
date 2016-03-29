@@ -1,5 +1,4 @@
 #!/bin/bash -eu
-dst=$($DEBUG ? "" : ">/dev/null")
 
 mkdir -p portable/debs
 cd portable/debs
