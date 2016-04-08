@@ -3,6 +3,7 @@ groups:
     jobs:
       - pipeline-lock
       - init
+      - start-conn-test
       - bosh-terraform
       - generate-bosh-config
       - bosh-deploy
@@ -20,6 +21,7 @@ groups:
   - name: bosh
     jobs:
       - init
+      - start-conn-test
       - bosh-terraform
       - generate-bosh-config
       - bosh-deploy
@@ -342,6 +344,67 @@ jobs:
                 paas-cf/concourse/scripts/s3init.sh {{state_bucket}} cf-certs.tar.gz paas-cf/concourse/init_files/empty.tar.gz
                 paas-cf/concourse/scripts/s3init.sh {{state_bucket}} cf-certs.tfstate paas-cf/concourse/init_files/terraform.tfstate.tpl
                 paas-cf/concourse/scripts/s3init.sh {{state_bucket}} git-keys.tar.gz paas-cf/concourse/init_files/empty.tar.gz
+                paas-cf/concourse/scripts/s3init.sh {{state_bucket}} cf-manifest.yml paas-cf/concourse/init_files/zero_bytes
+
+  - name: start-conn-test
+    plan:
+      - aggregate:
+          - get: pipeline-trigger
+            passed: ['init']
+            trigger: true
+          - get: paas-cf
+            passed: ['init']
+          - get: cf-manifest
+          - get: bosh-CA
+      - task: generate-test-config
+        config:
+          platform: linux
+          image: docker:///ruby#2.2-slim
+          inputs:
+            - name: paas-cf
+            - name: cf-manifest
+          outputs:
+            - name: test-config
+          run:
+            path: sh
+            args:
+              - -e
+              - -c
+              - |
+                export CF_MANIFEST=cf-manifest/cf-manifest.yml
+                if [ ! -s "${CF_MANIFEST}" ]; then
+                  > test-config/config.json
+                  echo "${CF_MANIFEST}" not found, skipping
+                  exit 0
+                fi
+                ./paas-cf/tests/acceptance-tests/generate_test_config.rb \
+                  > test-config/config.json
+      - task: run-tests
+        config:
+          platform: linux
+          image: docker:///governmentpaas/cf-acceptance-tests
+          inputs:
+            - name: paas-cf
+            - name: test-config
+            - name: bosh-CA
+          run:
+            path: sh
+            args:
+              - -e
+              - -c
+              - |
+                export CONFIG="$(pwd)/test-config/config.json"
+                if [ ! -s "${CONFIG}" ]; then
+                  echo "${CONFIG}" not found, skipping
+                  exit 0
+                fi
+                echo "Adding bosh-CA to root certificates"
+                tar -xf bosh-CA/bosh-CA.tar.gz -C /usr/local/share/ca-certificates bosh-CA.crt
+                update-ca-certificates
+
+                echo "Running tests"
+                export DISABLE_ENV_TEARDOWN=1
+                ./paas-cf/tests/acceptance-tests/run_tests.sh
 
   - name: generate-secrets
     serial_groups: [cf-deploy]
@@ -484,9 +547,9 @@ jobs:
       - aggregate:
           - get: pipeline-trigger
             trigger: true
-            passed: [ generate-secrets ]
+            passed: [ start-conn-test ]
           - get: paas-cf
-            passed: [ generate-secrets ]
+            passed: [ start-conn-test ]
           - get: vpc-tfstate
           - get: concourse-tfstate
           - get: bosh-tfstate
@@ -1557,6 +1620,7 @@ jobs:
 
                   echo "Running tests"
                   export CONFIG="$(pwd)/test-config/config.json"
+                  export DISABLE_ENV_SETUP=1
                   ./paas-cf/tests/run_tests.sh ./paas-cf/tests/src/acceptance/
 
         ensure:
