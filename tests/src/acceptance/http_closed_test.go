@@ -14,7 +14,6 @@ import (
 )
 
 var _ = Describe("Http client", func() {
-
 	var (
 		CONNECTION_TIMEOUT = 11 * time.Second
 	)

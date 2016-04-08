@@ -1,6 +1,7 @@
 package performance_test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -36,15 +37,24 @@ func TestSuite(t *testing.T) {
 		LONG_CURL_TIMEOUT = config.LongCurlTimeout * time.Second
 	}
 
-	context = helpers.NewContext(config)
+	if os.Getenv("DETERMINISTIC_ENV") == "" {
+		context = helpers.NewPersistentAppContext(config)
+	} else {
+		context = helpers.NewContext(config)
+	}
+
 	environment := helpers.NewEnvironment(context)
 
 	BeforeSuite(func() {
-		environment.Setup()
+		if os.Getenv("DISABLE_ENV_SETUP") == "" {
+			environment.Setup()
+		}
 	})
 
 	AfterSuite(func() {
-		environment.Teardown()
+		if os.Getenv("DISABLE_ENV_TEARDOWN") == "" {
+			environment.Teardown()
+		}
 	})
 
 	RunSpecs(t, "Performance tests")
