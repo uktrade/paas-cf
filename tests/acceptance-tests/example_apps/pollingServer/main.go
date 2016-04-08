@@ -20,7 +20,7 @@ func main() {
 	interval := getInterval()
 	timeout := getTimeout()
 	targetURL := getTargetURL(port)
-	skipSSLValidation := os.Getenv("SKIP_SSL_VALIDATION") == "true"
+	skipSSLValidation := os.Getenv("SKIP_SSL_VALIDATION") == ""
 
 	addr := ":" + port
 	fmt.Println("Listening on port", port)
@@ -59,7 +59,7 @@ func getInterval() time.Duration {
 	var err error
 
 	if intervalString == "" {
-		interval = time.Second
+		interval = time.Millisecond * 200
 	} else {
 		interval, err = time.ParseDuration(intervalString)
 		if err != nil {
@@ -176,9 +176,9 @@ func (s *pollingServer) start() {
 		select {
 		case <-s.DoneCh:
 			if s.Success {
-				result_string = fmt.Sprintf("Stopped\nEverything was fine\nMax request time: %v\n", maxTime)
+				result_string = "OK"
 			} else {
-				result_string = fmt.Sprintf("Stopped\nThere were errors\nMax request time: %v\n", maxTime)
+				result_string = "FAIL"
 			}
 			s.ResultsCh <- result_string
 			return
