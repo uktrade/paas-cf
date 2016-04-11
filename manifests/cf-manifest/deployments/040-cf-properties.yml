@@ -196,7 +196,7 @@ properties:
     brand: oss
     asset_base_url: ~
     uaa_base: ~
-    self_service_links_enabled: ~
+    self_service_links_enabled: true
     signups_enabled: ~
     invitations_enabled: true
     spring_profiles: ~
