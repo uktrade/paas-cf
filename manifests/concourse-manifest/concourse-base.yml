@@ -85,6 +85,7 @@ jobs:
         basic_auth_username: admin
         basic_auth_password: (( grab secrets.concourse_atc_password ))
         publicly_viewable: true
+        postgresql_database: atc
         postgresql:
           address: 127.0.0.1:5432
           role: &atc-role
