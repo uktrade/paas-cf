@@ -234,6 +234,21 @@ jobs:
       metron_agent:
         zone: z2
 
+  - name: consul_z3
+    templates: (( grab meta.consul_templates ))
+    instances: 1
+    persistent_disk: 1024
+    resource_pool: small_z3
+    networks:
+      - name: cf3
+        static_ips:
+    properties:
+      consul:
+        agent:
+          mode: server
+      metron_agent:
+        zone: z3
+
   - name: nats_z1
     templates: (( grab meta.nats_templates ))
     instances: 1
@@ -294,87 +309,6 @@ jobs:
           services:
             etcd: {}
 
-  - name: consul_z3
-    templates: (( grab meta.consul_templates ))
-    instances: 1
-    persistent_disk: 1024
-    resource_pool: small_z3
-    networks:
-      - name: cf3
-        static_ips:
-    properties:
-      consul:
-        agent:
-          mode: server
-      metron_agent:
-        zone: z3
-
-  - name: etcd_z3
-    templates: (( grab meta.etcd_templates ))
-    instances: 1
-    persistent_disk: 10024
-    resource_pool: medium_z3
-    networks:
-      - name: cf3
-        static_ips:
-    properties:
-      metron_agent:
-        zone: z3
-      consul:
-        agent:
-          services:
-            etcd: {}
-
-  - name: ha_proxy_z1
-    templates: (( grab meta.ha_proxy_templates ))
-    instances: 0
-    resource_pool: router_z1
-    networks:
-      - name: cf1
-        static_ips: ~
-    properties:
-      ha_proxy:
-      router:
-        servers:
-          z1: (( grab jobs.router_z1.networks.router1.static_ips ))
-          z2: (( grab jobs.router_z2.networks.router2.static_ips ))
-      metron_agent:
-        zone: z1
-
-  - name: stats_z1
-    templates: (( grab meta.stats_templates ))
-    instances: 1
-    resource_pool: small_z1
-    networks:
-      - name: cf1
-    properties:
-      metron_agent:
-        zone: z1
-
-  - name: nfs_z1
-    templates: (( grab meta.nfs_templates ))
-    instances: 0
-    resource_pool: medium_z1
-    persistent_disk: 102400
-    networks:
-      - name: cf1
-        static_ips: ~
-    properties:
-      metron_agent:
-        zone: z1
-
-  - name: postgres_z1
-    templates: (( grab meta.postgres_templates ))
-    instances: 0
-    resource_pool: medium_z1
-    persistent_disk: 4096
-    networks:
-    - name: cf1
-      static_ips: ~
-    properties:
-      metron_agent:
-        zone: z1
-
   # FIXME: Remove route_registrar (https://github.com/cloudfoundry/cf-release/issues/950)
   - name: uaa_z1
     templates: (( grab meta.uaa_templates ))
@@ -391,22 +325,6 @@ jobs:
             uaa: {}
       metron_agent:
         zone: z1
-      route_registrar:
-        routes: []
-
-  - name: uaa_z2
-    templates: (( grab meta.uaa_templates ))
-    instances: 1
-    resource_pool: uaa_z2
-    networks:
-      - name: cf2_rds
-    properties:
-      consul:
-        agent:
-          services:
-            uaa: {}
-      metron_agent:
-        zone: z2
       route_registrar:
         routes: []
 
@@ -428,6 +346,140 @@ jobs:
       route_registrar:
         routes: []
       nfs_server: (( grab meta.nfs_server ))
+
+  - name: api_worker_z1
+    templates: (( grab meta.api_worker_templates ))
+    instances: 1
+    resource_pool: api_worker_z1
+    persistent_disk: 0
+    networks:
+      - name: cf1_rds
+    update:
+      serial: true
+    properties:
+      metron_agent:
+        zone: z1
+      nfs_server: (( grab meta.nfs_server ))
+
+  - name: doppler_z1
+    templates: (( grab meta.loggregator_templates ))
+    instances: 1
+    resource_pool: medium_z1
+    networks:
+      - name: cf1
+    update:
+      serial: true
+    properties:
+      doppler:
+        zone: z1
+      metron_agent:
+        zone: z1
+
+  - name: loggregator_trafficcontroller_z1
+    templates: (( grab meta.loggregator_trafficcontroller_templates ))
+    instances: 1
+    resource_pool: loggregator_trafficcontroller_z1
+    networks:
+      - name: cf1
+    update:
+      serial: true
+    properties:
+      traffic_controller:
+        zone: z1
+      metron_agent:
+        zone: z1
+      route_registrar:
+        routes: []
+
+  - name: router_z1
+    templates: (( grab meta.router_templates ))
+    instances: 1
+    resource_pool: router_z1
+    networks:
+      - name: router1
+        static_ips: ~
+    update:
+      serial: true
+    properties:
+      consul:
+        agent:
+          services:
+            gorouter: {}
+      metron_agent:
+        zone: z1
+
+  - name: cell_z1
+    templates: (( grab base_job_templates.cell ))
+    instances: 1
+    resource_pool: cell_z1
+    networks:
+      - name: cell1
+    update:
+      serial: true
+    properties:
+      metron_agent:
+        zone: z1
+      diego:
+        rep:
+          zone: z1
+
+  - name: colocated_z1
+    templates: (( grab base_job_templates.colocated ))
+    instances: 1
+    persistent_disk_pool: database_disks
+    resource_pool: colocated_z1
+    networks:
+      - name: cf1
+    update:
+      serial: true
+    properties:
+      diego:
+        rep:
+          zone: z1
+      metron_agent:
+        zone: z1
+
+  - name: etcd_z3
+    templates: (( grab meta.etcd_templates ))
+    instances: 1
+    persistent_disk: 10024
+    resource_pool: medium_z3
+    networks:
+      - name: cf3
+        static_ips:
+    properties:
+      metron_agent:
+        zone: z3
+      consul:
+        agent:
+          services:
+            etcd: {}
+
+  - name: stats_z1
+    templates: (( grab meta.stats_templates ))
+    instances: 1
+    resource_pool: small_z1
+    networks:
+      - name: cf1
+    properties:
+      metron_agent:
+        zone: z1
+
+  - name: uaa_z2
+    templates: (( grab meta.uaa_templates ))
+    instances: 1
+    resource_pool: uaa_z2
+    networks:
+      - name: cf2_rds
+    properties:
+      consul:
+        agent:
+          services:
+            uaa: {}
+      metron_agent:
+        zone: z2
+      route_registrar:
+        routes: []
 
   - name: api_z2
     templates: (( grab meta.api_templates ))
@@ -457,20 +509,6 @@ jobs:
       metron_agent:
         zone: z1
 
-  - name: api_worker_z1
-    templates: (( grab meta.api_worker_templates ))
-    instances: 1
-    resource_pool: api_worker_z1
-    persistent_disk: 0
-    networks:
-      - name: cf1_rds
-    update:
-      serial: true
-    properties:
-      metron_agent:
-        zone: z1
-      nfs_server: (( grab meta.nfs_server ))
-
   - name: api_worker_z2
     templates: (( grab meta.api_worker_templates ))
     instances: 1
@@ -482,6 +520,116 @@ jobs:
       metron_agent:
         zone: z2
       nfs_server: (( grab meta.nfs_server ))
+
+  - name: doppler_z2
+    templates: (( grab meta.loggregator_templates ))
+    instances: 1
+    resource_pool: medium_z2
+    networks:
+      - name: cf2
+    properties:
+      doppler:
+        zone: z2
+      metron_agent:
+        zone: z2
+
+  - name: loggregator_trafficcontroller_z2
+    templates: (( grab meta.loggregator_trafficcontroller_templates ))
+    instances: 1
+    resource_pool: loggregator_trafficcontroller_z2
+    networks:
+      - name: cf2
+    properties:
+      traffic_controller:
+        zone: z2
+      metron_agent:
+        zone: z2
+      route_registrar:
+        routes: []
+
+  - name: router_z2
+    templates: (( grab meta.router_templates ))
+    instances: 1
+    resource_pool: router_z2
+    networks:
+      - name: router2
+        static_ips: ~
+    properties:
+      consul:
+        agent:
+          services:
+            gorouter: {}
+      metron_agent:
+        zone: z2
+
+  - name: cell_z2
+    templates: (( grab base_job_templates.cell ))
+    instances: 1
+    resource_pool: cell_z2
+    networks:
+      - name: cell2
+    properties:
+      metron_agent:
+        zone: z2
+      diego:
+        rep:
+          zone: z2
+
+  - name: colocated_z2
+    templates: (( grab base_job_templates.colocated ))
+    instances: 1
+    persistent_disk_pool: database_disks
+    resource_pool: colocated_z2
+    networks:
+      - name: cf2
+    properties:
+      diego:
+        rep:
+          zone: z2
+      metron_agent:
+        zone: z2
+
+
+  - name: ha_proxy_z1
+    templates: (( grab meta.ha_proxy_templates ))
+    instances: 0
+    resource_pool: router_z1
+    networks:
+      - name: cf1
+        static_ips: ~
+    properties:
+      ha_proxy:
+      router:
+        servers:
+          z1: (( grab jobs.router_z1.networks.router1.static_ips ))
+          z2: (( grab jobs.router_z2.networks.router2.static_ips ))
+      metron_agent:
+        zone: z1
+
+  - name: nfs_z1
+    templates: (( grab meta.nfs_templates ))
+    instances: 0
+    resource_pool: medium_z1
+    persistent_disk: 102400
+    networks:
+      - name: cf1
+        static_ips: ~
+    properties:
+      metron_agent:
+        zone: z1
+
+  - name: postgres_z1
+    templates: (( grab meta.postgres_templates ))
+    instances: 0
+    resource_pool: medium_z1
+    persistent_disk: 4096
+    networks:
+    - name: cf1
+      static_ips: ~
+    properties:
+      metron_agent:
+        zone: z1
+
 
   - name: loggregator_z1
     templates: (( grab meta.loggregator_templates ))
@@ -506,96 +654,6 @@ jobs:
         zone: z2
       metron_agent:
         zone: z2
-
-  - name: doppler_z1
-    templates: (( grab meta.loggregator_templates ))
-    instances: 1
-    resource_pool: medium_z1
-    networks:
-      - name: cf1
-    update:
-      serial: true
-    properties:
-      doppler:
-        zone: z1
-      metron_agent:
-        zone: z1
-
-  - name: doppler_z2
-    templates: (( grab meta.loggregator_templates ))
-    instances: 1
-    resource_pool: medium_z2
-    networks:
-      - name: cf2
-    properties:
-      doppler:
-        zone: z2
-      metron_agent:
-        zone: z2
-
-  - name: loggregator_trafficcontroller_z1
-    templates: (( grab meta.loggregator_trafficcontroller_templates ))
-    instances: 1
-    resource_pool: loggregator_trafficcontroller_z1
-    networks:
-      - name: cf1
-    update:
-      serial: true
-    properties:
-      traffic_controller:
-        zone: z1
-      metron_agent:
-        zone: z1
-      route_registrar:
-        routes: []
-
-  - name: loggregator_trafficcontroller_z2
-    templates: (( grab meta.loggregator_trafficcontroller_templates ))
-    instances: 1
-    resource_pool: loggregator_trafficcontroller_z2
-    networks:
-      - name: cf2
-    properties:
-      traffic_controller:
-        zone: z2
-      metron_agent:
-        zone: z2
-      route_registrar:
-        routes: []
-
-  - name: router_z1
-    templates: (( grab meta.router_templates ))
-    instances: 1
-    resource_pool: router_z1
-    networks:
-      - name: router1
-        static_ips: ~
-    update:
-      serial: true
-    properties:
-      consul:
-        agent:
-          services:
-            gorouter: {}
-      metron_agent:
-        zone: z1
-
-  - name: router_z2
-    templates: (( grab meta.router_templates ))
-    instances: 1
-    resource_pool: router_z2
-    networks:
-      - name: router2
-        static_ips: ~
-    properties:
-      consul:
-        agent:
-          services:
-            gorouter: {}
-      metron_agent:
-        zone: z2
-
-# Diego
 
   - name: access_z1
     templates: (( grab base_job_templates.access ))
@@ -654,64 +712,6 @@ jobs:
     networks:
       - name: cf2
     properties:
-      metron_agent:
-        zone: z2
-
-  - name: cell_z1
-    templates: (( grab base_job_templates.cell ))
-    instances: 1
-    resource_pool: cell_z1
-    networks:
-      - name: cell1
-    update:
-      serial: true
-    properties:
-      metron_agent:
-        zone: z1
-      diego:
-        rep:
-          zone: z1
-
-  - name: cell_z2
-    templates: (( grab base_job_templates.cell ))
-    instances: 1
-    resource_pool: cell_z2
-    networks:
-      - name: cell2
-    properties:
-      metron_agent:
-        zone: z2
-      diego:
-        rep:
-          zone: z2
-
-  - name: colocated_z1
-    templates: (( grab base_job_templates.colocated ))
-    instances: 1
-    persistent_disk_pool: database_disks
-    resource_pool: colocated_z1
-    networks:
-      - name: cf1
-    update:
-      serial: true
-    properties:
-      diego:
-        rep:
-          zone: z1
-      metron_agent:
-        zone: z1
-
-  - name: colocated_z2
-    templates: (( grab base_job_templates.colocated ))
-    instances: 1
-    persistent_disk_pool: database_disks
-    resource_pool: colocated_z2
-    networks:
-      - name: cf2
-    properties:
-      diego:
-        rep:
-          zone: z2
       metron_agent:
         zone: z2
 
