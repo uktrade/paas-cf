@@ -316,8 +316,6 @@ jobs:
     resource_pool: uaa_z1
     networks:
       - name: cf1_rds
-    update:
-      serial: true
     properties:
       consul:
         agent:
@@ -335,8 +333,6 @@ jobs:
     persistent_disk: 0
     networks:
       - name: cf1_rds
-    update:
-      serial: true
     properties:
       consul:
         agent:
@@ -354,8 +350,6 @@ jobs:
     persistent_disk: 0
     networks:
       - name: cf1_rds
-    update:
-      serial: true
     properties:
       metron_agent:
         zone: z1
@@ -367,8 +361,6 @@ jobs:
     resource_pool: medium_z1
     networks:
       - name: cf1
-    update:
-      serial: true
     properties:
       doppler:
         zone: z1
@@ -381,8 +373,6 @@ jobs:
     resource_pool: loggregator_trafficcontroller_z1
     networks:
       - name: cf1
-    update:
-      serial: true
     properties:
       traffic_controller:
         zone: z1
@@ -398,8 +388,6 @@ jobs:
     networks:
       - name: router1
         static_ips: ~
-    update:
-      serial: true
     properties:
       consul:
         agent:
@@ -414,8 +402,6 @@ jobs:
     resource_pool: cell_z1
     networks:
       - name: cell1
-    update:
-      serial: true
     properties:
       metron_agent:
         zone: z1
@@ -430,8 +416,6 @@ jobs:
     resource_pool: colocated_z1
     networks:
       - name: cf1
-    update:
-      serial: true
     properties:
       diego:
         rep:
@@ -471,6 +455,8 @@ jobs:
     resource_pool: uaa_z2
     networks:
       - name: cf2_rds
+    update:
+      serial: true
     properties:
       consul:
         agent:
