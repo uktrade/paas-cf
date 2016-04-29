@@ -497,7 +497,7 @@ jobs:
     - task: concourse-deploy
       timeout: 30m
       config:
-        image: docker:///governmentpaas/bosh-init
+        image: docker:///saliceti/bosh-init
         inputs:
         - name: concourse-manifest
         - name: concourse-bosh-state
