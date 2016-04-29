@@ -93,10 +93,7 @@ jobs:
         databases: [{name: atc}]
         roles:
           - *atc-role
-      tsa:
-        forward_host: 127.0.0.1
-        atc:
-          address: 127.0.0.1:8080
+      tsa_atc_address: 127.0.0.1:8080
       garden:
         listen_network: tcp
         listen_address: 0.0.0.0:7777
