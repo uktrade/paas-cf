@@ -105,10 +105,6 @@ jobs:
       password: BOSH_POSTGRES_PASSWORD
       port: 5432
       user: bosh
-    redis:
-      address: 127.0.0.1
-      listen_address: 127.0.0.1
-      password: BOSH_REDIS_PASSWORD
     registry:
       db:
         adapter: postgres
@@ -126,8 +122,6 @@ jobs:
   resource_pool: vms
   templates:
   - name: nats
-    release: bosh
-  - name: redis
     release: bosh
   - name: director
     release: bosh
@@ -164,8 +158,8 @@ properties:
       -----END RSA PRIVATE KEY-----
 releases:
 - name: bosh
-  sha1: 6b12652650b87810dcef1be1f6a6d23f1c0c13a7
-  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=255.8
+  sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
 - name: bosh-aws-cpi
   sha1: a1fe03071e8b9bf1fa97a4022151081bf144c8bc
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-aws-cpi-release?v=44

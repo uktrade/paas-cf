@@ -15,9 +15,8 @@ name: bosh
 
 releases:
 - name: bosh
-  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=255.8
-  sha1: 6b12652650b87810dcef1be1f6a6d23f1c0c13a7
-
+  url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
+  sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
 
 disk_pools:
 - name: disks
@@ -29,7 +28,6 @@ jobs:
 
   templates:
   - {name: nats, release: bosh}
-  - {name: redis, release: bosh}
   - {name: director, release: bosh}
   - {name: health_monitor, release: bosh}
 
@@ -50,11 +48,6 @@ jobs:
       address: 127.0.0.1
       user: nats
       password: (( grab secrets.bosh_nats_password ))
-
-    redis:
-      listen_address: 127.0.0.1
-      address: 127.0.0.1
-      password: (( grab secrets.bosh_redis_password ))
 
     postgres: (( grab meta.postgres ))
 
