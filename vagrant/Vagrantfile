@@ -1,28 +1,27 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require 'fog'
 
 Vagrant.require_version ">= 1.8.0"
 
-AWS_ACCOUNT = ENV.fetch("AWS_ACCOUNT", "dev")
-AWS_ACCOUNT_DATA = {
-  "dev" => {
-    :subnet_id => "subnet-d55defe8", # us-east-1e in default VPC, 172.31.32.0/20 range
-    :security_group => "sg-99e0c0e0", # "Bootstrap Concourse" security group
-  },
-  "ci" => {
-    :subnet_id => "subnet-68bb7e30", # us-east-1a in default VPC, 172.31.16.0/20 range
-    :security_group => "sg-23e1c15a", # "Bootstrap Concourse" security group
-  },
-  "staging" => {
-    :subnet_id => "subnet-9034fbc8", # us-east-1c in default VPC, 172.31.16.0/20 range
-    :security_group => "sg-87e1c1fe", # "Bootstrap Concourse" security group
-  },
-  "prod" => {
-    :subnet_id => "subnet-bc34fbe4", # us-east-1a in default VPC, 172.31.16.0/20 range
-    :security_group => "sg-14e2c26d", # "Bootstrap Concourse" security group
-  },
+aws_region = 'us-east-1'
+
+fog_config = {
+  :provider              => :aws,
+  :region                => aws_region
 }
-AWS_ACCOUNT_VARIABLES = AWS_ACCOUNT_DATA.fetch(AWS_ACCOUNT)
+fog_config[:aws_access_key_id] = ENV['AWS_ACCESS_KEY_ID']
+fog_config[:aws_secret_access_key] = ENV['AWS_SECRET_ACCESS_KEY']
+aws_client = Fog::Compute.new(fog_config)
+
+# We sort by version as fog doesn't expose the creation date
+concourse_amis = aws_client.images.all({'name' => 'concourse-v*'})
+raise "No concourse ami found in region #{aws_region}" if concourse_amis.length == 0
+sorted_amis = concourse_amis.sort! { |a,b| a.name <=> b.name }
+
+ami_id = sorted_amis[0].id
+subnet_id = aws_client.subnets.all[0].subnet_id
+security_group = aws_client.security_groups.get('Bootstrap Concourse').group_id
 
 Vagrant.configure(2) do |config|
   config.vm.box = ENV['VAGRANT_BOX_NAME'] || 'aws_vagrant_box'
@@ -44,15 +43,14 @@ Vagrant.configure(2) do |config|
     aws.associate_public_ip = true
     aws.tags = { 'Name' => (ENV['DEPLOY_ENV'] || ENV['USER']) + " concourse" }
 
-    # The Concourse AMI is currently only available in us-east-1, this is v. 0.70
-    aws.ami = 'ami-ae5eb2c3'
-    aws.region = 'us-east-1'
+    aws.ami = ami_id
+    aws.region = aws_region
 
     # Only HVM instances with ephemeral disks can be used
     aws.instance_type = 'm3.large'
 
-    aws.subnet_id = AWS_ACCOUNT_VARIABLES.fetch(:subnet_id)
-    aws.security_groups = [AWS_ACCOUNT_VARIABLES.fetch(:security_group)]
+    aws.subnet_id = subnet_id
+    aws.security_groups = [security_group]
 
     # Add IAM role to allow access to necessary AWS APIs
     aws.iam_instance_profile_name = 'bootstrap-concourse'
