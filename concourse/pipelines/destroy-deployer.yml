@@ -68,6 +68,8 @@ jobs:
         - name: paas-cf
         - name: concourse-manifest
         - name: concourse-bosh-state
+        outputs:
+        - name: destroy-concourse
         run:
           path: sh
           args:
@@ -88,6 +90,7 @@ jobs:
               || cp paas-cf/concourse/init_files/bosh-init-state.json.tpl concourse-manifest-state.json
             rm concourse-manifest/concourse-manifest.yml
             rm id_rsa
+            cp concourse-state.json destroy-concourse
       ensure:
         put: concourse-bosh-state
         params:
@@ -120,6 +123,8 @@ jobs:
         - name: paas-cf
         - name: vpc-terraform-outputs
         - name: concourse-terraform-state
+        outputs:
+        - name: destroy-concourse-terraform
         params:
           AWS_DEFAULT_REGION: {{aws_region}}
           TF_VAR_env: {{deploy_env}}
@@ -136,7 +141,7 @@ jobs:
             terraform destroy -force \
               -var-file=paas-cf/terraform/{{aws_account}}.tfvars \
               -state=concourse-terraform-state/concourse.tfstate \
-              -state-out=concourse.tfstate \
+              -state-out=destroy-concourse-terraform/concourse.tfstate \
               paas-cf/terraform/concourse
       ensure:
         put: concourse-terraform-state
@@ -159,11 +164,13 @@ jobs:
       config:
         image: docker:///governmentpaas/terraform
         params:
-            TF_VAR_env: {{deploy_env}}
-            AWS_DEFAULT_REGION: {{aws_region}}
+          TF_VAR_env: {{deploy_env}}
+          AWS_DEFAULT_REGION: {{aws_region}}
         inputs:
-          - name: paas-cf
-          - name: vpc-terraform-state
+        - name: paas-cf
+        - name: vpc-terraform-state
+        outputs:
+        - name: tf-destroy-vpc
         run:
           path: sh
           args:
@@ -172,7 +179,9 @@ jobs:
           - |
             touch paas-cf/terraform/vpc/id_rsa.pub
             terraform destroy -force -var-file=paas-cf/terraform/{{aws_account}}.tfvars \
-              -state=vpc-terraform-state/vpc.tfstate -state-out=vpc.tfstate paas-cf/terraform/vpc
+              -state=vpc-terraform-state/vpc.tfstate \
+              -state-out=tf-destroy-vpc/vpc.tfstate \
+              paas-cf/terraform/vpc
       ensure:
         put: vpc-terraform-state
         params:
