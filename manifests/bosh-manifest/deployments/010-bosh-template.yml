@@ -75,7 +75,7 @@ jobs:
     hm:
       director_account:
         user: admin
-        password: (( grab secrets.bosh_hm_director_password ))
+        password: (( grab secrets.bosh_admin_password ))
       resurrector_enabled: true
 
     ntp: (( grab meta.ntp ))

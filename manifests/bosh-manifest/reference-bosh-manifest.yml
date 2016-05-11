@@ -88,7 +88,7 @@ jobs:
     dns: null
     hm:
       director_account:
-        password: BOSH_HM_DIRECTOR_PASSWORD
+        password: BOSH_ADMIN_PASSWORD
         user: admin
       resurrector_enabled: true
     nats:
