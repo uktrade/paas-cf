@@ -13,6 +13,7 @@ addons:
       - git-core
     packages:
       - git
+      - gnupg
 
 before_install:
   - |

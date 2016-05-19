@@ -1,6 +1,19 @@
 require 'uaa_sync_admin_users'
+require 'mail_credentials_helper'
 
 RSpec.describe UaaSyncAdminUsers do
+
+  context "when encrypting a message" do
+    let(:key) { "1F6BEEE5" }
+    let(:message) { "plaintext" }
+
+    it "does not output plaintext" do
+      stub_request(:get, "http://pgp.mit.edu/pks/lookup?op=get&options=mr&search=0x" + key).
+           to_return(File.new('spec/test_pubkey.pub'))
+
+      expect(EmailCredentialsHelper.encrypt_message_to(message, key)).to_not eq message
+    end
+  end
 
   context "when connecting to a fake server" do
     let(:target) { "https://test.uaa.target" }
