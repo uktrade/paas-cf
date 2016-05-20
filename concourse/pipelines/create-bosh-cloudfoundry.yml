@@ -1133,13 +1133,54 @@ jobs:
                       ${extra_options}
                     )
                   done
-        - task: deploy-healthcheck-app
+        - task: update-quotas
           config:
             platform: linux
-            image: docker:///governmentpaas/cf-cli
             inputs:
               - name: paas-cf
               - name: config
+              - name: bosh-CA
+            params:
+            image: docker:///governmentpaas/cf-cli
+            run:
+              path: sh
+              args:
+                - -e
+                - -u
+                - -c
+                - |
+                  ./paas-cf/concourse/scripts/import_bosh_ca.sh
+                  . ./config/config.sh
+
+                  echo | cf login -a "${API_ENDPOINT}" -u "${CF_ADMIN}" -p "${CF_PASS}"
+
+                  for quota_file in config/*_quota.sh; do
+                    # Run in a subshell to make sure the variables are not kept
+                    (
+                    . "${quota_file}"
+
+                    if [ "${QUOTA_non_basic_services_allowed}" = "true" ]; then
+                      extra_options="--allow-paid-service-plans"
+                    else
+                      extra_options="--disallow-paid-service-plans"
+                    fi
+
+                    cf update-quota "${QUOTA_name}" \
+                      -m "${QUOTA_memory_limit}"M \
+                      -r "${QUOTA_total_routes}" \
+                      -s "${QUOTA_total_services}" \
+                      ${extra_options}
+                    )
+                  done
+
+        - task: sync-admin-users
+          config:
+            platform: linux
+            image: docker:///governmentpaas/cf-uaac
+            inputs:
+              - name: paas-cf
+              - name: cf-secrets
+              - name: cf-manifest
               - name: bosh-CA
             run:
               path: sh
@@ -1150,14 +1191,11 @@ jobs:
                   ./paas-cf/concourse/scripts/import_bosh_ca.sh
 
                   . ./config/config.sh
-                  echo | cf login -a ${API_ENDPOINT} -u ${CF_ADMIN} -p ${CF_PASS}
-                  echo | cf create-org testers
-                  cf create-space healthcheck -o testers
-                  cf target -o testers -s healthcheck
 
-                  cd paas-cf/tests/example-apps/healthcheck-app
+                  VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+                  UAA_CLIENT_SECRET=$($VAL_FROM_YAML secrets.uaa_admin_client_secret cf-secrets/cf-secrets.yml)
 
-                  cf push
+                  ./paas-cf/scripts/sync-admin-users.rb ${API_ENDPOINT} ./paas-cf/config/admin_users.yml
 
         - task: register-rds-broker
           config:
