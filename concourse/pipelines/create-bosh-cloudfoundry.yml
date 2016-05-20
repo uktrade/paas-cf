@@ -1452,7 +1452,7 @@ jobs:
           - get: paas-cf
             passed: ['cf-deploy']
           - get: concourse-manifest
-      - task: test-bosh-vms-via-bosh-cli
+      - task: test-bosh-cli
         config:
           platform: linux
           image: docker:///ruby#2.2-slim
@@ -1472,6 +1472,26 @@ jobs:
               CONCOURSE_ATC_PASSWORD=$("$VAL_FROM_YAML" jobs.concourse.properties.atc.basic_auth_password concourse-manifest/concourse-manifest.yml)
               export CONCOURSE_ATC_PASSWORD
               echo Looking for non running VMs
+              ./paas-cf/concourse/scripts/bosh-cli.sh bosh status
+      - task: test-bosh-vms
+        config:
+          platform: linux
+          image: docker:///ruby#2.2-slim
+          params:
+            SYSTEM_DNS_ZONE_NAME: {{system_dns_zone_name}}
+            DEPLOY_ENV: {{deploy_env}}
+          inputs:
+          - name: paas-cf
+          - name: concourse-manifest
+          run:
+            path: sh
+            args:
+            - -e
+            - -c
+            - |
+              VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+              CONCOURSE_ATC_PASSWORD=$("$VAL_FROM_YAML" jobs.concourse.properties.atc.basic_auth_password concourse-manifest/concourse-manifest.yml)
+              export CONCOURSE_ATC_PASSWORD
               ./paas-cf/concourse/scripts/bosh-cli.sh bosh vms | tee vms.txt
               [ $(grep '|' vms.txt | grep -cEv "(\-\-|VM|running)") -eq 0 ]
 
