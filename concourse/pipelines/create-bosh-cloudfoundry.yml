@@ -1476,22 +1476,22 @@ jobs:
       - task: test-bosh-vms
         config:
           platform: linux
-          image: docker:///ruby#2.2-slim
+          image: docker:///governmentpaas/bosh-cli
           params:
             SYSTEM_DNS_ZONE_NAME: {{system_dns_zone_name}}
             DEPLOY_ENV: {{deploy_env}}
           inputs:
           - name: paas-cf
-          - name: concourse-manifest
+          - name: cf-manifest
+          - name: bosh-secrets
           run:
             path: sh
             args:
             - -e
             - -c
             - |
-              VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
-              CONCOURSE_ATC_PASSWORD=$("$VAL_FROM_YAML" jobs.concourse.properties.atc.basic_auth_password concourse-manifest/concourse-manifest.yml)
-              export CONCOURSE_ATC_PASSWORD
+              ./paas-cf/concourse/scripts/bosh_login.sh {{bosh_fqdn}} bosh-secrets/bosh-secrets.yml
+              bosh deployment cf-manifest/cf-manifest.yml
               ./paas-cf/concourse/scripts/bosh-cli.sh bosh vms | tee vms.txt
               [ $(grep '|' vms.txt | grep -cEv "(\-\-|VM|running)") -eq 0 ]
 
