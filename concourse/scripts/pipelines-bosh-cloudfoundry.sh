@@ -38,6 +38,7 @@ prepare_environment() {
   cf_manifest_dir="${SCRIPT_DIR}/../../manifests/cf-manifest/deployments"
   cf_release_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.cf.version "${cf_manifest_dir}/000-base-cf-deployment.yml")
   cf_paas_haproxy_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.paas-haproxy.version "${cf_manifest_dir}/000-base-cf-deployment.yml")
+  cf_paas_os_conf_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.paas-os-conf.version "${cf_manifest_dir}/000-base-cf-deployment.yml")
   cf_graphite_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.graphite.version "${cf_manifest_dir}/055-graphite.yml")
   cf_grafana_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.grafana.version "${cf_manifest_dir}/055-graphite.yml")
   cf_aws_broker_version=$("${SCRIPT_DIR}"/val_from_yaml.rb releases.aws-broker.version "${cf_manifest_dir}/060-aws-broker.yml")
@@ -68,6 +69,7 @@ aws_region: ${AWS_DEFAULT_REGION}
 debug: ${DEBUG:-}
 cf-release-version: v${cf_release_version}
 cf-paas-haproxy-release-version: ${cf_paas_haproxy_version}
+cf-paas-os-conf-release-version: ${cf_paas_os_conf_version}
 cf_graphite_version: ${cf_graphite_version}
 cf_grafana_version: ${cf_grafana_version}
 cf_aws_broker_version: ${cf_aws_broker_version}
