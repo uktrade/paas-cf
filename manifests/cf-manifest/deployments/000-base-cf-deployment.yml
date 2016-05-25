@@ -30,6 +30,18 @@ releases:
   - name: paas-os-conf
     version: 7
 
+addons:
+  - name: os-configuration
+    jobs:
+    - name: script_runner
+      release: paas-os-conf
+    properties:
+      script_runner:
+        script: |
+          #!/bin/bash
+          ifconfig eth0 mtu 1500
+          echo "#!/bin/bash\nifconfig eth0 mtu 1500\n" > /etc/dhcp/dhclient-exit-hooks.d/set_mtu
+
 compilation:
   workers: 6
   network: cf1

@@ -284,17 +284,6 @@ disk_pools:
   - name: database_disks
     disk_size: 1024
 
-addons:
-  - name: os-configuration
-    jobs:
-    - name: script_runner
-      release: paas-os-conf
-    properties:
-      script_runner:
-        script: |
-          #!/bin/bash
-          ifconfig eth0 mtu 1500
-          echo "#!/bin/bash\nifconfig eth0 mtu 1500\n" > /etc/dhcp/dhclient-exit-hooks.d/set_mtu
 jobs:
   - name: consul_z1
     templates: (( grab meta.consul_templates ))
