@@ -28,7 +28,7 @@ releases:
   - name: paas-haproxy
     version: 0.0.2
   - name: paas-os-conf
-    version: 7
+    version: 0.0.7
 
 addons:
   - name: os-configuration
