@@ -83,6 +83,8 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-os-conf-release.git
       tag_filter: {{cf-paas-os-conf-release-version}}
+      #FIXME: remove this when changes are merged into master
+      branch: script_runner
 
   - name: graphite-statsd-boshrelease
     type: git
