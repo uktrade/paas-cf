@@ -983,7 +983,7 @@ jobs:
       - task: upload-releases
         config:
           platform: linux
-          image: docker:///governmentpaas/bosh-cli
+          image: docker:///governmentpaas/bosh-cli#update_bosh_cli_gem
           inputs:
             - name: paas-cf
             - name: bosh-secrets
@@ -1014,7 +1014,7 @@ jobs:
       - task: cf-deploy
         config:
           platform: linux
-          image: docker:///governmentpaas/bosh-cli
+          image: docker:///governmentpaas/bosh-cli#update_bosh_cli_gem
           inputs:
             - name: paas-cf
             - name: cf-manifest
@@ -1327,7 +1327,7 @@ jobs:
         - task: generate-test-config
           config:
             platform: linux
-            image: docker:///governmentpaas/bosh-cli
+            image: docker:///governmentpaas/bosh-cli#update_bosh_cli_gem
             inputs:
               - name: cf-release
               - name: paas-cf
@@ -1493,7 +1493,7 @@ jobs:
       - task: test-bosh-vms
         config:
           platform: linux
-          image: docker:///governmentpaas/bosh-cli
+          image: docker:///governmentpaas/bosh-cli#update_bosh_cli_gem
           inputs:
           - name: paas-cf
           - name: cf-manifest
