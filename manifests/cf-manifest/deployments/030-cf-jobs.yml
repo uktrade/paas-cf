@@ -231,6 +231,8 @@ meta:
 disk_pools:
   - name: database_disks
     disk_size: 1024
+    cloud_properties:
+      type: gp2
 
 jobs:
   - name: consul_z1
