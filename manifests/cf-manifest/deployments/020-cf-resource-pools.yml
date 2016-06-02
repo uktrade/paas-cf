@@ -359,6 +359,8 @@ resource_pools:
     cloud_properties:
       instance_type: m3.medium
       availability_zone: (( grab meta.zones.z1 ))
+      elbs:
+        - (( grab terraform_outputs.cf_ssh_proxy_elb_name ))
 
   - name: colocated_z2
     network: cf2
@@ -367,3 +369,5 @@ resource_pools:
     cloud_properties:
       instance_type: m3.medium
       availability_zone: (( grab meta.zones.z2 ))
+      elbs:
+        - (( grab terraform_outputs.cf_ssh_proxy_elb_name ))
