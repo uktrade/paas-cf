@@ -1400,6 +1400,21 @@ jobs:
         - task: smoke-tests-run
           file: paas-cf/concourse/tasks/smoke-tests-run.yml
 
+        - task: print-cf-cli-trace
+          config:
+            platform: linux
+            #TODO: choose an appropriate image
+            image: docker:///
+            inputs:
+             - name: trace
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  #TODO: print the CF_TRACE logs
+
         ensure:
           task: remove-temp-user
           file: paas-cf/concourse/tasks/delete_admin.yml
@@ -1469,6 +1484,9 @@ jobs:
                     acceptance_test_properties.yml \
                       > ./test-config/config.json
 
+                  NEW_CONFIG=$(ruby -e "require 'json'; f = File.open('test-config/config.json', 'r') { |f| f.read }; j = JSON.load(f); j['artifacts_directory'] = './trace'; print j.to_json")
+                  echo "${NEW_CONFIG}" > ./test-config/config.json
+
         - task: run-tests
           config:
             platform: linux
@@ -1479,6 +1497,8 @@ jobs:
               - name: cf-manifest
               - name: test-config
               - name: bosh-CA
+            outputs:
+              - name: trace
             run:
               path: sh
               args:
@@ -1493,6 +1513,21 @@ jobs:
                   ln -snf /usr/local/go /var/vcap/packages/golang1.6
                   ln -snf $(pwd)/cf-release/src/github.com/cloudfoundry/cf-acceptance-tests /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry/
                   /var/vcap/jobs/acceptance-tests/bin/run
+
+        - task: print-cf-cli-trace
+          config:
+            platform: linux
+            #TODO: choose an appropriate image
+            image: docker:///
+            inputs:
+             - name: trace
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  #TODO: print the CF_TRACE logs
 
         ensure:
           task: remove-temp-user

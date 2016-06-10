@@ -8,6 +8,7 @@ inputs:
   - name: bosh-CA
 outputs:
   - name: smoke-tests-log
+  - name: trace
 run:
   path: bash
   args:
