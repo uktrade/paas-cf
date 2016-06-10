@@ -8,6 +8,8 @@ inputs:
   - name: bosh-CA
 outputs:
   - name: smoke-tests-log
+  - name: trace
+    path: /var/vcap/jobs/smoke-tests/trace
 run:
   path: bash
   args:
@@ -17,6 +19,7 @@ run:
       ./paas-cf/concourse/scripts/import_bosh_ca.sh
 
       mkdir -p /var/vcap/jobs/smoke-tests/bin/ /var/vcap/packages/smoke-tests/src/github.com/cloudfoundry
+      mkdir /var/vcap/jobs/smoke-tests/trace
       ln -snf $(pwd)/test-config/config.json /var/vcap/jobs/smoke-tests/bin/config.json
       ln -snf $(pwd)/test-config/run /var/vcap/jobs/smoke-tests/bin/run
       ln -snf /usr/local/go /var/vcap/packages/golang1.6

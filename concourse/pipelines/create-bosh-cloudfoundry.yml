@@ -1400,6 +1400,23 @@ jobs:
         - task: smoke-tests-run
           file: paas-cf/concourse/tasks/smoke-tests-run.yml
 
+        #FIXME: temporary logging of CF_TRACE output for debugging
+        - task: print-cf-cli-trace
+          config:
+            platform: linux
+            image: docker:///alpine
+            inputs:
+             - name: trace
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  cd var/vcap/jobs/smoke-tests/trace
+                  ls -lh
+                  tail +1 *
+
         ensure:
           task: remove-temp-user
           file: paas-cf/concourse/tasks/delete_admin.yml
@@ -1469,6 +1486,8 @@ jobs:
                     acceptance_test_properties.yml \
                       > ./test-config/config.json
 
+                  ruby -e "require 'json'; j = JSON.load(File.read('./test-config/config.json')); j['artifacts_directory'] = '/var/vcap/jobs/acceptance-tests/trace'; print j" > ./test-config/config.json
+
         - task: run-tests
           config:
             platform: linux
@@ -1479,6 +1498,9 @@ jobs:
               - name: cf-manifest
               - name: test-config
               - name: bosh-CA
+            outputs:
+              - name: trace
+                path: /var/vcap/jobs/acceptance-tests/trace
             run:
               path: sh
               args:
@@ -1488,11 +1510,29 @@ jobs:
                   ./paas-cf/concourse/scripts/import_bosh_ca.sh
 
                   mkdir -p /var/vcap/jobs/acceptance-tests/bin/ /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry
+                  mkdir /var/vcap/jobs/acceptance-tests/trace
                   ln -snf $(pwd)/test-config/config.json /var/vcap/jobs/acceptance-tests/bin/config.json
                   ln -snf $(pwd)/test-config/run /var/vcap/jobs/acceptance-tests/bin/run
                   ln -snf /usr/local/go /var/vcap/packages/golang1.6
                   ln -snf $(pwd)/cf-release/src/github.com/cloudfoundry/cf-acceptance-tests /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry/
                   /var/vcap/jobs/acceptance-tests/bin/run
+
+        #FIXME: temporary logging of CF_TRACE output for debugging
+        - task: print-cf-cli-trace
+          config:
+            platform: linux
+            image: docker:///alpine
+            inputs:
+             - name: trace
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  cd var/vcap/jobs/acceptance-tests/trace
+                  ls -lh
+                  tail +1 *
 
         ensure:
           task: remove-temp-user
