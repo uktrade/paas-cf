@@ -1486,8 +1486,6 @@ jobs:
                     acceptance_test_properties.yml \
                       > ./test-config/config.json
 
-                  ruby -e "require 'json'; j = JSON.load(File.read('./test-config/config.json')); j['artifacts_directory'] = '/var/vcap/jobs/acceptance-tests/trace'; print j" > ./test-config/config.json
-
         - task: run-tests
           config:
             platform: linux
@@ -1511,11 +1509,12 @@ jobs:
 
                   mkdir -p /var/vcap/jobs/acceptance-tests/bin/ /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry
                   mkdir /var/vcap/jobs/acceptance-tests/trace
+                  touch /var/vcap/jobs/acceptance-tests/trace/log
                   ln -snf $(pwd)/test-config/config.json /var/vcap/jobs/acceptance-tests/bin/config.json
                   ln -snf $(pwd)/test-config/run /var/vcap/jobs/acceptance-tests/bin/run
                   ln -snf /usr/local/go /var/vcap/packages/golang1.6
                   ln -snf $(pwd)/cf-release/src/github.com/cloudfoundry/cf-acceptance-tests /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry/
-                  /var/vcap/jobs/acceptance-tests/bin/run
+                  CF_TRACE=/var/vcap/jobs/acceptance-tests/trace/log /var/vcap/jobs/acceptance-tests/bin/run
 
         #FIXME: temporary logging of CF_TRACE output for debugging
         - task: print-cf-cli-trace

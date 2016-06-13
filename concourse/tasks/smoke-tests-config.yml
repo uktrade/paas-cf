@@ -36,4 +36,3 @@ run:
         smoke_test_properties.yml \
           > ./test-config/config.json
 
-      ruby -e "require 'json'; j = JSON.load(File.read('./test-config/config.json')); j['artifacts_directory'] = '/var/vcap/jobs/smoke-tests/trace'; print j" > ./test-config/config.json
