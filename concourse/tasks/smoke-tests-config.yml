@@ -36,4 +36,4 @@ run:
         smoke_test_properties.yml \
           > ./test-config/config.json
 
-      ruby -e "require 'JSON'; f = File.open('test-config/config.json', 'r') { |f| f.read }; j = JSON.load(f); print j"
+      ruby -e "require 'json'; f = File.open('test-config/config.json', 'r') { |f| f.read }; j = JSON.load(f); print j"
