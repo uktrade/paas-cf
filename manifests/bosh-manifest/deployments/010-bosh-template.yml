@@ -77,6 +77,10 @@ jobs:
         user: admin
         password: (( grab secrets.bosh_hm_director_password ))
       resurrector_enabled: true
+      graphite_enabled: true
+      graphite:
+        address: 10.0.16.20
+        port: 2003
 
     ntp: (( grab meta.ntp ))
 
