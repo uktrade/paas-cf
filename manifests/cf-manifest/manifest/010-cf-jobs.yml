@@ -331,6 +331,8 @@ jobs:
         password: (( grab secrets.bosh_nats_password ))
         port: 4222
         user: nats
+      director:
+        address: 10.0.0.6
 
   - name: uaa
     azs: [z1, z2]
