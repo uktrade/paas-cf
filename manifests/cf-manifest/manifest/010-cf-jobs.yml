@@ -301,6 +301,36 @@ jobs:
       metron_agent:
         zone: ""
 
+  - name: health_monitor
+    azs: [z1,z2]
+    templates:
+    - {name: health_monitor, release: bosh}
+    instances: 2
+    vm_type: small
+    stemcell: default
+    networks:
+      - name: cf
+    properties:
+      metron_agent:
+        zone: ""
+      hm:
+        director_account:
+          user: admin
+          password: (( grab secrets.bosh_admin_password ))
+        resurrector_enabled: false
+        graphite_enabled: true
+        graphite:
+          address: 10.0.16.20
+          port: 2003
+      nats:
+        address: 10.0.0.6
+        user: nats
+        password: (( grab secrets.bosh_nats_password ))
+      event_nats:
+        address: 10.0.0.6
+        password: (( grab secrets.bosh_nats_password ))
+        port: 4222
+        user: nats
 
   - name: uaa
     azs: [z1, z2]

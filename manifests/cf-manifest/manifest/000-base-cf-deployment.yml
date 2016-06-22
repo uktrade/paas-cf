@@ -23,6 +23,9 @@ releases:
     sha1: c166c0e34fa2ebdc42585075409f9b84aa4d14d8
   - name: paas-haproxy
     version: 0.0.2
+  - name: bosh
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=255.8
+    sha1: 6b12652650b87810dcef1be1f6a6d23f1c0c13a7
 
 stemcells:
   - alias: default
