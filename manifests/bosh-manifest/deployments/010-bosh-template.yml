@@ -75,12 +75,18 @@ jobs:
     hm:
       director_account:
         user: admin
-        password: (( grab secrets.bosh_hm_director_password ))
-      resurrector_enabled: true
+        password: (( grab secrets.bosh_admin_password ))
+      resurrector_enabled: false
       graphite_enabled: true
       graphite:
         address: 10.0.16.20
         port: 2003
+
+    event_nats:
+      address: 10.0.0.6
+      password: (( grab secrets.bosh_nats_password ))
+      port: 4222
+      user: nats
 
     ntp: (( grab meta.ntp ))
 
