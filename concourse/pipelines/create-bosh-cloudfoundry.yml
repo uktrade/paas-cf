@@ -896,6 +896,7 @@ jobs:
             passed: ['bosh-terraform']
           - get: cf-tfstate
             passed: ['cf-terraform']
+          - get: bosh-secrets
       - task: extract-terraform-outputs
         config:
           platform: linux
@@ -962,6 +963,7 @@ jobs:
               - name: terraform-outputs
               - name: cf-secrets
               - name: cf-certs
+              - name: bosh-secrets
               - name: bosh-CA
             outputs:
               - name: cf-manifest
@@ -971,6 +973,7 @@ jobs:
                 ./paas-cf/manifests/cf-manifest/manifest/data/*.yml
                 ./terraform-outputs/*.yml
                 ./cf-secrets/cf-secrets.yml
+                ./bosh-secrets/bosh-secrets.yml
                 ./certs/*.yml
                 ./paas-cf/manifests/cf-manifest/manifest/env-specific/{{cf_env_specific_manifest}}
             run:
