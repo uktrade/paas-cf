@@ -86,6 +86,7 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-haproxy-release.git
       tag_filter: {{cf-paas-haproxy-release-version}}
+      branch: 121933113_user_agent_healthcheck
 
   - name: graphite-statsd-boshrelease
     type: git
