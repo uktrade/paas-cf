@@ -27,6 +27,8 @@ releases:
     sha1: 4ab6166d800668ad3e9c2c10cfd3403a7de5885f
   - name: paas-haproxy
     version: commit-3547ac3cda4c98bb69823b7a8e684a9bf814490c
+  - name: routing
+    version: commit-bd2d3143ae13d8bda9b1407490688d7681a196d8
 
 stemcells:
   - alias: default
