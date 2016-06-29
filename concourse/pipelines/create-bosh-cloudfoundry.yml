@@ -125,7 +125,7 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-routing-release.git
       tag_filter: {{cf_routing_version}}
-      branch: cf_237_and_gorouter_fix
+      branch: gorouter_healthcheck_user_agent
 
   - name: graphite-nozzle
     type: git

@@ -150,6 +150,7 @@ properties:
     debug_addr:
     enable_routing_api:
     drain_wait: 15
+    healthcheck_user_agent: ELB-HealthChecker/1.0
 
   cc:
     jobs:
