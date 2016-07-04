@@ -1,6 +1,9 @@
 ---
 properties:
   grafana:
+    root_url: "/"
+    admin_username: "admin"
+    admin_password: (( grab secrets.grafana_admin_password ))
     datasources:
       - name: graphite
         url: http://localhost:3001
