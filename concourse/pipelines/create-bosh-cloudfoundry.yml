@@ -1073,7 +1073,7 @@ jobs:
         - task: generate-grafana-dashboards-manifest
           config:
             platform: linux
-            image: docker:///governmentpaas/spruce
+            image: docker:///ruby#2.2-slim
             inputs:
               - name: paas-cf
             outputs:
