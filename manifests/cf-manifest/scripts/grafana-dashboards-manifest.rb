@@ -12,5 +12,5 @@ dashboard_files.each{ |dashboard_file|
   dashboards_hash['properties']['grafana']['dashboards'] = JSON.load(json)
 }
 
-File.write("grafana-dasbboards-manifest.yml", YAML.dump(content, f))
+File.write("grafana-dasbboards-manifest.yml", YAML.dump(dashboards_hash, f))
 
