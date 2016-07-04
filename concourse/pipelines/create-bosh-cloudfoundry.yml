@@ -1070,6 +1070,24 @@ jobs:
             params:
               file: cloud-config/cloud-config.yml
 
+        - task: generate-grafana-dashboards-manifest
+          config:
+            platform: linux
+            image: docker:///governmentpaas/spruce
+            inputs:
+              - name: paas-cf
+            outputs:
+              - name: grafana-dashboards-manifest
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  CF_MANIFEST_DIR=./paas-cf/manifests/cf-manifest
+                  ${CF_MANIFEST_DIR}/scripts/grafana-dashboards-manifest.rb ${CF_MANIFEST_DIR}/grafana \
+                    > grafana-dashboards-manifest/grafana-dashboards-manifest.yml
+
         - task: generate-cf-manifest
           config:
             platform: linux
@@ -1080,6 +1098,7 @@ jobs:
               - name: cf-secrets
               - name: cf-certs
               - name: bosh-CA
+              - name: grafana-dashboards-manifest
             outputs:
               - name: cf-manifest
             params:
@@ -1090,6 +1109,7 @@ jobs:
                 ./cf-secrets/cf-secrets.yml
                 ./certs/*.yml
                 ./paas-cf/manifests/cf-manifest/manifest/env-specific/{{cf_env_specific_manifest}}
+                ./grafana-dashboards-manifest/grafana-dashboards-manifest.yml
             run:
               path: sh
               args:
