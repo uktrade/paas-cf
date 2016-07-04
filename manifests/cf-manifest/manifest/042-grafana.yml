@@ -1,0 +1,7 @@
+---
+properties:
+  grafana:
+    datasources:
+      - name: graphite
+        url: http://localhost:3001
+        database_type: graphite
