@@ -98,7 +98,11 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-grafana-boshrelease.git
-      tag_filter: {{cf_grafana_version}}
+      branch: 122183539_upload_dashboards_minify
+      #FIXME: Once pull request on paas-grafana-boshrelease is merged the merge
+      # commit will be tagged. Once tagged, the line above can be removed and
+      # the line below uncommented.
+      #tag_filter: {{cf_grafana_version}}
 
   - name: aws-broker-boshrelease
     type: git

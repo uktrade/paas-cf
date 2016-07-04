@@ -15,7 +15,9 @@ releases:
 - name: graphite
   version: commit-ccc206f3ba21fe5ba4f3e617bb7dca3e66a652ad
 - name: grafana
-  version: commit-4a9e3a322b72bfb4a76ae460a280acf04a5b445d
+  #FIXME: Once changes are merged in paas-grafana-boshrelease the merge commit will be tagged.
+  # Once tagged, line below can be replaced with the tag name
+  version: test-version-1
 
 jobs:
 - name: graphite
