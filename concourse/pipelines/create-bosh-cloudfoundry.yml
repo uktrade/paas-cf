@@ -98,7 +98,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-grafana-boshrelease.git
-      tag_filter: {{cf_grafana_version}}
+      branch: 122183539_upload_dashboards
 
   - name: aws-broker-boshrelease
     type: git
