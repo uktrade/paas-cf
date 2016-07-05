@@ -98,7 +98,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-grafana-boshrelease.git
-      tag_filter: {{cf_grafana_version}}
+      branch: wip/henry
 
   - name: aws-broker-boshrelease
     type: git
@@ -1200,7 +1200,7 @@ jobs:
                     {{cf_graphite_version}} graphite-statsd-boshrelease
 
                   paas-cf/concourse/scripts/bosh_create_and_upload_release.rb grafana \
-                    {{cf_grafana_version}} grafana-boshrelease
+                    `date +1.%s` grafana-boshrelease
 
                   paas-cf/concourse/scripts/bosh_create_and_upload_release.rb paas-haproxy \
                     {{cf-paas-haproxy-release-version}} paas-haproxy-release
