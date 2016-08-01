@@ -113,6 +113,8 @@ properties:
     tls:
       client_cert: ~
       client_key: ~
+    logrotate:
+      freq_min: 6
 
   metron_endpoint:
     shared_secret: (( grab properties.loggregator_endpoint.shared_secret ))
