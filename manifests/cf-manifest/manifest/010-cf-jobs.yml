@@ -336,7 +336,7 @@ jobs:
       metron_agent:
         zone: ""
         logrotate:
-          freq_min: 6
+          freq_min: 4
 
   - name: cc_bridge
     azs: [z1, z2]
