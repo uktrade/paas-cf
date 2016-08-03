@@ -92,6 +92,7 @@ staging: globals check-env-vars ## Set Environment to Staging
 	$(eval export ALERT_EMAIL_ADDRESS=the-multi-cloud-paas-team+staging@digital.cabinet-office.gov.uk)
 	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=${ALERT_EMAIL_ADDRESS})
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-default.yml)
+	$(eval export ENABLE_CF_ACCEPTANCE_TESTS=false)
 	@true
 
 .PHONY: prod
@@ -106,6 +107,7 @@ prod: globals check-env-vars ## Set Environment to Production
 	$(eval export ALERT_EMAIL_ADDRESS=the-multi-cloud-paas-team+prod@digital.cabinet-office.gov.uk)
 	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=${ALERT_EMAIL_ADDRESS})
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-prod.yml)
+	$(eval export ENABLE_CF_ACCEPTANCE_TESTS=false)
 	@true
 
 .PHONY: bootstrap
