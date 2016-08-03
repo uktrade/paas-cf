@@ -15,7 +15,7 @@ groups:
       - cf-deploy
       - post-deploy
       - smoke-tests
-      - acceptance-tests
+      - {{acceptance_tests_job_name}}
       - custom-acceptance-tests
       - bosh-tests
       - performance-tests
@@ -39,7 +39,7 @@ groups:
       - cf-deploy
       - post-deploy
       - smoke-tests
-      - acceptance-tests
+      - {{acceptance_tests_job_name}}
       - custom-acceptance-tests
       - bosh-tests
       - performance-tests
@@ -58,7 +58,7 @@ groups:
     jobs:
       - availability-tests
       - smoke-tests
-      - acceptance-tests
+      - {{acceptance_tests_job_name}}
       - custom-acceptance-tests
       - bosh-tests
       - performance-tests
@@ -1840,7 +1840,7 @@ jobs:
           task: remove-temp-user
           file: paas-cf/concourse/tasks/delete_admin.yml
 
-  - name: acceptance-tests
+  - name: {{acceptance_tests_job_name}}
     plan:
       - aggregate:
           - get: pipeline-trigger
@@ -2058,15 +2058,15 @@ jobs:
     plan:
       - aggregate:
           - get: pipeline-trigger
-            passed: ['smoke-tests', 'acceptance-tests', 'custom-acceptance-tests', 'bosh-tests']
+            passed: ['smoke-tests', {{acceptance_tests_job_name}}, 'custom-acceptance-tests', 'bosh-tests']
             trigger: true
           - get: paas-cf
-            passed: ['smoke-tests', 'acceptance-tests', 'custom-acceptance-tests', 'bosh-tests']
+            passed: ['smoke-tests', {{acceptance_tests_job_name}}, 'custom-acceptance-tests', 'bosh-tests']
           - get: cf-manifest
-            passed: ['smoke-tests', 'acceptance-tests', 'custom-acceptance-tests']
+            passed: ['smoke-tests', {{acceptance_tests_job_name}}, 'custom-acceptance-tests']
           - get: bosh-CA
           - get: cf-secrets
-            passed: ['smoke-tests', 'acceptance-tests', 'custom-acceptance-tests']
+            passed: ['smoke-tests', {{acceptance_tests_job_name}}, 'custom-acceptance-tests']
 
       - do:
         - task: create-temp-user

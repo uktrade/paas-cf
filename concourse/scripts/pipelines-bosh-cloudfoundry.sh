@@ -57,6 +57,12 @@ prepare_environment() {
 }
 
 generate_vars_file() {
+  if [ "${ENABLE_CF_ACCEPTANCE_TESTS}" == "false" ]; then
+    ACCEPTANCE_TESTS_JOB_NAME=disabled-tests
+  else
+    ACCEPTANCE_TESTS_JOB_NAME=acceptance-tests
+  fi
+
   cat <<EOF
 ---
 pipeline_name: ${pipeline_name}
@@ -92,6 +98,7 @@ bosh_az: ${bosh_az}
 bosh_manifest_state: bosh-manifest-state-${bosh_az}.json
 bosh_fqdn: bosh.${SYSTEM_DNS_ZONE_NAME}
 enable_cf_acceptance_tests: ${ENABLE_CF_ACCEPTANCE_TESTS:-true}
+acceptance_tests_job_name: ${ACCEPTANCE_TESTS_JOB_NAME:-acceptance-tests}
 EOF
   echo -e "pipeline_lock_git_private_key: |\n  ${git_id_rsa//$'\n'/$'\n'  }"
 }
