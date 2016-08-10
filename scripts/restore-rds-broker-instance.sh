@@ -5,6 +5,8 @@ set -eux
 SCRIPT_NAME="$0"
 export AWS_DEFAULT_REGION=eu-west-1
 
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+
 abort() {
   echo "$@" 1>&2
   exit 1
@@ -12,93 +14,56 @@ abort() {
 
 usage() {
   cat <<EOF
-This script will restore a RDS backup using AWS restore point in time
-or recover from a snapshot, creating a new service in the current organisation
-with that DB.
 
-The script will:
- 1. Create a service instance using cf-cli
- 2. Throw away the RDS instance created by cf-cli, but keep the reference in CF.
- 3. Restore the backup to a new RDS instace
- 4. Rename the restored instance to the name created in 1, and deleted in 2.
+This script will restore a RDS backup using AWS restore point in time, or recover from a snapshot.
 
-In order for this script to work you require:
- * Have cf-cli installed.
+In order for this script to work you must:
+ * Have cf-cli on your PATH.
+ * Have aws-cli on your PATH.
+ * Have jq (https://stedolan.github.io/jq/) on your PATH.
  * Login into cf as a OrgManager or Admin user.
  * Target the organisation where the services reside and must be restored.
- * Have aws-cli installed.
  * Export the AWS credentials for the AWS account that hosts the RDS instances
 
 Usage:
 
 $SCRIPT_NAME point-in-time <from-service-instance> <to-service-instance> <time-stamp>
 
-Will restore a DB to a point in time. The origin DB must exists.
+Restores an existing DB service to a point in time, creating a new service instance for the restored DB.
+The original service instance is unchanged.
 
- * from-service-instance: CF DB instance to restore from.
- * to-service-instance: Name of the new service created
- * time-stamp: time to restore from, in any format the "date" command supportS:
-   * "15 minutes ago"
-   * "yesterday"
-   * "2016-08-09T09:07:16+0000"
+ * from-service-instance: CF service instance to restore from.
+ * to-service-instance: Name of the new service instance created.
+ * time-stamp: time to restore from, in iso-8601 UTC format: "2016-08-09T09:07:16Z"
 
 $SCRIPT_NAME snapshot <aws-snapshot-name> <to-service-instance> <plan>
 
-Will restore a DB based on a given snapshot. Will create a service with the given plan.
+Restores a final snapshot of a DB service, creating a new service instance for the restored DB.
+The original service instance is assumed to already have been deleted.
 
- * from-service-instance: CF DB instance to restore from.
- * to-service-instance: Name of the new service created
- * plan: plan to use from the marketplace of postgres
+ * aws-snapshot-name: AWS snapshot to restore from.
+ * to-service-instance: Name of the new service created.
+ * plan: plan to use from the marketplace of postgres.
+
+In both usage cases, the script will:
+ 1. Create a service instance using cf-cli.
+ 2. Throw away the RDS instance created by cf-cli, but keep the reference in CF.
+ 3. Restore the backup to a new RDS instance.
+ 4. Rename the restored instance to the name created in 1, and deleted in 2.
+
+Limitations:
+
+ After the script finishes, there will be an RDS instance with the restored db, and a CF service instance pointing at it.
+ Because of the way we have to delete and rename the RDS instances without notificying CF in order to perform the restore,
+ CF will have the wrong state for the new service instance - it will appear that the create failed.
+ In fact, after the script finishes the new service instance should be fine - we have tested we can bind it to an app and hit the /db endpoint.
+
+ We don't currently supply the correct master password seed to the script (see TODO below).
+ Thus, we cannot bind to the new service instance until we have manually set the correct password.
+ A quickish way to workaround this is to restart an rds-broker, as it resets passwords for instances it cannot log in to on startup.
+
 EOF
-}
-
-parse_params() {
-  # TODO
-  RDS_BROKER_MASTER_PASSWORD_SEED="mysecret"
-
-  FROM_INSTANCE_GUID=""
-  SERVICE_PLAN=""
-
-  RESTORE_TYPE=${1:-}
-  case "$RESTORE_TYPE" in
-    point-in-time)
-      shift
-      if [ $# -lt 3 ]; then
-        usage
-      fi
-      FROM_INSTANCE_NAME="$1"
-      TO_INSTANCE_NAME="$2"
-      RESTORE_DATE_PARAM="$3"
-
-      # Value must be a time in Universal Coordinated Time (UTC) format
-      RESTORE_DATE="$(date -d "${RESTORE_DATE_PARAM}" -u --iso-8601=seconds)" # Parse the date and output iso-8601
-
-      if ! INSTANCE_INFO="$(cf service "${FROM_INSTANCE_NAME}")"; then
-        abort "Unable to get original service instance ${FROM_INSTANCE_NAME} info: ${INSTANCE_INFO}"
-      fi
-      if ! FROM_INSTANCE_GUID="$(cf service "${FROM_INSTANCE_NAME}" --guid)"; then
-        abort "Unable to get original service instance GUID: ${FROM_INSTANCE_GUID}"
-      fi
-      SERVICE_TYPE="$(echo "${INSTANCE_INFO}" | sed -n 's/^Service: //p')"
-      SERVICE_PLAN="$(echo "${INSTANCE_INFO}" | sed -n 's/^Plan: //p')"
-      FROM_RDS_INSTANCE_NAME="rdsbroker-${FROM_INSTANCE_GUID}"
-    ;;
-    snapshot)
-      shift
-      if [ $# -lt 3 ]; then
-        usage
-      fi
-      FROM_RDS_SNAPSHOT_NAME="$1"
-      TO_INSTANCE_NAME="$2"
-      SERVICE_PLAN="$3"
-      SERVICE_TYPE="postgres"
-    ;;
-    *)
-      usage
-    ;;
-  esac
-
-  AWS_ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+  abort
 }
 
 extract_existing_instance_info() {
@@ -133,6 +98,8 @@ extract_existing_instance_info() {
 }
 
 create_new_cf_instance() {
+  # Will create a CF instance, and the RDS one will be being deleted in background
+
   echo "Creating new instance $TO_INSTANCE_NAME in Cloudfoundry..."
   if cf service "${TO_INSTANCE_NAME}" > /dev/null; then
     abort "ERROR: Service ${TO_INSTANCE_NAME} already exists, aborting..."
@@ -157,6 +124,7 @@ create_new_cf_instance() {
 }
 
 trigger_restore_instance() {
+  # Will trigger a backup in background
   case "$RESTORE_TYPE" in
     point-in-time)
       echo "Restoring RDS instance ${FROM_RDS_INSTANCE_NAME} into ${TO_RDS_INSTANCE_NAME}-restore from point in time ${RESTORE_DATE}"
@@ -259,12 +227,63 @@ wait_for_rds_instance_deleted() {
   echo
 }
 
+set_point_in_time_vars() {
+  if [ $# -lt 3 ]; then
+    usage
+  fi
 
-parse_params "$@"
+  # TODO
+  RDS_BROKER_MASTER_PASSWORD_SEED="mysecret"
 
-# Will create a CF instance, and the RDS one will be being deleted in background
+  FROM_INSTANCE_GUID=""
+  SERVICE_PLAN=""
+
+  FROM_INSTANCE_NAME="$1"
+  TO_INSTANCE_NAME="$2"
+  # Value must be a time in Universal Coordinated Time (UTC) format
+  RESTORE_DATE="$3"
+
+  if ! INSTANCE_INFO="$(cf service "${FROM_INSTANCE_NAME}")"; then
+    abort "Unable to get original service instance ${FROM_INSTANCE_NAME} info: ${INSTANCE_INFO}"
+  fi
+  if ! FROM_INSTANCE_GUID="$(cf service "${FROM_INSTANCE_NAME}" --guid)"; then
+    abort "Unable to get original service instance GUID: ${FROM_INSTANCE_GUID}"
+  fi
+  SERVICE_TYPE="$(echo "${INSTANCE_INFO}" | sed -n 's/^Service: //p')"
+  SERVICE_PLAN="$(echo "${INSTANCE_INFO}" | sed -n 's/^Plan: //p')"
+  FROM_RDS_INSTANCE_NAME="rdsbroker-${FROM_INSTANCE_GUID}"
+}
+
+set_snapshot_vars() {
+  if [ $# -lt 3 ]; then
+    usage
+  fi
+
+  FROM_RDS_SNAPSHOT_NAME="$1"
+  TO_INSTANCE_NAME="$2"
+  SERVICE_PLAN="$3"
+  SERVICE_TYPE="postgres"
+}
+
+if [ $# -lt 1 ]; then
+  usage
+fi
+RESTORE_TYPE=${1:-}
+shift
+
+case "$RESTORE_TYPE" in
+  point-in-time)
+    set_point_in_time_vars "$@"
+  ;;
+  snapshot)
+    set_snapshot_vars "$@"
+  ;;
+  *)
+    usage
+  ;;
+esac
+
 create_new_cf_instance
-# Will trigger a backup in background
 trigger_restore_instance
 
 wait_for_rds_instance_available "${TO_RDS_INSTANCE_NAME}-restore"
@@ -273,4 +292,3 @@ wait_for_rds_instance_deleted "${TO_RDS_INSTANCE_NAME}"
 modify_new_instance
 
 echo "Done :)"
-
