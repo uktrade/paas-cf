@@ -81,7 +81,7 @@ extract_existing_instance_info() {
   DESIRED_OPTION_GROUP_NAME="$(jq -r '.DBInstances[0].OptionGroupMemberships[0].OptionGroupName' < ${instance_info_json})"
   DESIRED_STORAGE_TYPE="$(jq -r '.DBInstances[0].StorageType' < ${instance_info_json})"
   DESIRED_DB_PARAMETER_GROUP_NAME="$(jq -r '.DBInstances[0].DBParameterGroups[0].DBParameterGroupName' < ${instance_info_json})"
-  DESIRED_VPC_SECURITY_GROUP_IDS="$(jq -r '.DBInstances[0].VpcSecurityGroups | map(.VpcSecurityGroupId)' < ${instance_info_json} | xargs)"
+  DESIRED_VPC_SECURITY_GROUP_IDS="$(jq -r '.DBInstances[0].VpcSecurityGroups | map(.VpcSecurityGroupId) | join(" ")' < ${instance_info_json})"
   DESIRED_BACKUP_RETENTION_PERIOD="$(jq -r '.DBInstances[0].BackupRetentionPeriod' < ${instance_info_json})"
 
   DESIRED_TAGS=$(
