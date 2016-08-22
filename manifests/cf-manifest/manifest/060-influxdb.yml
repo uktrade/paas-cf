@@ -1,0 +1,28 @@
+releases:
+- name: influxdb
+  url: https://bosh.io/d/github.com/vito/influxdb-boshrelease?v=4
+  version: 4
+  sha1: 036ef77fb9ed387c4c8999f304cd798c09949ad2
+
+jobs:
+  - name: influx
+    azs: [z1, z2]
+    instances: 1
+    vm_type: rds_broker
+    stemcell: default
+    templates:
+      - name: influxdb
+        release: influxdb
+    networks:
+      - name: cf
+      - static_ips:
+        - 10.0.16.15
+    properties:
+      database: "influxdb"
+      user: "root"
+      password:"root"
+      retention: "14d"
+      replication: "1"
+      udp:
+        enabled: "true"
+        bind_address: ":8089"
