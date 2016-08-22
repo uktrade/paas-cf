@@ -57,3 +57,7 @@ meta:
          AlwaysAppendDS false
        </Node>
       </Plugin>
+
+      <Plugin "network">
+        Server "10.0.16.15" # Influx server, default udp port of collectd is 25826
+      </Plugin>
