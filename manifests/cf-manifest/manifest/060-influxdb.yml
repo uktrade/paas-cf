@@ -18,11 +18,12 @@ jobs:
         static_ips:
         - 10.0.16.15
     properties:
-      database: "influxdb"
-      user: "root"
-      password: "root"
-      retention: "14d"
-      replication: "1"
-      udp:
-        enabled: "true"
-        bind_address: ":8089"
+      influxdb:
+        database: "influxdb"
+        user: "root"
+        password: "root"
+        retention: "14d"
+        replication: "1"
+        udp:
+          enabled: "true"
+          bind_address: ":8089"
