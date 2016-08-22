@@ -78,6 +78,11 @@ jobs:
         user: hm
         password: (( grab secrets.bosh_hm_director_password ))
       resurrector_enabled: false
+      graphite_enabled: true
+      graphite:
+        address: 10.0.16.15 #influx ip
+        port: 2003
+        prefix: "bosh"
 
     ntp: (( grab meta.ntp ))
 
