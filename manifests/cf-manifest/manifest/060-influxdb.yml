@@ -15,12 +15,12 @@ jobs:
         release: influxdb
     networks:
       - name: cf
-      - static_ips:
+        static_ips:
         - 10.0.16.15
     properties:
       database: "influxdb"
       user: "root"
-      password:"root"
+      password: "root"
       retention: "14d"
       replication: "1"
       udp:
