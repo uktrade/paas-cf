@@ -2,8 +2,7 @@ require_relative "../set_quotas_from_manifest"
 
 RSpec.describe QuotasSetter do
   let(:quota_definitions) { {} }
-  let(:manifest) {
-    {
+  let(:manifest) {{
     "properties" => {
       "cc" => {
         "quota_definitions" => quota_definitions,

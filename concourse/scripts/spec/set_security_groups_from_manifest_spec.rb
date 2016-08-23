@@ -4,8 +4,7 @@ RSpec.describe SecurityGroupsSetter do
   let(:security_group_definitions) { [] }
   let(:default_running_security_groups) { [] }
   let(:default_staging_security_groups) { [] }
-  let(:manifest) {
-    {
+  let(:manifest) {{
     "properties" => {
       "cc" => {
         "security_group_definitions" => security_group_definitions,

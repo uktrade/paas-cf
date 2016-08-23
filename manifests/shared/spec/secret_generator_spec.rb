@@ -109,8 +109,7 @@ RSpec.describe SecretGenerator do
     end
 
     describe "generating sha_512 crypted passwords" do
-      let(:required_secrets) {
-        {
+      let(:required_secrets) {{
         "baz" => :sha512_crypted,
       }}
       let(:results) { SecretGenerator.new(required_secrets).generate }
@@ -144,8 +143,7 @@ RSpec.describe SecretGenerator do
   end
 
   describe "merging with existing passwords" do
-    let(:required_secrets) {
-      {
+    let(:required_secrets) {{
       "simple1" => :simple,
       "simple2" => :simple,
       "array" => :simple_in_array,
