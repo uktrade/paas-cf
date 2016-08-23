@@ -3,3 +3,8 @@ AllCops:
     - 'vendor/**/*'
     - 'scripts/vendor/**/*'
   TargetRubyVersion: 2.2
+
+# FIXME: Remove this once we're using a version of govuk-lint that includes
+# https://github.com/alphagov/govuk-lint/pull/58
+Style/MultilineBlockLayout:
+  Enabled: false
