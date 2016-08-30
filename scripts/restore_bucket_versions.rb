@@ -20,20 +20,41 @@ def s3_object_get_version_for_timestamp(bucket_name, prefix, timestamp)
   return older_versions.last
 end
 
+def clean_latest_delete_mark_and_get_object(bucket_name, prefix)
+  bucket = Aws::S3::Bucket.new(bucket_name)
+  latest_version = bucket.object_versions(prefix: prefix).find {|v|
+    v.is_latest
+  }
+  begin
+    latest_version.head
+  rescue Aws::S3::Errors::Http405Error
+    puts "Deleting latest object delete mark"
+    latest_version.delete
+  end
+end
+
 def s3_object_restore_version_for_timestamp(bucket_name, prefix, timestamp)
   old_version = s3_object_get_version_for_timestamp( bucket_name, prefix, timestamp)
-  if not old_version.is_latest
-    puts "Restoring #{bucket_name}/#{prefix} to version #{old_version.version_id}..."
-    bucket = Aws::S3::Bucket.new(bucket_name)
-    object = bucket.object(prefix)
-    if old_version.etag != object.etag
-      object.copy_from(old_version)
-      puts "OK"
-    else
-      puts "Last version has same etag than version to restore, skipping"
-    end
+  if old_version == nil
+    puts "no old versions for #{prefix}"
   else
-    puts "Already latest version"
+    if not old_version.is_latest
+      puts "Restoring #{bucket_name}/#{prefix} to version #{old_version.version_id}..."
+      bucket = Aws::S3::Bucket.new(bucket_name)
+
+      clean_latest_delete_mark_and_get_object(bucket_name, prefix)
+      object = bucket.object(prefix)
+      if old_version.etag != object.etag
+        # http://docs.aws.amazon.com/AmazonS3/latest/dev/DeleteMarker.html
+
+        object.copy_from(old_version)
+        puts "OK"
+      else
+        puts "Last version has same etag than version to restore, skipping"
+      end
+    else
+      puts "Already latest version"
+    end
   end
 end
 
