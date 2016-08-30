@@ -1,37 +1,44 @@
 # gem install aws-sdk
 # gem install pg
-require 'aws-sdk-core'
+require 'aws-sdk'
 require 'pg'
 
-deploy_env="hector"
+
 
 Aws.config.update({
   region: 'eu-west-1',
 })
 
-s3client = Aws::S3.new
+def s3_object_get_version_for_timestamp(bucket_name, prefix, timestamp)
+  bucket = Aws::S3::Bucket.new(bucket_name)
 
-
-def s3_object_get_version_for_timestamp(s3client, bucket_name, prefix, timestamp)
-  response = s3client.list_object_versions(bucket: bucket_name, prefix: prefix)
-
-  older_versions = response.versions.select {|v|
+  older_versions = bucket.object_versions(prefix: prefix).select {|v|
     v.last_modified < timestamp
+  }.sort { |v1, v2|
+    v1.last_modified <=> v2.last_modified
   }
-  older_versions.sort { |v1, v2| v1.last_modified <=> v2.last_modified }
-  return older_versions.first
+  return older_versions.last
 end
 
-def s3_object_restore_version_for_timestamp(s3client, bucket_name, prefix, timestamp)
-  old_version = s3_object_get_version_for_timestamp(s3client, bucket_name, prefix, timestamp)
-  puts old_version
+def s3_object_restore_version_for_timestamp(bucket_name, prefix, timestamp)
+  old_version = s3_object_get_version_for_timestamp( bucket_name, prefix, timestamp)
   if not old_version.is_latest
-    s3client.get_object(bucket: bucket_name, key: prefix).copy_from(prefix, version_id: old_version.id)
+    puts "Restoring #{bucket_name}/#{prefix} to version #{old_version.version_id}..."
+    bucket = Aws::S3::Bucket.new(bucket_name)
+    object = bucket.object(prefix)
+    if old_version.etag != object.etag
+      object.copy_from(old_version)
+      puts "OK"
+    else
+      puts "Last version has same etag than version to restore, skipping"
+    end
+  else
+    puts "Already latest version"
   end
 end
 
-bucket_name = "hector-state"
-prefix = "test"
+#bucket_name = "hector-state"
+#prefix = "test"
 
 #bucket_name = "hector-cf-packages"
 #prefix = "2a/18/2a18b47f-13a6-461e-8255-c5301d93c5e7"
@@ -39,9 +46,6 @@ prefix = "test"
 #get_version_for_timestamp(bucket_name, prefix, t)
 
 
-
-# Output a table of current connections to the DB
-conn = PG.connect( host: 'localhost', port: 5432, dbname: 'api', user: 'api', password: ENV['CF_API_DB_PASSWORD'])
 
 def get_all_app_guids(conn)
   guids = []
@@ -66,7 +70,7 @@ end
 
 def get_lastest_modified_app_date(conn)
   conn.exec( "select updated_at from apps order by updated_at desc limit 1;" ) do |result|
-    return Time.parse(result.first.values_at('updated_at').first)
+    return Time.parse(result.first.values_at('updated_at').first + " UTC")
   end
 end
 
@@ -76,17 +80,29 @@ def partitioned_key(key)
   key
 end
 
+def revert_objects_in_db(deploy_env)
+  conn = PG.connect( host: 'localhost', port: 5432, dbname: 'api', user: 'api', password: ENV['CF_API_DB_PASSWORD'])
 
-latest_timestamp = get_lastest_modified_app_date(conn)
-get_all_app_guids(conn).each { |guid|
-  puts s3_object_get_version_for_timestamp("#{deploy_env}-cf-packages", partitioned_key(guid), latest_timestamp)
-}
+  latest_timestamp = get_lastest_modified_app_date(conn)
 
-get_all_droplet_guid_and_hashes(conn).each { |guid_and_hash|
-  puts s3_object_get_version_for_timestamp(
-    "#{deploy_env}-cf-droplets",
-    partitioned_key(File.join(guid_and_hash[:guid], guid_and_hash[:hash])),
-    latest_timestamp
-  )
-}
+  puts "Autodeteted lastest timestamp is #{latest_timestamp}"
+
+  get_all_app_guids(conn).each { |guid|
+    key = partitioned_key(guid)
+    puts "processing package #{key}"
+    s3_object_restore_version_for_timestamp("#{deploy_env}-cf-packages", key, latest_timestamp)
+  }
+
+  get_all_droplet_guid_and_hashes(conn).each { |guid_and_hash|
+    key = partitioned_key(File.join(guid_and_hash[:guid], guid_and_hash[:hash]))
+    puts "processing droplet #{key}"
+    s3_object_restore_version_for_timestamp(
+      "#{deploy_env}-cf-droplets",
+      key,
+      latest_timestamp
+    )
+  }
+end
+
+revert_objects_in_db("hector");
 
