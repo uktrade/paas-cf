@@ -58,6 +58,21 @@ def s3_object_restore_version_for_timestamp(bucket_name, prefix, timestamp)
   end
 end
 
+def s3_object_delete_versions_older_than(bucket_name, timestamp)
+  bucket = Aws::S3::Bucket.new(bucket_name)
+
+  bucket.object_versions().each {|v|
+    if v.last_modified > timestamp
+      puts "Deleting s3://#{v.bucket_name}#{v.object_key} with version #{v.version_id}, dated #{v.last_modified}"
+      v.delete
+    end
+  }
+end
+
+bucket_name="hector-state"
+timestamp=Time.now -100
+s3_object_delete_versions_older_than(bucket_name, timestamp)
+
 #bucket_name = "hector-state"
 #prefix = "test"
 
