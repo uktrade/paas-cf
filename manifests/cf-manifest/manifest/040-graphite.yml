@@ -19,9 +19,9 @@ releases:
 - name: grafana
   version: commit-6dce2ec39a6ffc00c092d5b0401dfaf8bbf3ae55
 - name: example
-  version: 0.0.1472824415
-  url: https://s3-eu-west-1.amazonaws.com/dev-releases-state/example-0.0.1472824415.tgz
-  sha1: b3c9eec8d261e49b7cefa4e168e4309821e6348b
+  version: 0.0.1472828909
+  url: https://s3-eu-west-1.amazonaws.com/dev-releases-state/example-0.0.1472828909.tgz
+  sha1: 009815e9bba7ad3815911d91caffa40ff8c9baa4
 
 
 jobs:
