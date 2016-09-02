@@ -10,12 +10,21 @@ meta:
       release: graphite
     - name: grafana
       release: grafana
+    - name: example-server
+      release: example
 
 releases:
 - name: graphite
   version: commit-829b5920f4343cb9929c5fc219dfc4413a772e63
 - name: grafana
   version: commit-6dce2ec39a6ffc00c092d5b0401dfaf8bbf3ae55
+- name: example
+  version: 0+dev.1472820489
+  url: https://s3-eu-west-1.amazonaws.com/dev-releases-state/example-0+dev.1472820489.tgz
+  sha1: 67652d00545a9b9e71727390d029da858e6ec35f
+
+
+
 
 jobs:
 - name: graphite
