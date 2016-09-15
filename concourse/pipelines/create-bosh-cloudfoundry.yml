@@ -110,7 +110,8 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-aws-broker-boshrelease.git
-      tag_filter: {{cf_aws_broker_version}}
+      branch: feature/124720541-support-syslog-logging
+      #tag_filter: {{cf_aws_broker_version}}
 
   - name: os-conf-boshrelease
     type: git
