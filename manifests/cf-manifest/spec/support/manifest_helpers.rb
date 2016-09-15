@@ -61,6 +61,7 @@ private
         grafana_dashboards_manifest_path,
         File.expand_path("../../../manifest/env-specific/cf-#{environment}.yml", __FILE__),
         File.expand_path("../../../../shared/deployments/datadog.yml", __FILE__),
+        File.expand_path("../../../../shared/deployments/metron.yml", __FILE__),
     ])
 
     cloud_config = render([
@@ -84,7 +85,8 @@ private
       File.expand_path("../../../../shared/build_manifest.sh", __FILE__),
       File.expand_path("../../../runtime-config/runtime-config-base.yml", __FILE__),
       File.expand_path("../../../../shared/deployments/datadog.yml", __FILE__),
-      File.expand_path("../../../../shared/deployments/collectd.yml", __FILE__)
+      File.expand_path("../../../../shared/deployments/collectd.yml", __FILE__),
+      File.expand_path("../../../../shared/deployments/metron.yml", __FILE__),
     ])
 
     # Deep freeze the object so that it's safe to use across multiple examples
