@@ -110,8 +110,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-aws-broker-boshrelease.git
-      branch: feature/124720541-support-syslog-logging
-      #tag_filter: {{cf_aws_broker_version}}
+      tag_filter: {{cf_aws_broker_version}}
 
   - name: os-conf-boshrelease
     type: git
@@ -1354,6 +1353,7 @@ jobs:
                 ./paas-cf/manifests/shared/deployments/collectd.yml
                 ./paas-cf/manifests/shared/deployments/datadog.yml
                 ./paas-cf/manifests/shared/deployments/metron.yml
+                ./paas-cf/manifests/cf-manifest/common/releases.yml
                 ./paas-cf/manifests/cf-manifest/manifest/env-specific/{{cf_env_specific_manifest}}
               AWS_ACCOUNT: {{aws_account}}
               DATADOG_API_KEY: {{datadog_api_key}}
@@ -1409,6 +1409,7 @@ jobs:
                 ./paas-cf/manifests/shared/deployments/collectd.yml
                 ./paas-cf/manifests/shared/deployments/datadog.yml
                 ./paas-cf/manifests/shared/deployments/metron.yml
+                ./paas-cf/manifests/cf-manifest/common/releases.yml
             run:
               path: sh
               args:
