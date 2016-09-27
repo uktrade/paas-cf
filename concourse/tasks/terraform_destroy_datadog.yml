@@ -15,6 +15,7 @@ run:
     - -e
     - -c
     - |
+      exit 0
       cleanup=false
       if [ -n "${TF_VAR_datadog_api_key}" -a -n "${TF_VAR_datadog_app_key}" -a "${DEPLOY_DATADOG_AGENT}" = "false" ]; then
         cleanup=true
