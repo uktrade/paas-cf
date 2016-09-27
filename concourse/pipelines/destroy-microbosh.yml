@@ -130,6 +130,7 @@ jobs:
               - -e
               - -c
               - |
+                exit 0
                 ./paas-cf/concourse/scripts/bosh_login.sh {{bosh_fqdn}} bosh-secrets/bosh-secrets.yml
 
                 ./paas-cf/concourse/scripts/bosh_pre_destroy.rb
@@ -149,6 +150,7 @@ jobs:
               - -e
               - -c
               - |
+                exit 0
                 ./paas-cf/concourse/scripts/bosh_login.sh {{bosh_fqdn}} bosh-secrets/bosh-secrets.yml
 
                 bosh cleanup --all
@@ -173,6 +175,7 @@ jobs:
               - -e
               - -c
               - |
+                exit 0
                 cp bosh-manifest/bosh-manifest.yml bosh-init-working-dir/bosh-manifest.yml
                 cp bosh-init-state/"${BOSH_MANIFEST_STATE}" bosh-init-working-dir/bosh-manifest-state.json
                 bosh-init delete bosh-init-working-dir/bosh-manifest.yml
@@ -180,10 +183,10 @@ jobs:
                 if [ ! -f bosh-init-working-dir/bosh-manifest-state.json ]; then
                   cp paas-cf/concourse/init_files/bosh-init-state.json.tpl bosh-init-working-dir/bosh-manifest-state.json
                 fi
-        ensure:
-          put: bosh-init-state
-          params:
-            file: "bosh-init-working-dir/bosh-manifest-state.json"
+#        ensure:
+#          put: bosh-init-state
+#          params:
+#            file: "bosh-init-working-dir/bosh-manifest-state.json"
 
   - name: bosh-terraform-destroy
     serial: true
