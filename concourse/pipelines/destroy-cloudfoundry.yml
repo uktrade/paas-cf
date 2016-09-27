@@ -166,10 +166,10 @@ jobs:
           TF_VAR_datadog_app_key: {{datadog_app_key}}
           TF_VAR_env: {{deploy_env}}
           DEPLOY_DATADOG_AGENT: {{deploy_datadog_agent}}
-        ensure:
-          put: datadog-tfstate
-          params:
-            file: updated-datadog-tfstate/datadog.tfstate
+#        ensure:
+#          put: datadog-tfstate
+#          params:
+#            file: updated-datadog-tfstate/datadog.tfstate
 
       - task: delete-deployment
         config:
@@ -193,10 +193,10 @@ jobs:
                 ./paas-cf/concourse/scripts/bosh_login.sh {{bosh_fqdn}} bosh-secrets/bosh-secrets.yml
                 bosh -n delete deployment --force {{deploy_env}}
                 echo "no" > deployed-healthcheck/healthcheck-deployed
-        on_success:
-          put: deployed-healthcheck
-          params:
-            file: deployed-healthcheck/healthcheck-deployed
+#        on_success:
+#          put: deployed-healthcheck
+#          params:
+#            file: deployed-healthcheck/healthcheck-deployed
 
 
   - name: terraform-destroy
