@@ -3,7 +3,7 @@ releases:
 - name: datadog-agent
   sha1: b1b9debe21ed353a17f7214ab4d55d7312d8661b
   url: https://github.com/alphagov/paas-datadog-agent-boshrelease/releases/download/wip.122200041.1/datadog-agent-wip.122200041.1.tgz
-  version: "custom_007"
+  version: "wip.122200041.1"
 
 meta:
   datadog:
