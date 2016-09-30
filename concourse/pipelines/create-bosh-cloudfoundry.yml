@@ -110,7 +110,8 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-datadog-for-cloudfoundry-boshrelease.git
-      tag_filter: {{cf_datadog_for_cloudfoundry_version}}
+      branch: "feature/122200041_initial_implementation"
+      # tag_filter: {{cf_datadog_for_cloudfoundry_version}}
 
   - name: aws-broker-boshrelease
     type: git
