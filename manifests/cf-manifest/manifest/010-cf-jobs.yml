@@ -113,9 +113,6 @@ jobs:
       consul:
         agent:
           mode: server
-      tags:
-        job: consul
-        tags: (( inject meta.datadog_tags ))
 
   - name: nats
     azs: [z1, z2]
@@ -128,10 +125,6 @@ jobs:
         static_ips:
           - 10.0.16.11
           - 10.0.17.11
-    properties:
-      tags:
-        job: nats
-        tags: (( inject meta.datadog_tags ))
 
   - name: etcd
     azs: [z1, z2, z3]
@@ -153,9 +146,6 @@ jobs:
         agent:
           services:
             etcd: {}
-      tags:
-        job: etcd
-        tags: (( inject meta.datadog_tags ))
 
   - name: database
     azs: [z1, z2]
@@ -169,10 +159,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: database
-        tags: (( inject meta.datadog_tags ))
     update:
       serial: true
 
@@ -189,9 +175,6 @@ jobs:
         agent:
           services:
             uaa: {}
-      tags:
-        job: uaa
-        tags: (( inject meta.datadog_tags ))
 
   - name: api
     azs: [z1, z2]
@@ -205,9 +188,6 @@ jobs:
       consul:
         agent:
           services: (( grab meta.api_consul_services ))
-      tags:
-        job: api
-        tags: (( inject meta.datadog_tags ))
 
   - name: clock_global
     azs: [z1]
@@ -217,10 +197,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: clock_global
-        tags: (( inject meta.datadog_tags ))
 
   - name: api_worker
     azs: [z1, z2]
@@ -230,10 +206,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: api_worker
-        tags: (( inject meta.datadog_tags ))
 
   - name: doppler
     azs: [z1, z2]
@@ -243,10 +215,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: doppler
-        tags: (( inject meta.datadog_tags ))
 
   - name: loggregator_trafficcontroller
     azs: [z1, z2]
@@ -256,10 +224,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: loggregator_trafficcontroller
-        tags: (( inject meta.datadog_tags ))
 
   - name: router
     azs: [z1, z2]
@@ -274,9 +238,6 @@ jobs:
         agent:
           services:
             gorouter: {}
-      tags:
-        job: router
-        tags: (( inject meta.datadog_tags ))
 
   - name: brain
     azs: [z1, z2]
@@ -290,10 +251,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: brain
-        tags: (( inject meta.datadog_tags ))
 
   - name: cell
     azs: [z1, z2, z3]
@@ -311,10 +268,6 @@ jobs:
     stemcell: default
     networks:
       - name: cell
-    properties:
-      tags:
-        job: cell
-        tags: (( inject meta.datadog_tags ))
 
   - name: cc_bridge
     azs: [z1, z2]
@@ -334,10 +287,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: cc_bridge
-        tags: (( inject meta.datadog_tags ))
 
   - name: route_emitter
     azs: [z1, z2]
@@ -351,10 +300,6 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: route_emitter
-        tags: (( inject meta.datadog_tags ))
 
   - name: access
     azs: [z1, z2]
@@ -370,7 +315,3 @@ jobs:
     stemcell: default
     networks:
       - name: cf
-    properties:
-      tags:
-        job: access
-        tags: (( inject meta.datadog_tags ))

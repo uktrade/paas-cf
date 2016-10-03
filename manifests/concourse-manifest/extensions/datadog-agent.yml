@@ -10,10 +10,7 @@ jobs:
       - name: datadog-agent
         release: datadog-agent
         properties:
-          datadog: (( inject meta.datadog ))
-          tags:
-            job: concourse
-            tags: (( inject meta.datadog_tags ))
+          _datadog: (( inject meta.datadog ))
       - name: riemann
         release: riemann
         properties:
