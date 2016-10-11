@@ -110,7 +110,8 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-datadog-for-cloudfoundry-boshrelease.git
-      tag_filter: {{cf_datadog_for_cloudfoundry_version}}
+      # tag_filter: {{cf_datadog_for_cloudfoundry_version}}
+      branch: 131355575_nats_health
 
   - name: aws-broker-boshrelease
     type: git
@@ -1523,7 +1524,7 @@ jobs:
                     {{cf_logsearch_for_cloudfoundry_version}} logsearch-for-cloudfoundry-boshrelease
 
                   paas-cf/concourse/scripts/bosh_create_and_upload_release.rb datadog-for-cloudfoundry \
-                    {{cf_datadog_for_cloudfoundry_version}} datadog-for-cloudfoundry-boshrelease
+                    datadog-$(date +%s) datadog-for-cloudfoundry-boshrelease
 
         - task: get-and-upload-stemcell
           config:
