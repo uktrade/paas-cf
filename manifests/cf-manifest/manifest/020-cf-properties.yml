@@ -52,8 +52,8 @@ properties:
     machines: (( grab jobs.nats.networks.cf.static_ips ))
     debug: false
     trace: false
-    monitor_port: 0
-    prof_port: 0
+    monitor_port: 4333
+    prof_port: 4334
     user: nats_user
     password: (( grab secrets.nats_password ))
 
