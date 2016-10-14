@@ -467,6 +467,10 @@ jobs:
                               ./paas-cf/manifests/concourse-manifest/extensions/datadog-agent.yml
                               ./paas-cf/manifests/shared/deployments/datadog-agent.yml"
             fi
+            # shellcheck disable=SC2050
+            if [ {{aws_account}} = "prod" ] ; then
+              export AUTH_DURATION=5m
+            fi
             ./paas-cf/manifests/shared/build_manifest.sh $CONCOURSE_MANIFEST_STUBS \
               > concourse-manifest/concourse-manifest.yml
             ls -l concourse-manifest/concourse-manifest.yml
