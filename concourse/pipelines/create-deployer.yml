@@ -442,6 +442,7 @@ jobs:
           AWS_ACCOUNT: {{aws_account}}
           DATADOG_API_KEY: {{datadog_api_key}}
           ENABLE_DATADOG: {{enable_datadog}}
+          CONCOURSE_AUTH_DURATION: {{concourse_auth_duration}}
           CONCOURSE_MANIFEST_STUBS: |
             ./paas-cf/manifests/concourse-manifest/concourse-base.yml
             predefined-concourse-secrets/predefined-concourse-secrets.yml
@@ -466,10 +467,6 @@ jobs:
                CONCOURSE_MANIFEST_STUBS="${CONCOURSE_MANIFEST_STUBS}
                               ./paas-cf/manifests/concourse-manifest/extensions/datadog-agent.yml
                               ./paas-cf/manifests/shared/deployments/datadog-agent.yml"
-            fi
-            # shellcheck disable=SC2050
-            if [ {{aws_account}} = "prod" ] ; then
-              export AUTH_DURATION=5m
             fi
             ./paas-cf/manifests/shared/build_manifest.sh $CONCOURSE_MANIFEST_STUBS \
               > concourse-manifest/concourse-manifest.yml
