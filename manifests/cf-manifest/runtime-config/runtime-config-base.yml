@@ -2,6 +2,10 @@
 releases:
   - name: os-conf
     version: commit-a2bc2ab32248c8edf7c4790b33902893b1f4db66
+  - name: syslog
+    version: "7"
+    url: https://bosh.io/d/github.com/cloudfoundry/syslog-release?v=7
+    sha1: 7aca1a3633f12cc5ce760812959e62b6e51b8641
 
 addons:
   - name: os-configuration
@@ -14,3 +18,12 @@ addons:
       release: collectd
     properties:
       collectd: (( grab meta.collectd ))
+  - name: syslog-forwarder
+    jobs:
+    - name: syslog_forwarder
+      release: syslog
+    properties:
+      syslog:
+        address: (( grab terraform_outputs.logsearch_ingestor_elb_dns_name ))
+        port: 2514
+        transport: 'relp'
