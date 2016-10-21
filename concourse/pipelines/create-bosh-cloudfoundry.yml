@@ -122,8 +122,8 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-os-conf-release.git
-      tag_filter: {{cf_os_conf_version}}
-      branch: gds_master
+      # tag_filter: {{cf_os_conf_version}}
+      branch: feature/131975557_remove_metron_agent_forwarder
 
   - name: logsearch-for-cloudfoundry-boshrelease
     type: git
@@ -1575,7 +1575,7 @@ jobs:
                   paas-cf/concourse/scripts/bosh_create_and_upload_release.rb paas-haproxy \
                     {{cf-paas-haproxy-release-version}} paas-haproxy-release
 
-                  ./paas-cf/concourse/scripts/git_check_tag.sh {{cf_os_conf_version}} os-conf-boshrelease
+                  # ./paas-cf/concourse/scripts/git_check_tag.sh {{cf_os_conf_version}} os-conf-boshrelease
                   paas-cf/concourse/scripts/bosh_create_and_upload_release.rb os-conf \
                     {{cf_os_conf_version}} os-conf-boshrelease
 
