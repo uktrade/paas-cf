@@ -6,7 +6,9 @@ director_uuid: ~
 
 releases:
   - name: cf
-    data: (( inject meta.cf-releases.cf ))
+    version: 240
+    url: https://bosh.io/d/github.com/cloudfoundry/cf-release?v=240
+    sha1: 7dba7cc0c9c4beca699d8c876ac046890e13bb9e
   - name: routing
     version: 0.136.0.gds1
     url: https://github.com/alphagov/paas-routing-release/releases/download/0.136.0.gds1/routing-0.136.0.gds1.tgz
