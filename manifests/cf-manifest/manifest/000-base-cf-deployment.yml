@@ -9,6 +9,10 @@ releases:
     version: "245"
     url: https://bosh.io/d/github.com/cloudfoundry/cf-release?v=245
     sha1: 0c9f485f640c2b9e3136fcc89047b3d76dd6863c
+  - name: syslog
+    version: "7"
+    url: https://bosh.io/d/github.com/cloudfoundry/syslog-release?v=7
+    sha1: 7aca1a3633f12cc5ce760812959e62b6e51b8641
   - name: capi
     version: 1.8.0
     url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.8.0
