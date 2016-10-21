@@ -16,15 +16,16 @@ var _ = Describe("PythonBuildpack", func() {
 
 	It("should not fail when pushing a python app without Procfile", func() {
 		appName = generator.PrefixedRandomName("CATS-APP-")
-		session := cf.Cf(
+		Expect(cf.Cf(
 			"push", appName,
+			"--no-start",
 			"-m", DEFAULT_MEMORY_LIMIT,
 			"-p", "../../example-apps/simple-python-app",
 			"-b", "python_buildpack",
 			"-c", "python hello.py",
 			"-d", config.AppsDomain,
-		).Wait(DEFAULT_TIMEOUT)
-		Expect(session).To(Exit(0))
+		).Wait(CF_PUSH_TIMEOUT)).To(Exit(0))
+		Expect(cf.Cf("start", appName).Wait(DEFAULT_TIMEOUT * 2)).To(Exit(0))
 	})
 
 })
