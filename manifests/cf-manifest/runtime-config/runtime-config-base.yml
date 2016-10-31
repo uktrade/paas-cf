@@ -1,7 +1,7 @@
 ---
 releases:
   - name: os-conf
-    version: "1477575693"
+    version: "1477916383"
 
 addons:
   - name: os-configuration
