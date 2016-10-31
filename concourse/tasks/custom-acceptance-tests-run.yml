@@ -8,6 +8,9 @@ inputs:
   - name: paas-cf
   - name: test-config
   - name: bosh-CA
+outputs:
+  - name: artifacts
+    path: /var/vcap/sys/log/test_artifacts
 run:
   path: sh
   args:

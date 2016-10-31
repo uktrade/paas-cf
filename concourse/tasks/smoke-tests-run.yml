@@ -9,6 +9,9 @@ inputs:
   - name: cf-release
   - name: test-config
   - name: bosh-CA
+outputs:
+  - name: artifacts
+    path: /var/vcap/sys/log/smoke_tests
 run:
   path: bash
   args:
