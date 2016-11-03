@@ -2275,7 +2275,6 @@ jobs:
               - name: bosh-CA
             outputs:
               - name: artifacts
-                path: /var/vcap/sys/log/acceptance_tests
             run:
               path: sh
               args:
@@ -2291,8 +2290,13 @@ jobs:
                   ln -snf $(pwd)/cf-release/src/github.com/cloudfoundry/cf-acceptance-tests /var/vcap/packages/acceptance-tests/src/github.com/cloudfoundry/
                   if  [ "${DISABLE_CF_ACCEPTANCE_TESTS:-}" = "true" ]; then
                     echo "WARNING: The acceptance tests have been disabled. Unset DISABLE_CF_ACCEPTANCE_TESTS when uploading the pipelines to enable them. You can still hijack this container to run them manually, but you must update the admin user in ./test-config/config.json."
+                    exit 0
                   else
-                    /var/vcap/jobs/acceptance-tests/bin/run
+                    set +e
+                    RET_VAL=$(/var/vcap/jobs/acceptance-tests/bin/run)
+                    set -e
+                    mv /var/vcap/sys/log/acceptance_tests/* artifacts
+                    exit $RET_VAL
                   fi
 
           ensure:

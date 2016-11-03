@@ -10,7 +10,6 @@ inputs:
   - name: bosh-CA
 outputs:
   - name: artifacts
-    path: /var/vcap/sys/log/test_artifacts
 run:
   path: sh
   args:
@@ -24,6 +23,11 @@ run:
       CONFIG="$(pwd)/test-config/config.json"
       if  [ "${DISABLE_CUSTOM_ACCEPTANCE_TESTS:-}" = "true" ]; then
         echo "WARNING: The custom acceptance tests have been disabled. Unset DISABLE_CUSTOM_ACCEPTANCE_TESTS when uploading the pipelines to enable them. You can still hijack this container to run them manually, but you must update the admin user in ./test-config/config.json."
+        exit 0
       else
-        ./paas-cf/platform-tests/run_tests.sh ./paas-cf/platform-tests/src/acceptance/
+        set +e
+        RET_VAL=$(./paas-cf/platform-tests/run_tests.sh ./paas-cf/platform-tests/src/acceptance/)
+        set -e
+        mv /var/vcap/sys/log/test_artifacts/* artifacts/
+        exit $RET_VAL
       fi
