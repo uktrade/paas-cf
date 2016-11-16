@@ -13,7 +13,7 @@ RSpec.describe "RDS broker properties" do
       expect(rds_sg["rules"]).to eq([{
         "protocol" => "tcp",
         "destination" => terraform_fixture("aws_backing_service_cidr_all"),
-        "ports" => "5432",
+        "ports" => "5432, 6379",
       }])
     end
 

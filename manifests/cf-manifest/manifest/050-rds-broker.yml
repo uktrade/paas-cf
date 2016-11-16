@@ -188,7 +188,8 @@ properties:
         rules:
           - protocol: tcp
             destination: (( grab terraform_outputs.aws_backing_service_cidr_all ))
-            ports: '5432'
+            # the space is necessary to avoid a ruby YAML parsing bug - https://github.com/ruby/psych/issues/273
+            ports: "5432, 6379"
 
     default_running_security_groups:
       - (( append ))
