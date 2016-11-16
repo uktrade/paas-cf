@@ -98,6 +98,10 @@ output "aws_backing_service_cidr_all" {
   value = "${var.aws_backing_service_cidr_all}"
 }
 
+output "elasticache_broker_instance_clients_security_group" {
+  value = "${aws_security_group.elasticache_broker_instance_clients.name}"
+}
+
 output "rds_broker_db_clients_security_group" {
   value = "${aws_security_group.rds_broker_db_clients.name}"
 }
