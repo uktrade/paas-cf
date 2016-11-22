@@ -23,7 +23,7 @@ resource "aws_network_acl_rule" "cf_api_whitelist" {
   network_acl_id = "${aws_network_acl.cf_api.id}"
   rule_number    = "${100 + count.index}"
   egress         = false
-  protocol       = "-1"
+  protocol       = -1
   rule_action    = "allow"
 }
 
@@ -40,7 +40,7 @@ resource "aws_network_acl_rule" "cf_api_blacklist" {
   network_acl_id = "${aws_network_acl.cf_api.id}"
   rule_number    = "${200 + count.index}"
   egress         = false
-  protocol       = "-1"
+  protocol       = -1
   rule_action    = "allow"
 }
 
