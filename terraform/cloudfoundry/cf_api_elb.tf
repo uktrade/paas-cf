@@ -4,9 +4,7 @@ resource "aws_elb" "cf_cc" {
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
 
-  security_groups = [
-    "${aws_security_group.cf_api_elb.id}",
-  ]
+  security_groups = []
 
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"
@@ -37,10 +35,6 @@ resource "aws_elb" "cf_uaa" {
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
 
-  security_groups = [
-    "${aws_security_group.cf_api_elb.id}",
-  ]
-
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"
     bucket_prefix = "cf-uaa"
@@ -70,9 +64,7 @@ resource "aws_elb" "cf_loggregator" {
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
 
-  security_groups = [
-    "${aws_security_group.cf_api_elb.id}",
-  ]
+  security_groups = []
 
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"
@@ -103,9 +95,7 @@ resource "aws_elb" "cf_doppler" {
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
 
-  security_groups = [
-    "${aws_security_group.cf_api_elb.id}",
-  ]
+  security_groups = []
 
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"

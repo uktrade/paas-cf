@@ -43,6 +43,16 @@ variable "aws_backing_service_cidr_all" {
   default     = "10.0.52.0/22"
 }
 
+variable "api_blacklist_cidrs" {
+  description = "CSV of CIDR addresses which API access is blocked"
+  default     = ""
+}
+
+variable "api_allowed_cidrs" {
+  description = "CSV of CIDR addresses which API access is allowed (sub-CIDRs can still be blocked). Use 0.0.0.0/0 to allow all"
+  default     = ""
+}
+
 variable "health_check_interval" {
   description = "Interval between requests for load balancer health checks"
   default     = 5
