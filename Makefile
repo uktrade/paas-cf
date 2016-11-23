@@ -1,4 +1,4 @@
-.PHONY: help test spec lint_yaml lint_terraform lint_shellcheck lint_concourse check-env-vars
+.PHONY: help test spec lint_yaml lint_terraform format_terraform lint_shellcheck lint_concourse check-env-vars
 
 .DEFAULT_GOAL := help
 
@@ -49,10 +49,14 @@ lint_terraform: dev
 	$(eval export TF_VAR_apps_dns_zone_name=$APPS_DNS_ZONE_NAME)
 	find terraform -mindepth 1 -maxdepth 1 -type d -not -path 'terraform/providers' -not -path 'terraform/scripts' -print0 | xargs -0 -n 1 -t terraform graph > /dev/null
 	@if [ "$$(terraform fmt -write=false terraform)" != "" ] ; then \
-		echo "Use 'terraform fmt' to fix HCL formatting:"; \
+		echo "\n\nHCL formatting problems found:\n"; \
 		terraform fmt -write=false -diff=true terraform ; \
+		echo "\n\nUse 'make format_terraform' to fix HCL formatting"; \
 		exit 1; \
 	fi
+
+format_terraform: dev
+	find terraform -mindepth 1 -maxdepth 1 -type d -not -path 'terraform/providers' -not -path 'terraform/scripts' -print0 | xargs -0 -n 1 -t terraform fmt -write=true
 
 lint_shellcheck:
 	find . -name '*.sh' -not -path '*/vendor/*' | xargs $(SHELLCHECK)
