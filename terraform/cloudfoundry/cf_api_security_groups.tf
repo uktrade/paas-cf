@@ -17,11 +17,8 @@ resource "aws_security_group" "cf_api_elb" {
     to_port   = 443
     protocol  = "tcp"
 
-    cidr_blocks = [
-      "${compact(split(",", var.admin_cidrs))}",
-      "${compact(split(",", var.tenant_cidrs))}",
-      "${var.concourse_elastic_ip}/32",
-    ]
+    # FIXME: Allow all to allow cloudfront.... MUST BE CHANGED
+    cidr_blocks = [ "0.0.0.0/0" ]
   }
 
   ingress {

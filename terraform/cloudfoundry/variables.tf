@@ -124,3 +124,11 @@ variable "system_domain_cert_arn" {
 variable "apps_domain_cert_arn" {
   description = "Amazon ARN for the public facing certificate to be used for apps"
 }
+
+variable "system_domain_cloudfront_cert_id" {
+  description = "Amazon Certificate ID for the public facing certificate to be used for the system components"
+}
+
+variable "apps_domain_cloudfront_cert_id" {
+  description = "Amazon Certificate ID for the public facing certificate to be used for apps"
+}
