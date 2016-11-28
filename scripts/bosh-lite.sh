@@ -14,15 +14,12 @@ BOSH_LITE_AUTO_HALT=${BOSH_LITE_AUTO_HALT:-true}
 DEFAULT_BOSH_LITE_INSTANCE_TYPE=m3.xlarge
 DEFAULT_BOSH_LITE_CODEBASE_PATH="${PROJECT_DIR_PARENT}/bosh-lite"
 DEFAULT_BOSH_LITE_REGION="eu-west-1"
-DEFAULT_BOSH_LITE_SUBNET_TAG_NAME="bosh-lite-subnet-0"
-DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME="bosh-lite-office-access"
+DEFAULT_BOSH_LITE_VPC_TAG_NAME_SUFFIX="bosh-lite-vpc"
+DEFAULT_BOSH_LITE_SUBNET_TAG_NAME_SUFFIX="bosh-lite-subnet-0"
+DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME_SUFFIX="bosh-lite-office-access"
 
-export BOSH_LITE_INSTANCE_TYPE="${BOSH_LITE_INSTANCE_TYPE:-${DEFAULT_BOSH_LITE_INSTANCE_TYPE}}"
-export BOSH_LITE_CODEBASE_PATH="${BOSH_LITE_CODEBASE_PATH:-${DEFAULT_BOSH_LITE_CODEBASE_PATH}}"
-export BOSH_LITE_REGION="${BOSH_LITE_REGION:-${DEFAULT_BOSH_LITE_REGION}}"
-
-export BOSH_LITE_SUBNET_TAG_NAME="${BOSH_LITE_SUBNET_TAG_NAME:-${DEFAULT_BOSH_LITE_SUBNET_TAG_NAME}}"
-export BOSH_LITE_SECURITY_GROUP_TAG_NAME="${BOSH_LITE_SECURITY_GROUP_TAG_NAME:-${DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME}}"
+DEFAULT_BOSH_LITE_ALLOWED_CIDRS="80.194.77.90/32 80.194.77.100/32 85.133.67.244/32"
+DEFAULT_BOSH_LITE_ALLOWED_PORTS="22 25555"
 
 usage() {
   cat <<EOF
@@ -56,12 +53,26 @@ Variables to override:
     Default: ${DEFAULT_BOSH_LITE_CODEBASE_PATH}
 
   BOSH_LITE_SUBNET_TAG_NAME:
-    Subnet tag 'Name' to deploy to. The subnet determines the VPC.
-    Default: ${DEFAULT_BOSH_LITE_SUBNET_TAG_NAME}
+    VPC tag 'Name' to deploy to. Will be created if missing.
+    Default: \${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_VPC_TAG_NAME_SUFFIX}
+
+  BOSH_LITE_SUBNET_TAG_NAME:
+    Subnet tag 'Name' to deploy to. Will be created if missing.
+    Default: \${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_SUBNET_TAG_NAME_SUFFIX}
 
   BOSH_LITE_SECURITY_GROUP_TAG_NAME:
-    Security Group tag 'Name' to use for bosh-lite.
-    Default: ${DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME}
+    Security Group tag 'Name' to use for bosh-lite. Will be created if missing.
+    Default: \${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME_SUFFIX}
+
+  BOSH_LITE_ALLOWED_CIDRS:
+    CIDRs to allow when creating the security group
+    Note: Won't be updated if the SG already exists.
+    Default: ${DEFAULT_BOSH_LITE_ALLOWED_CIDRS}
+
+  BOSH_LITE_ALLOWED_PORTS:
+    Ports in bosh-lite to allow when creating the security group
+    Note: Won't be updated if the SG already exists.
+    Default: ${DEFAULT_BOSH_LITE_ALLOWED_PORTS}
 
   BOSH_LITE_REGION:
     Bosh lite region to deploy
@@ -89,7 +100,7 @@ EOF
 }
 
 check_vagrant() {
-  if ! ( which vagrant > /dev/null || vagrant plugin list | grep -q vagrant-aws); then
+  if ! ( which vagrant > /dev/null && vagrant plugin list | grep -q vagrant-aws); then
     cat <<EOF
 You must have vagrant installed in your system with the vagrant-aws plugin.
 
@@ -106,10 +117,28 @@ get_vagrant_box() {
   fi
 }
 
-init_credentials() {
+init_environment() {
+  if [ -z "${DEPLOY_ENV:-}" ]; then
+    echo "Error: You must set \$DEPLOY_ENV"
+    exit 1
+  fi
+
   export BOSH_LITE_NAME="${DEPLOY_ENV}-bosh-lite"
   export BOSH_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
   export BOSH_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+
+  export BOSH_LITE_CODEBASE_PATH="${BOSH_LITE_CODEBASE_PATH:-$DEFAULT_BOSH_LITE_CODEBASE_PATH}"
+
+  export BOSH_LITE_INSTANCE_TYPE="${BOSH_LITE_INSTANCE_TYPE:-${DEFAULT_BOSH_LITE_INSTANCE_TYPE}}"
+  export BOSH_LITE_CODEBASE_PATH="${BOSH_LITE_CODEBASE_PATH:-${DEFAULT_BOSH_LITE_CODEBASE_PATH}}"
+  export BOSH_LITE_REGION="${BOSH_LITE_REGION:-${DEFAULT_BOSH_LITE_REGION}}"
+
+  export BOSH_LITE_VPC_TAG_NAME="${BOSH_LITE_VPC_TAG_NAME:-${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_VPC_TAG_NAME_SUFFIX}}"
+  export BOSH_LITE_SUBNET_TAG_NAME="${BOSH_LITE_SUBNET_TAG_NAME:-${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_SUBNET_TAG_NAME_SUFFIX}}"
+  export BOSH_LITE_SECURITY_GROUP_TAG_NAME="${BOSH_LITE_SECURITY_GROUP_TAG_NAME:-${DEPLOY_ENV}-${DEFAULT_BOSH_LITE_SECURITY_GROUP_TAG_NAME_SUFFIX}}"
+
+  export BOSH_LITE_ALLOWED_CIDRS="${BOSH_LITE_ALLOWED_CIDRS:-${DEFAULT_BOSH_LITE_ALLOWED_CIDRS}}"
+  export BOSH_LITE_ALLOWED_PORTS="${BOSH_LITE_ALLOWED_PORTS:-${DEFAULT_BOSH_LITE_ALLOWED_PORTS}}"
 }
 
 get_aws_key_pair_finger_print() {
@@ -159,15 +188,182 @@ delete_ssh_key_pair() {
     --key-name "${BOSH_LITE_KEYPAIR}" > /dev/null || true
 }
 
-init_subnet_and_security_group() {
-  # Query the subnet tagged as Name=bosh-lite-subnet-0
-  BOSH_LITE_SUBNET_ID=$(
-    aws ec2 describe-subnets \
+build_aws_cli_tag_filter() {
+  local pair
+  local filter
+  filter=""
+  for pair in "$@"; do
+    filter="${filter:+${filter},}Name=tag:${pair%:*},Values=${pair#*:}"
+  done
+  echo "${filter}"
+}
+
+find_vpc_by_tags() {
+  local tag_filter
+  tag_filter="$(build_aws_cli_tag_filter "$@")"
+  aws ec2 describe-vpcs \
+    --region "${BOSH_LITE_REGION}" \
+    --filters "${tag_filter}" \
+    --query 'Vpcs[0].VpcId' \
+    --output text
+}
+
+find_route_table_by_tags() {
+  local tag_filter
+  tag_filter="$(build_aws_cli_tag_filter "$@")"
+  aws ec2 describe-route-tables \
+    --region "${BOSH_LITE_REGION}" \
+    --filters "${tag_filter}" \
+    --query 'RouteTables[0]RouteTableId' \
+    --output text
+}
+
+find_subnet_by_tags() {
+  local tag_filter
+  tag_filter="$(build_aws_cli_tag_filter "$@")"
+  aws ec2 describe-subnets \
+    --region "${BOSH_LITE_REGION}" \
+    --filters "${tag_filter}" \
+    --query 'Subnets[0].SubnetId' \
+    --output text
+}
+
+find_security_group_by_tags() {
+  local tag_filter
+  tag_filter="$(build_aws_cli_tag_filter "$@")"
+  aws ec2 describe-security-groups \
+    --region "${BOSH_LITE_REGION}" \
+    --filters "${tag_filter}" \
+    --query 'SecurityGroups[0].GroupId' \
+    --output text
+}
+
+create_dedicated_subnet_and_security_group() {
+  local vpcid
+  local subnetid
+  local sgid
+
+  vpcid=$(find_vpc_by_tags "Name:${BOSH_LITE_VPC_TAG_NAME}")
+  if [ "$vpcid" == "None" ]; then
+    echo "Creating missing VPC with Name:${BOSH_LITE_VPC_TAG_NAME}"
+    vpcid="$(
+      aws ec2 create-vpc \
+        --region "${BOSH_LITE_REGION}" \
+        --cidr-block 10.244.0.32/28 \
+        --query Vpc.VpcId \
+        --output text
+    )"
+    aws ec2 create-tags \
       --region "${BOSH_LITE_REGION}" \
-      --filters "Name=tag:Name,Values=${BOSH_LITE_SUBNET_TAG_NAME}" \
-      --query 'Subnets[0].SubnetId' \
-      --output text
-    )
+      --resources "${vpcid}" \
+      --tags "Key=Name,Value=${BOSH_LITE_VPC_TAG_NAME}"
+    aws ec2 create-tags \
+      --region "${BOSH_LITE_REGION}" \
+      --resources "${vpcid}" \
+      --tags "Key=Created-by,Value=bosh-lite.sh"
+
+  fi
+  echo "Using VPC ${vpcid} with Name:${BOSH_LITE_VPC_TAG_NAME}"
+
+  # TODO: Create the routing table :(
+
+  subnetid=$(find_subnet_by_tags "Name:${BOSH_LITE_SUBNET_TAG_NAME}")
+  if [ "$subnetid" == "None" ]; then
+    echo "Creating missing Subnet with Name:${BOSH_LITE_SUBNET_TAG_NAME}"
+    subnetid="$(
+      aws ec2 create-subnet \
+        --region "${BOSH_LITE_REGION}" \
+        --cidr-block 10.244.0.32/28 \
+        --vpc-id "${vpcid}" \
+        --cidr-block "10.244.0.32/28" \
+        --query Subnet.SubnetId \
+        --output text
+    )"
+
+    aws ec2 create-tags \
+      --region "${BOSH_LITE_REGION}" \
+      --resources "${subnetid}" \
+      --tags "Key=Name,Value=${BOSH_LITE_SUBNET_TAG_NAME}"
+    aws ec2 create-tags \
+      --region "${BOSH_LITE_REGION}" \
+      --resources "${subnetid}" \
+      --tags "Key=Created-by,Value=bosh-lite.sh"
+
+    aws ec2 modify-subnet-attribute \
+      --region "${BOSH_LITE_REGION}" \
+      --subnet-id "${subnetid}" \
+      --map-public-ip-on-launch
+  fi
+  echo "Using Subnet ${subnetid} with Name:${BOSH_LITE_SUBNET_TAG_NAME}"
+
+  sgid="$(find_security_group_by_tags "Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}")"
+  if [ "$sgid" == "None" ]; then
+    echo "Creating missing Security Group with Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}"
+    sgid="$(
+      aws ec2 create-security-group \
+        --region "${BOSH_LITE_REGION}" \
+        --group-name "${BOSH_LITE_SECURITY_GROUP_TAG_NAME}" \
+        --description "${DEPLOY_ENV} bosh-lite: Allow access from Office and management IPs" \
+        --vpc-id "${vpcid}" \
+        --query GroupId \
+        --output text
+    )"
+    aws ec2 create-tags \
+      --region "${BOSH_LITE_REGION}" \
+      --resources "${sgid}" \
+      --tags "Key=Name,Value="${BOSH_LITE_SECURITY_GROUP_TAG_NAME}""
+    aws ec2 create-tags \
+      --region "${BOSH_LITE_REGION}" \
+      --resources "${sgid}" \
+      --tags "Key=Created-by,Value=bosh-lite.sh"
+
+    local cidr
+    local port
+    for cidr in ${BOSH_LITE_ALLOWED_CIDRS}; do
+      for port in ${BOSH_LITE_ALLOWED_PORTS}; do
+        aws ec2 authorize-security-group-ingress \
+          --region "${BOSH_LITE_REGION}" \
+          --group-id "${sgid}" \
+          --protocol "tcp" \
+          --port "${port}" \
+          --cidr "${cidr}"
+      done
+    done
+  fi
+  echo "Using Security Group ${sgid} with Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}"
+}
+
+delete_dedicated_subnet_and_security_group() {
+  sgid="$(find_security_group_by_tags "Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}" "Created-by:bosh-lite.sh")"
+  if [ "$sgid" != "None" ]; then
+    echo "Deleting Security Group with Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}"
+    aws ec2 delete-security-group \
+      --region "${BOSH_LITE_REGION}" \
+      --group-id "${sgid}"
+  fi
+
+  subnetid=$(find_subnet_by_tags "Name:${BOSH_LITE_SUBNET_TAG_NAME}" "Created-by:bosh-lite.sh")
+  if [ "$subnetid" != "None" ]; then
+    echo "Deleting Subnet with Name:${BOSH_LITE_SUBNET_TAG_NAME}"
+    aws ec2 delete-subnet \
+      --region "${BOSH_LITE_REGION}" \
+      --subnet-id "${subnetid}"
+  fi
+
+  vpcid=$(find_vpc_by_tags "Name:${BOSH_LITE_VPC_TAG_NAME}" "Created-by:bosh-lite.sh")
+  if [ "$vpcid" != "None" ]; then
+    echo "Deleting VPC with Name:${BOSH_LITE_VPC_TAG_NAME}"
+    aws ec2 delete-vpc \
+      --region "${BOSH_LITE_REGION}" \
+      --vpc-id "${vpcid}"
+  fi
+}
+
+
+
+init_subnet_and_security_group_vars() {
+  # Query the subnet tagged as Name=bosh-lite-subnet-0
+  BOSH_LITE_SUBNET_ID="$(find_subnet_by_tags "Name:${BOSH_LITE_SUBNET_TAG_NAME}")"
   export BOSH_LITE_SUBNET_ID
   if ! aws ec2 describe-subnets --region "${BOSH_LITE_REGION}" --subnet-ids "${BOSH_LITE_SUBNET_ID}" > /dev/null; then
     echo
@@ -176,13 +372,7 @@ init_subnet_and_security_group() {
   fi
 
   # Query the security group tagged as Name=bosh-lite-office-access
-  BOSH_LITE_SECURITY_GROUP=$(
-    aws ec2 describe-security-groups \
-      --region "${BOSH_LITE_REGION}" \
-      --filters "Name=tag:Name,Values=${BOSH_LITE_SECURITY_GROUP_TAG_NAME}" \
-      --query 'SecurityGroups[0].GroupId' \
-      --output text
-    )
+  BOSH_LITE_SECURITY_GROUP="$(find_security_group_by_tags "Name:${BOSH_LITE_SECURITY_GROUP_TAG_NAME}")"
   export BOSH_LITE_SECURITY_GROUP
   if ! aws ec2 describe-security-groups --region "${BOSH_LITE_REGION}" --group-ids "${BOSH_LITE_SECURITY_GROUP}" > /dev/null; then
     echo
@@ -301,7 +491,7 @@ EOF
 ACTION=${1:-}
 
 case "${ACTION}" in
-  info|start|stop|destroy|ssh)
+  info|start|stop|destroy|ssh|t|d)
   ;;
   *)
     usage
@@ -309,10 +499,18 @@ case "${ACTION}" in
 esac
 
 case "${ACTION}" in
+  t)
+    init_environment
+    create_dedicated_subnet_and_security_group
+  ;;
+  d)
+    init_environment
+    delete_dedicated_subnet_and_security_group
+  ;;
   info)
+    init_environment
     check_bosh_lite_codebase
     check_vagrant
-    init_credentials
     init_ssh_key_vars
     print_info
     if [ "$(get_vagrant_state)" == "running" ]; then
@@ -320,11 +518,11 @@ case "${ACTION}" in
     fi
   ;;
   start)
+    init_environment
     check_bosh_lite_codebase
     check_vagrant
-    init_credentials
     init_ssh_key_vars
-    init_subnet_and_security_group
+    init_subnet_and_security_group_vars
 
     get_vagrant_box
 
@@ -335,9 +533,9 @@ case "${ACTION}" in
     print_info
   ;;
   stop)
+    init_environment
     check_bosh_lite_codebase
     check_vagrant
-    init_credentials
     init_ssh_key_vars
     echo "Halting Bosh lite VM"
     run_vagrant ssh -- sudo halt
@@ -345,17 +543,17 @@ case "${ACTION}" in
     echo "Bosh lite VM state: $(get_vagrant_state)"
   ;;
   destroy)
+    init_environment
     check_bosh_lite_codebase
     check_vagrant
-    init_credentials
     init_ssh_key_vars
     run_vagrant destroy
     delete_ssh_key_pair
   ;;
   ssh)
+    init_environment
     check_bosh_lite_codebase
     check_vagrant
-    init_credentials
     init_ssh_key_vars
     shift
     run_vagrant ssh ${1:+--} "$@"
