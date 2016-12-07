@@ -386,8 +386,8 @@ properties:
       client_secret:
 
     jwt:
-      verification_key:
-      signing_key:
+      verification_key: (( grab secrets.uaa_jwt_verification_key ))
+      signing_key: (( grab secrets.uaa_jwt_signing_key ))
       policy:
         refreshTokenValiditySeconds: 604800
         global:
