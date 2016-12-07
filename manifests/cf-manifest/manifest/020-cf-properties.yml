@@ -381,9 +381,9 @@ properties:
     port: 8080
 
     admin:
-      client_secret: (( grab secrets.uaa_admin_client_secret ))
+      client_secret:
     cc:
-      client_secret: (( grab secrets.uaa_cc_client_secret ))
+      client_secret:
 
     jwt:
       verification_key: (( grab secrets.uaa_jwt_verification_key ))
