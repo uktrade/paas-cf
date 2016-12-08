@@ -118,7 +118,7 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-logsearch-for-cloudfoundry.git
       tag_filter: {{cf_logsearch_for_cloudfoundry_version}}
-      branch: gds_master
+      branch: develop
 
   - name: graphite-nozzle
     type: git
