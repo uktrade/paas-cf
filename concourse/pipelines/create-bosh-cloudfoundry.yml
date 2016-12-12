@@ -1422,10 +1422,9 @@ jobs:
 
                   echo "Generating manifests"
 
-                  if [ "${ENABLE_DATADOG}" = "true" ] ; then
-                     MANIFEST_STUBS="${MANIFEST_STUBS}
-                                    ./paas-cf/manifests/cf-manifest/stubs/datadog-nozzle.yml"
-                  fi
+                  MANIFEST_STUBS="${MANIFEST_STUBS}
+                                ./paas-cf/manifests/cf-manifest/stubs/datadog-nozzle.yml
+                                ./paas-cf/manifests/shared/deployments/datadog-agent.yml"
 
                   # FIXME: Remove eval after https://github.com/concourse/concourse/issues/360
                   eval ./paas-cf/manifests/shared/build_manifest.sh $MANIFEST_STUBS > cf-manifest/cf-manifest.yml

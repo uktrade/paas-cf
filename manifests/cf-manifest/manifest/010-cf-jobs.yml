@@ -384,11 +384,15 @@ jobs:
         release: cf
       - name: datadog-route-emitter
         release: datadog-for-cloudfoundry
+      - name: datadog-agent
+        release: datadog-agent
     instances: 2
     vm_type: medium
     stemcell: default
     networks:
       - name: cf
+    properties:
+      datadog: (( inject meta.datadog ))
 
   - name: access
     azs: [z1, z2]
