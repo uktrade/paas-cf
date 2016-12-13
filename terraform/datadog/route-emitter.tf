@@ -118,3 +118,30 @@ resource "datadog_monitor" "route_emitter_fresh_registered_routes" {
     "job"        = "route_emitter"
   }
 }
+
+resource "datadog_monitor" "route_emitter_syncing" {
+  name                = "${format("%s route-emitter is syncing routes with BBS", var.env)}"
+  type                = "query alert"
+  message             = "route-emitter is not syncing the routes with BBS"
+  escalation_message  = "route-emitter is still not syncing the routes with BBS"
+  notify_no_data      = true
+  no_data_timeframe   = "7"
+  require_full_window = true
+
+  query = "${
+    format(
+      "max(last_5m):
+        count_not_null(max:cf.route_emitter.RouteEmitterSyncDuration{deployment:%s}) < 1
+      ", var.env)
+    }"
+
+  thresholds {
+    critical = "1"
+  }
+
+  tags {
+    "deployment" = "${var.env}"
+    "service"    = "${var.env}_monitors"
+    "job"        = "route_emitter"
+  }
+}
