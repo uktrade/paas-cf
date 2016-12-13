@@ -90,3 +90,31 @@ resource "datadog_monitor" "route_emitter_lock_held_once" {
     "job"        = "route_emitter"
   }
 }
+
+resource "datadog_monitor" "route_emitter_fresh_registered_routes" {
+  name                = "${format("%s route-emitter has refreshed registered routes from BBS", var.env)}"
+  type                = "query alert"
+  message             = "route-emitter is not refreshing the routes with BBS"
+  escalation_message  = "route-emitter is still not refreshing the routes with BBS"
+  notify_no_data      = true
+  no_data_timeframe   = "7"
+  require_full_window = true
+
+  query = "${
+    format(
+      "max(last_5m):
+        count_not_null(max:cf.route_emitter.RoutesUnregistered{deployment:%s}) +
+        count_not_null(max:cf.route_emitter.RoutesRegistered{deployment:%s}) < 2
+      ", var.env, var.env)
+    }"
+
+  thresholds {
+    critical = "2"
+  }
+
+  tags {
+    "deployment" = "${var.env}"
+    "service"    = "${var.env}_monitors"
+    "job"        = "route_emitter"
+  }
+}
