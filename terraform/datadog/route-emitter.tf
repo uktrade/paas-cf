@@ -90,35 +90,3 @@ resource "datadog_monitor" "route_emitter_lock_held_once" {
     "job"        = "route_emitter"
   }
 }
-
-resource "datadog_monitor" "route_emiter_gorouter_difference" {
-  name                = "${format("%s route-emitter vs. Gorouter total routers (%s)", var.env, element(list("upper", "lower"), count.index))}"
-  type                = "query alert"
-  message             = "There is a divergence between route-emitter and gorouter total routes"
-  escalation_message  = "There is still divergence between route-emitter and gorouter total routes."
-  notify_no_data      = false
-  require_full_window = false
-
-  count = 2
-
-  query = "${
-    format("
-      min(last_15m):
-        ( max:cf.route_emitter.RoutesTotal{deployment:%s} - max:cf.gorouter.total_routes{deployment:%s} ) -
-        ( max:cf.bbs.LRPsDesired{deployment:%s} - max:cf.bbs.LRPsRunning{deployment:%s} ) %s",
-        var.env, var.env, var.env, var.env,
-        element(list("> 2", "< -2"), count.index)
-      )
-    }"
-
-  thresholds {
-    warning  = "${element(list("1", "-1"), count.index)}"
-    critical = "${element(list("2", "-2"), count.index)}"
-  }
-
-  tags {
-    "deployment" = "${var.env}"
-    "service"    = "${var.env}_monitors"
-    "job"        = "route_emitter"
-  }
-}
