@@ -1,0 +1,9 @@
+meta:
+  ipsec:
+    targets:
+    - (( grab terraform_outputs.cell0_subnet_cidr_block ))
+    - (( grab terraform_outputs.cell1_subnet_cidr_block ))
+    - (( grab terraform_outputs.cell2_subnet_cidr_block ))
+    - (( grab terraform_outputs.router0_subnet_cidr_block ))
+    - (( grab terraform_outputs.router1_subnet_cidr_block ))
+    - (( grab terraform_outputs.router2_subnet_cidr_block ))

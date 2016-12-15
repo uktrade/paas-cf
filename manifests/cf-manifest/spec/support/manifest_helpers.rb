@@ -59,6 +59,7 @@ private
         grafana_dashboards_manifest_path,
         File.expand_path("../../../manifest/env-specific/cf-#{environment}.yml", __FILE__),
         File.expand_path("../../../../shared/deployments/datadog-agent.yml", __FILE__),
+        File.expand_path("../../../../shared/deployments/ipsec.yml", __FILE__),
         File.expand_path("../../../stubs/datadog-nozzle.yml", __FILE__),
         File.expand_path("../../../../shared/spec/fixtures/terraform/*.yml", __FILE__),
         File.expand_path("../../../../shared/spec/fixtures/cf-secrets.yml", __FILE__),
