@@ -2,6 +2,8 @@ This README is for the benefit of those looking at the contents of the work in t
 
 # Example usage
 
+**Note:** the script uses the CF CLI tool, so remember to be logged in to the dev account before running it. Also, have your AWS credentials loaded as environment variables.
+
 ```
 ./elasticache.py --provision --vpc-id vpc-c461eaa0 --instance-id h-$(date +%s) --service-id service-1 --plan-id plan-1 --org-id org-1 --space-id space-1 --security-group-id sg-2be5874d --org-name testers --space-name healthcheck
 ```
