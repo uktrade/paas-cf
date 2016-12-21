@@ -21,7 +21,8 @@ class ElasticacheBrokerTest(object):
         elasticache = boto3.client('elasticache')
         vpc = boto3.resource('ec2').Vpc(self.vpc_id)
 
-        subnets = self.create_subnets(vpc, self.select_subnets())
+        existing_subnets = vpc.subnets.all()
+        subnets = self.create_subnets(vpc, self.select_subnets(existing_subnets))
 
         subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
         subnet_group = self.create_subnet_group(elasticache, subnet_ids)
@@ -33,14 +34,16 @@ class ElasticacheBrokerTest(object):
     def deprovision(self):
         print self
 
-    def select_subnets(self):
+    def select_subnets(self, existing_subnets):
         supernet = netaddr.IPNetwork('10.0.64.0/18')
-        all_subnets = list(supernet.subnet(28))
-        # TODO
-        # used_subnets = [] # derive from aws
-        # return (all_subnets - used_subnets).take(2)
+        allowed_subnet_set = netaddr.IPSet(list(supernet.subnet(28)))
+        existing_subnet_set = netaddr.IPSet(map(lambda subnet: subnet.cidr_block, existing_subnets))
+        available_subnet_set = allowed_subnet_set - existing_subnet_set
+        available_subnets = []
+        for cidr in available_subnet_set.iter_cidrs():
+            available_subnets.extend(cidr.subnet(28))
         azs = ['eu-west-1a', 'eu-west-1b']
-        return zip(all_subnets[:2], azs)
+        return zip(available_subnets[:2], azs)
 
     def create_subnets(self, vpc, subnets_and_azs):
         print "Creating subnets..."
