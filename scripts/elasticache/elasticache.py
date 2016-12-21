@@ -8,6 +8,7 @@ import json
 
 class ElasticacheBrokerTest(object):
     def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, space_id=None):
+        self.vpc_id = vpc_id
         self.instance_id = instance_id
         self.service_id = service_id
         self.plan_id = plan_id
@@ -20,11 +21,11 @@ class ElasticacheBrokerTest(object):
         elasticache = boto3.client('elasticache')
         vpc = boto3.resource('ec2').Vpc(self.vpc_id)
 
-        subnets = self.create_subnets(vpc, select_subnets())
+        subnets = self.create_subnets(vpc, self.select_subnets())
 
-	subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
+        subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
         subnet_group = self.create_subnet_group(elasticache, subnet_ids)
-        self.create_elasticache(elasticache, subnet_group, self.cache_node_type(self.plan_id), self.engine_version())
+        self.create_elasticache(elasticache, subnet_group, self.cache_node_type(), self.engine_version())
 
         subnet_cidrs = map(lambda subnet: subnet.cidr_block, subnets)
         self.create_application_security_group(subnet_group, subnet_cidrs)
@@ -42,14 +43,10 @@ class ElasticacheBrokerTest(object):
         return zip(all_subnets[:2], azs)
 
     def create_subnets(self, vpc, subnets_and_azs):
-        return map(lambda (subnet, az):
-                vpc.create_subnet(
-                    DryRun=False,
-                    CidrBlock=subnet,
-                    AvailabilityZone=az
-                ),
-            subnets_and_azs
-        )
+        print "Creating subnets..."
+        print subnets_and_azs
+        return map(lambda (subnet, az): create_subnet(vpc, subnet, az), subnets_and_azs)
+
 
     def create_subnet_group(self, elasticache, subnet_ids):
         return elasticache.create_cache_subnet_group(
@@ -61,7 +58,8 @@ class ElasticacheBrokerTest(object):
     def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version):
         # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
         return elasticache.create_cache_cluster(
-            CacheClusterId='cache-cluster-%s' % self.instance_id,
+            #Note: has a 20 character limit
+            CacheClusterId='ccid-%s' % self.instance_id,
             #ReplicationGroupId='string',
             NumCacheNodes=1,
             CacheNodeType=cache_node_type,
@@ -105,23 +103,23 @@ class ElasticacheBrokerTest(object):
             Port=self.port,
             #NotificationTopicArn='string',
             AutoMinorVersionUpgrade=False,
-            SnapshotRetentionLimit=7,
-            SnapshotWindow='01:00-02:00',
+            #SnapshotRetentionLimit=7,
+            #SnapshotWindow='01:00-02:00',
             # For guidance on AuthToken see:
             # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
-            AuthToken=''
+            #AuthToken=''
         )
 
-    def cache_node_type(plan_id):
+    def cache_node_type(self):
         #TODO: get the node type from the plan
         return 'cache.t2.micro'
 
-    def engine_version():
+    def engine_version(self):
         #TODO: get the engine version from the plan
         # http://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/SelectEngine.RedisVersions.html
         return '3.2.4'
 
-    def create_application_security_group(subnet_group, subnet_cidrs):
+    def create_application_security_group(self, subnet_group, subnet_cidrs):
         asg_name = 'elasticache-{}-{}'.format(self.space_id, subnet_group)
         asg_rules = map(lambda subnet_cidr:
             {'protocol': 'tcp', 'destination': subnet_cidr, 'port': self.port},
@@ -130,6 +128,14 @@ class ElasticacheBrokerTest(object):
             json.dump(asg_rules, temp_file)
             call(['cf', 'create-security-group', asg_name, temp_file.name])
 
+def create_subnet(vpc, subnet, az):
+    print "Calling vpc.create_subnet..."
+    print '%s' % subnet
+    return vpc.create_subnet(
+        DryRun=False,
+        CidrBlock='%s' % subnet,
+        AvailabilityZone=az
+    )
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
