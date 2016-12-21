@@ -2,6 +2,9 @@
 import argparse
 import boto3
 import netaddr
+from subprocess import call
+import tempfile
+import json
 
 class ElasticacheBrokerTest(object):
     def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, space_id=None):
@@ -11,6 +14,7 @@ class ElasticacheBrokerTest(object):
         self.org_id = org_id
         self.space_id = space_id
         self.security_group_id = security_group_id
+        self.port = 6379
 
     def provision(self):
         elasticache = boto3.client('elasticache')
@@ -18,8 +22,12 @@ class ElasticacheBrokerTest(object):
 
         subnets = self.create_subnets(vpc, select_subnets())
 
-        subnet_group = self.create_subnet_group(elasticache, subnets)
+	subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
+        subnet_group = self.create_subnet_group(elasticache, subnet_ids)
         self.create_elasticache(elasticache, subnet_group, self.cache_node_type(self.plan_id), self.engine_version())
+
+        subnet_cidrs = map(lambda subnet: subnet.cidr_block, subnets)
+        self.create_application_security_group(subnet_group, subnet_cidrs)
 
     def deprovision(self):
         print self
@@ -39,15 +47,15 @@ class ElasticacheBrokerTest(object):
                     DryRun=False,
                     CidrBlock=subnet,
                     AvailabilityZone=az
-                ).subnet_id,
+                ),
             subnets_and_azs
         )
 
-    def create_subnet_group(self, elasticache, subnets):
+    def create_subnet_group(self, elasticache, subnet_ids):
         return elasticache.create_cache_subnet_group(
             CacheSubnetGroupName='cache-subnet-group-%s' % self.instance_id,
             CacheSubnetGroupDescription='Cache subnet group for %s' % self.instance_id,
-            SubnetIds=subnets
+            SubnetIds=subnet_ids
         )['CacheSubnetGroup']['CacheSubnetGroupName']
 
     def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version):
@@ -94,14 +102,14 @@ class ElasticacheBrokerTest(object):
             #SnapshotArns=[],
             #SnapshotName='string',
             PreferredMaintenanceWindow='Thu:03:00-Thu:04:00',
-            Port=6379,
+            Port=self.port,
             #NotificationTopicArn='string',
             AutoMinorVersionUpgrade=False,
             SnapshotRetentionLimit=7,
             SnapshotWindow='01:00-02:00',
             # For guidance on AuthToken see:
             # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
-            AuthToken='string'
+            AuthToken=''
         )
 
     def cache_node_type(plan_id):
@@ -112,6 +120,15 @@ class ElasticacheBrokerTest(object):
         #TODO: get the engine version from the plan
         # http://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/SelectEngine.RedisVersions.html
         return '3.2.4'
+
+    def create_application_security_group(subnet_group, subnet_cidrs):
+        asg_name = 'elasticache-{}-{}'.format(self.space_id, subnet_group)
+        asg_rules = map(lambda subnet_cidr:
+            {'protocol': 'tcp', 'destination': subnet_cidr, 'port': self.port},
+            subnet_cidrs)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            json.dump(asg_rules, temp_file)
+            call(['cf', 'create-security-group', asg_name, temp_file.name])
 
 
 if __name__ == '__main__':
