@@ -125,3 +125,11 @@ output "rds_broker_elb_dns_name" {
 output "cloud_controller_security_group" {
   value = "${aws_security_group.cloud_controller.name}"
 }
+
+output "elasticache_broker_clients_security_group" {
+  value = "${aws_security_group.elasticache_broker_clients.name}"
+}
+
+output "elasticache_broker_instances_security_group_id" {
+  value = "${aws_security_group.elasticache_broker_instances.id}"
+}
