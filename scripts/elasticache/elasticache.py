@@ -2,18 +2,20 @@
 import argparse
 import boto3
 import netaddr
-from subprocess import call
+import subprocess
 import tempfile
 import json
 
 class ElasticacheBrokerTest(object):
-    def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, space_id=None):
+    def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, org_name=None, space_id=None, space_name=None):
         self.vpc_id = vpc_id
         self.instance_id = instance_id
         self.service_id = service_id
         self.plan_id = plan_id
         self.org_id = org_id
+        self.org_name = org_name
         self.space_id = space_id
+        self.space_name = space_name
         self.security_group_id = security_group_id
         self.port = 6379
 
@@ -29,7 +31,8 @@ class ElasticacheBrokerTest(object):
         self.create_elasticache(elasticache, subnet_group, self.cache_node_type(), self.engine_version())
 
         subnet_cidrs = map(lambda subnet: subnet.cidr_block, subnets)
-        self.create_application_security_group(subnet_group, subnet_cidrs)
+        asg_name = self.create_application_security_group(subnet_group, subnet_cidrs)
+        self.bind_application_security_group(asg_name)
 
     def deprovision(self):
         print self
@@ -125,11 +128,16 @@ class ElasticacheBrokerTest(object):
     def create_application_security_group(self, subnet_group, subnet_cidrs):
         asg_name = 'elasticache-{}-{}'.format(self.space_id, subnet_group)
         asg_rules = map(lambda subnet_cidr:
-            {'protocol': 'tcp', 'destination': subnet_cidr, 'port': self.port},
+            {'protocol': 'tcp', 'destination': subnet_cidr, 'ports': '{}'.format(self.port)},
             subnet_cidrs)
         with tempfile.NamedTemporaryFile() as temp_file:
             json.dump(asg_rules, temp_file)
-            call(['cf', 'create-security-group', asg_name, temp_file.name])
+            temp_file.flush()
+            subprocess.check_call(['cf', 'create-security-group', asg_name, temp_file.name])
+        return asg_name
+
+    def bind_application_security_group(self, asg_name):
+        subprocess.check_call(['cf', 'bind-security-group', asg_name, self.org_name, self.space_name])
 
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
@@ -152,12 +160,18 @@ if __name__ == '__main__':
     parser.add_argument('--service-id', help='Service ID for new elasticache instance', required=True)
     parser.add_argument('--plan-id', help='Plan ID for new elasticache instance', required=True)
     parser.add_argument('--org-id', help='Org for new elasticache instance', required=True)
+    # A broker implementation would probably derive the org name from the org ID, but for simplicity and proof of concept
+    # we will just pass it into this script
+    parser.add_argument('--org-name', help='Org for new elasticache instance', required=True)
     parser.add_argument('--space-id', help='Space for new elasticache instance', required=True)
+    # A broker implementation would probably derive the space name from the space ID, but for simplicity and proof of concept
+    # we will just pass it into this script
+    parser.add_argument('--space-name', help='Space for new elasticache instance', required=True)
     parser.add_argument('--security-group-id', help='Security group for new elasticache instance', required=True)
 
     args = parser.parse_args()
 
-    ec = ElasticacheBrokerTest(args.vpc_id, args.instance_id, args.service_id, args.plan_id, args.security_group_id, args.org_id, args.space_id)
+    ec = ElasticacheBrokerTest(args.vpc_id, args.instance_id, args.service_id, args.plan_id, args.security_group_id, args.org_id, args.org_name, args.space_id, args.space_name)
     if args.provision:
         ec.provision()
     else:
