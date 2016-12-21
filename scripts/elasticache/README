@@ -1,0 +1,11 @@
+This README is for the benefit of those looking at the contents of the work in this spike (https://www.pivotaltracker.com/story/show/134681911), not for actual use within any repository.
+
+# Example usage
+
+```
+./elasticache.py --provision --vpc-id vpc-c461eaa0 --instance-id h-$(date +%s) --service-id service-1 --plan-id plan-1 --org-id org-1 --space-id space-1 --security-group-id sg-2be5874d --org-name testers --space-name healthcheck
+```
+
+You will need to deploy using this branch and manually pull the `elasticache_broker_instances_security_group_id` from the Terraform outputs in the cf-terraform job.
+You will also need to supply the ID of your VPC. At the time of writing we did not actually get around to deploying an actual app which uses a Redis instance, so you will need to figure that bit out and supply the necessary space and org.
+
