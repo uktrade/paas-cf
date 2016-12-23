@@ -126,26 +126,10 @@ output "cloud_controller_security_group" {
   value = "${aws_security_group.cloud_controller.name}"
 }
 
-output "cell0_subnet_cidr_block" {
-  value = "${aws_subnet.cell.0.cidr_block}"
+output "cell_subnet_cidr_blocks" {
+  value = ["${aws_subnet.cell.*.cidr_block}"]
 }
 
-output "cell1_subnet_cidr_block" {
-  value = "${aws_subnet.cell.1.cidr_block}"
-}
-
-output "cell2_subnet_cidr_block" {
-  value = "${aws_subnet.cell.2.cidr_block}"
-}
-
-output "router0_subnet_cidr_block" {
-  value = "${aws_subnet.router.0.cidr_block}"
-}
-
-output "router1_subnet_cidr_block" {
-  value = "${aws_subnet.router.1.cidr_block}"
-}
-
-output "router2_subnet_cidr_block" {
-  value = "${aws_subnet.router.2.cidr_block}"
+output "router_subnet_cidr_blocks" {
+  value = ["${aws_subnet.router.*.cidr_block}"]
 }
