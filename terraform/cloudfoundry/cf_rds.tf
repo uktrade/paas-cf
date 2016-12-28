@@ -45,7 +45,7 @@ resource "aws_db_instance" "cf" {
   identifier           = "${var.env}-cf"
   allocated_storage    = 10
   engine               = "postgres"
-  engine_version       = "9.4.5"
+  engine_version       = "9.4.7"
   instance_class       = "db.t2.micro"
   username             = "dbadmin"
   password             = "${var.secrets_cf_db_master_password}"
