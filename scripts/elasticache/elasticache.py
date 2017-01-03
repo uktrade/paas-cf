@@ -9,6 +9,13 @@ import os
 
 DEPLOY_ENV = os.environ.get('DEPLOY_ENV')
 
+# The ARN of the elasticache cluster is needed to add a tag to the cluster (after creation)
+# In a real broker implementation the fields 'aws', region, and account number would have to be fetched from the manifest
+# Note: there is value in parameterising the partition field: https://github.com/alphagov/paas-rds-broker/pull/23
+ELASTICACHE_ARN_PREFIX='arn:aws:elasticache:eu-west-1:{}:cluster:'.format(os.environ.get('AWS_DEV_ACCOUNT'))
+APP_GUID='appGuidProvidedByCloudController'
+BINDING_ID='someValueProvidedByCloudController'
+
 class ElasticacheBrokerTest(object):
     def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, org_name=None, space_id=None, space_name=None):
         self.vpc_id = vpc_id
@@ -41,6 +48,29 @@ class ElasticacheBrokerTest(object):
     def deprovision(self):
         print self
 
+    def bind(self):
+        arn = self.buildARN()
+        elasticache = boto3.client('elasticache')
+        elasticache.add_tags_to_resource(
+            ResourceName=arn,
+            Tags=[
+                {
+                    'Key': 'bound-app-{}'.format(APP_GUID),
+                    'Value': BINDING_ID
+                },
+            ]
+        )
+        print 'Redis cluster endpoint: '
+        j = {'credentials': self.get_cluster_url(self.buildCacheClusterId())}
+        print json.dumps(j)
+
+    def get_cluster_url(self, cache_cluster_id):
+        elasticache = boto3.client('elasticache')
+        response = elasticache.describe_cache_clusters(CacheClusterId=cache_cluster_id, ShowCacheNodeInfo=True)
+        address = response['CacheClusters'][0]['CacheNodes'][0]['Endpoint']['Address']
+        port = response['CacheClusters'][0]['CacheNodes'][0]['Endpoint']['Port']
+        return '{}:{}'.format(address, port)
+
     def select_subnets(self, existing_subnets):
         supernet = netaddr.IPNetwork('10.0.64.0/18')
         allowed_subnet_set = netaddr.IPSet(list(supernet.subnet(28)))
@@ -66,11 +96,10 @@ class ElasticacheBrokerTest(object):
         )['CacheSubnetGroup']['CacheSubnetGroupName']
 
     def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version):
-        cache_cluster_id = 'ccid-%s' % self.instance_id
         # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
         return elasticache.create_cache_cluster(
             #Note: has a 20 character limit
-            CacheClusterId=cache_cluster_id,
+            CacheClusterId=self.buildCacheClusterId(),
             #ReplicationGroupId='string',
             NumCacheNodes=1,
             CacheNodeType=cache_node_type,
@@ -162,6 +191,12 @@ class ElasticacheBrokerTest(object):
             Tags=self.build_tags()
         )
 
+    def buildCacheClusterId(self):
+        return 'ccid-%s' % self.instance_id
+
+    def buildARN(self):
+        return '{}{}'.format(ELASTICACHE_ARN_PREFIX, self.buildCacheClusterId())
+
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
     print '%s' % subnet
@@ -179,6 +214,7 @@ if __name__ == '__main__':
     action_group = parser.add_mutually_exclusive_group(required=True)
     action_group.add_argument('--provision', help='Create a new elasticache', action='store_true')
     action_group.add_argument('--deprovision', help='Delete an existing elasticache', action='store_true')
+    action_group.add_argument('--bind', help='Bind an app to an existing elasticache', action='store_true')
 
     parser.add_argument('--vpc-id', help='Id for existing VPC', required=True)
     parser.add_argument('--instance-id', help='Id for new elasticache instance', required=True)
@@ -199,6 +235,7 @@ if __name__ == '__main__':
     ec = ElasticacheBrokerTest(args.vpc_id, args.instance_id, args.service_id, args.plan_id, args.security_group_id, args.org_id, args.org_name, args.space_id, args.space_name)
     if args.provision:
         ec.provision()
-    else:
+    elif args.deprovision:
         ec.deprovision()
-
+    else:
+        ec.bind()
