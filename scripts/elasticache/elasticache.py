@@ -27,6 +27,7 @@ class ElasticacheBrokerTest(object):
         subnets = self.create_subnets(vpc, self.select_subnets(existing_subnets))
 
         subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
+        self.create_tags(vpc, subnet_ids)
         subnet_group = self.create_subnet_group(elasticache, subnet_ids)
         self.create_elasticache(elasticache, subnet_group, self.cache_node_type(), self.engine_version())
 
@@ -77,32 +78,7 @@ class ElasticacheBrokerTest(object):
             SecurityGroupIds=[
                 self.security_group_id,
             ],
-            Tags=[
-                {
-                    'Key': 'Owner',
-                    'Value': 'Cloud Foundry'
-                },
-                {
-                    'Key': 'Plan ID',
-                    'Value': self.plan_id
-                },
-                {
-                    'Key': 'Service ID',
-                    'Value': self.service_id
-                },
-                {
-                    'Key': 'Space ID',
-                    'Value': self.space_id
-                },
-                {
-                    'Key': 'Broker Name',
-                    'Value': 'Insert some env-specific name here'
-                },
-                {
-                    'Key': 'Organization ID',
-                    'Value': self.org_id
-                },
-            ],
+            Tags=self.build_tags(),
             #SnapshotArns=[],
             #SnapshotName='string',
             PreferredMaintenanceWindow='Thu:03:00-Thu:04:00',
@@ -139,6 +115,46 @@ class ElasticacheBrokerTest(object):
     def bind_application_security_group(self, asg_name):
         subprocess.check_call(['cf', 'bind-security-group', asg_name, self.org_name, self.space_name])
 
+    def build_tags(self):
+        tags = [
+            {
+                'Key': 'Owner',
+                'Value': 'Cloud Foundry'
+            },
+            {
+                'Key': 'Plan ID',
+                'Value': self.plan_id
+            },
+            {
+                'Key': 'Service ID',
+                'Value': self.service_id
+            },
+            {
+                'Key': 'Space ID',
+                'Value': self.space_id
+            },
+            {
+                'Key': 'Broker Name',
+                'Value': 'Insert some env-specific name here'
+            },
+            {
+                'Key': 'Organization ID',
+                'Value': self.org_id
+            },
+            {
+                'Key': 'Instance ID',
+                'Value': self.instance_id
+            },
+        ]
+        tags
+
+    def create_tags(self, vpc, subnet_ids):
+        vpc.create_tags(
+            DryRun=False,
+            Resources=subnet_ids,
+            Tags=self.build_tags()
+        )
+
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
     print '%s' % subnet
@@ -147,6 +163,8 @@ def create_subnet(vpc, subnet, az):
         CidrBlock='%s' % subnet,
         AvailabilityZone=az
     )
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
