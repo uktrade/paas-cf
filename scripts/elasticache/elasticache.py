@@ -55,14 +55,22 @@ class ElasticacheBrokerTest(object):
             ResourceName=arn,
             Tags=[
                 {
-                    'Key': 'bound-app-{}'.format(APP_GUID),
-                    'Value': BINDING_ID
+                    'Key': self.buildBindingTagKey(),
+                    'Value': 'app-guid-{}'.format(APP_GUID)
                 },
             ]
         )
         print 'Redis cluster endpoint: '
         j = {'credentials': self.get_cluster_url(self.buildCacheClusterId())}
         print json.dumps(j)
+
+    def unbind(self):
+        arn = self.buildARN()
+        elasticache = boto3.client('elasticache')
+        elasticache.remove_tags_from_resource(
+            ResourceName=arn,
+            TagKeys=[self.buildBindingTagKey()]
+        )
 
     def get_cluster_url(self, cache_cluster_id):
         elasticache = boto3.client('elasticache')
@@ -197,6 +205,9 @@ class ElasticacheBrokerTest(object):
     def buildARN(self):
         return '{}{}'.format(ELASTICACHE_ARN_PREFIX, self.buildCacheClusterId())
 
+    def buildBindingTagKey(self):
+        return 'binding-id-{}'.format(BINDING_ID)
+
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
     print '%s' % subnet
@@ -215,6 +226,7 @@ if __name__ == '__main__':
     action_group.add_argument('--provision', help='Create a new elasticache', action='store_true')
     action_group.add_argument('--deprovision', help='Delete an existing elasticache', action='store_true')
     action_group.add_argument('--bind', help='Bind an app to an existing elasticache', action='store_true')
+    action_group.add_argument('--unbind', help='Unbind an app from an existing elasticache', action='store_true')
 
     parser.add_argument('--vpc-id', help='Id for existing VPC', required=True)
     parser.add_argument('--instance-id', help='Id for new elasticache instance', required=True)
@@ -237,5 +249,7 @@ if __name__ == '__main__':
         ec.provision()
     elif args.deprovision:
         ec.deprovision()
-    else:
+    elif args.bind:
         ec.bind()
+    else:
+        ec.unbind()
