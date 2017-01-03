@@ -46,7 +46,20 @@ class ElasticacheBrokerTest(object):
         self.bind_application_security_group(asg_name)
 
     def deprovision(self):
-        print self
+        elasticache = boto3.client('elasticache')
+        self.delete_application_security_group()
+        response = self.delete_elasticache(elasticache)
+        cache_subnet_group_name = response['CacheCluster']['CacheSubnetGroupName']
+
+        while self.cache_cluster_still_exists(self.buildCacheClusterId()):
+            print 'Waiting for cache cluster deletion...'
+            time.sleep(15)
+
+        self.delete_subnet_group(elasticache, cache_subnet_group_name)
+        while self.subnet_group_still_exists(cache_subnet_group_name):
+            print 'Waiting for subnet group deletion...'
+            time.sleep(15)
+
 
     def bind(self):
         arn = self.buildARN()
@@ -103,6 +116,9 @@ class ElasticacheBrokerTest(object):
             SubnetIds=subnet_ids
         )['CacheSubnetGroup']['CacheSubnetGroupName']
 
+    def delete_subnet_group(self, elasticache, subnet_group):
+        elasticache.delete_cache_subnet_group( CacheSubnetGroupName=subnet_group)
+
     def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version):
         # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
         return elasticache.create_cache_cluster(
@@ -133,6 +149,15 @@ class ElasticacheBrokerTest(object):
             #AuthToken=''
         )
 
+    def delete_elasticache(self, elasticache):
+        response = elasticache.delete_cache_cluster(
+            CacheClusterId=self.buildCacheClusterId(),
+            #FinalSnapshotIdentifier=self.buildCacheClusterId()
+        )
+        print 'Deleting cache cluster:'
+        print response
+        return response
+
     def cache_node_type(self):
         #TODO: get the node type from the plan
         return 'cache.t2.micro'
@@ -143,7 +168,7 @@ class ElasticacheBrokerTest(object):
         return '3.2.4'
 
     def create_application_security_group(self, subnet_group, subnet_cidrs):
-        asg_name = 'elasticache-{}-{}'.format(self.space_id, subnet_group)
+        asg_name = self.buildApplicationSecurityGroupName()
         asg_rules = map(lambda subnet_cidr:
             {'protocol': 'tcp', 'destination': subnet_cidr, 'ports': '{}'.format(self.port)},
             subnet_cidrs)
@@ -152,6 +177,10 @@ class ElasticacheBrokerTest(object):
             temp_file.flush()
             subprocess.check_call(['cf', 'create-security-group', asg_name, temp_file.name])
         return asg_name
+
+    def delete_application_security_group(self):
+        asg_name = self.buildApplicationSecurityGroupName()
+        subprocess.check_call(['cf', 'delete-security-group', asg_name, '-f'])
 
     def bind_application_security_group(self, asg_name):
         subprocess.check_call(['cf', 'bind-security-group', asg_name, self.org_name, self.space_name])
@@ -207,6 +236,9 @@ class ElasticacheBrokerTest(object):
 
     def buildBindingTagKey(self):
         return 'binding-id-{}'.format(BINDING_ID)
+
+    def buildApplicationSecurityGroupName(self):
+        return 'elasticache-{}'.format(self.instance_id)
 
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
