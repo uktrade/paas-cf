@@ -5,6 +5,9 @@ import netaddr
 import subprocess
 import tempfile
 import json
+import os
+
+DEPLOY_ENV = os.environ.get('DEPLOY_ENV')
 
 class ElasticacheBrokerTest(object):
     def __init__(self, vpc_id, instance_id, service_id, plan_id, security_group_id, org_id=None, org_name=None, space_id=None, space_name=None):
@@ -63,10 +66,11 @@ class ElasticacheBrokerTest(object):
         )['CacheSubnetGroup']['CacheSubnetGroupName']
 
     def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version):
+        cache_cluster_id = 'ccid-%s' % self.instance_id
         # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
         return elasticache.create_cache_cluster(
             #Note: has a 20 character limit
-            CacheClusterId='ccid-%s' % self.instance_id,
+            CacheClusterId=cache_cluster_id,
             #ReplicationGroupId='string',
             NumCacheNodes=1,
             CacheNodeType=cache_node_type,
@@ -116,7 +120,11 @@ class ElasticacheBrokerTest(object):
         subprocess.check_call(['cf', 'bind-security-group', asg_name, self.org_name, self.space_name])
 
     def build_tags(self):
-        tags = [
+        return [
+            {
+                'Key': 'Name',
+                'Value': 'elasticache-{}'.format(self.instance_id)
+            },
             {
                 'Key': 'Owner',
                 'Value': 'Cloud Foundry'
@@ -135,7 +143,7 @@ class ElasticacheBrokerTest(object):
             },
             {
                 'Key': 'Broker Name',
-                'Value': 'Insert some env-specific name here'
+                'Value': 'Redis-broker'
             },
             {
                 'Key': 'Organization ID',
@@ -146,7 +154,6 @@ class ElasticacheBrokerTest(object):
                 'Value': self.instance_id
             },
         ]
-        tags
 
     def create_tags(self, vpc, subnet_ids):
         vpc.create_tags(
