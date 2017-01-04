@@ -25,6 +25,7 @@ class ElasticacheBrokerTest(object):
         self.service_id = service_id
         self.security_group_id = security_group_id
         self.port = 6379
+        self.subnet_range = '10.0.64.0/18'
 
     def provision(self, instance_id, space_name, space_id, org_id, plan_id):
         elasticache = boto3.client('elasticache')
@@ -48,6 +49,7 @@ class ElasticacheBrokerTest(object):
 
         cluster_id = self.buildCacheClusterId(instance_id)
         if self.cache_cluster_still_exists(elasticache, cluster_id):
+            print "Deleting cluster: %s" % instance_id
             response = self.delete_elasticache(elasticache, instance_id)
 
         while self.cache_cluster_still_exists(elasticache, cluster_id):
@@ -56,6 +58,7 @@ class ElasticacheBrokerTest(object):
 
         subnet_group = self.build_subnet_group_name(instance_id)
         if self.subnet_group_still_exists(elasticache, subnet_group):
+            print "Deleting subnet group: %s" % subnet_group
             self.delete_subnet_group(elasticache, subnet_group)
 
         while self.subnet_group_still_exists(elasticache, subnet_group):
@@ -63,7 +66,7 @@ class ElasticacheBrokerTest(object):
             time.sleep(15)
 
         for subnet in self.get_subnets(instance_id):
-            print "Deleting subnet %s" % subnet.id
+            print "Deleting subnet: %s" % subnet.id
             subnet.delete()
 
     def get_subnets(self, instance_id):
@@ -97,6 +100,8 @@ class ElasticacheBrokerTest(object):
     def bind(self, instance_id):
         arn = self.buildARN(instance_id)
         elasticache = boto3.client('elasticache')
+        print "Adding tag: %s" % self.buildBindingTagKey()
+        print "To resource: %s" % arn
         elasticache.add_tags_to_resource(
             ResourceName=arn,
             Tags=[
@@ -113,6 +118,8 @@ class ElasticacheBrokerTest(object):
     def unbind(self, instance_id):
         arn = self.buildARN(instance_id)
         elasticache = boto3.client('elasticache')
+        print "Removing tag: %s" % self.buildBindingTagKey()
+        print "From resource: %s" % arn
         elasticache.remove_tags_from_resource(
             ResourceName=arn,
             TagKeys=[self.buildBindingTagKey()]
@@ -126,7 +133,8 @@ class ElasticacheBrokerTest(object):
         return '{}:{}'.format(address, port)
 
     def select_subnets(self, existing_subnets):
-        supernet = netaddr.IPNetwork('10.0.64.0/18')
+        print "Selecting subnets in range %s" % self.subnet_range
+        supernet = netaddr.IPNetwork(self.subnet_range)
         allowed_subnet_set = netaddr.IPSet(list(supernet.subnet(28)))
         existing_subnet_set = netaddr.IPSet(map(lambda subnet: subnet.cidr_block, existing_subnets))
         available_subnet_set = allowed_subnet_set - existing_subnet_set
@@ -306,21 +314,24 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     action_group = parser.add_mutually_exclusive_group(required=True)
+
+    # Actions
     action_group.add_argument('--provision', help='Create a new elasticache', action='store_true')
     action_group.add_argument('--deprovision', help='Delete an existing elasticache', action='store_true')
     action_group.add_argument('--bind', help='Bind an app to an existing elasticache', action='store_true')
     action_group.add_argument('--unbind', help='Unbind an app from an existing elasticache', action='store_true')
 
+    # Broker constants
     parser.add_argument('--vpc-id', help='Id for existing VPC', required=True)
-    parser.add_argument('--instance-id', help='Id for new elasticache instance', required=True)
     parser.add_argument('--service-id', help='Service ID for new elasticache instance', required=True)
-    parser.add_argument('--plan-id', help='Plan ID for new elasticache instance', required=True)
-    parser.add_argument('--org-id', help='Org for new elasticache instance', required=True)
-    # A broker implementation would probably derive the org name from the org ID, but for simplicity and proof of concept
-    # we will just pass it into this script
-    parser.add_argument('--org-name', help='Org for new elasticache instance', required=True)
-    parser.add_argument('--space-name', help='Space for new elasticache instance', required=True)
     parser.add_argument('--security-group-id', help='Security group for new elasticache instance', required=True)
+
+    # Parameters sent by the cloud controller
+    parser.add_argument('--instance-id', help='Id for new elasticache instance', required=True)
+    parser.add_argument('--plan-id', help='Plan ID for new elasticache instance', required=True)
+    parser.add_argument('--space-name', help='Space for new elasticache instance', required=True)
+    # A broker implementation would receive the space id from the cloud controller, but for simplicity and proof of concept
+    # we just pass name and the script retrieves the id
 
     args = parser.parse_args()
 
