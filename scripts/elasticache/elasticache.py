@@ -8,6 +8,7 @@ import json
 import os
 import pprint
 from botocore.exceptions import ClientError
+import time
 
 DEPLOY_ENV = os.environ.get('DEPLOY_ENV')
 
@@ -50,34 +51,54 @@ class ElasticacheBrokerTest(object):
     def deprovision(self):
         elasticache = boto3.client('elasticache')
         self.delete_application_security_group()
-        response = elasticache.describe_cache_clusters(CacheClusterId=self.buildCacheClusterId())
-        if len(response['CacheClusters']) > 1:
-            raise Exception("I expect only 1 cluster")
-        cluster = response['CacheClusters'][0]
-        pprint.PrettyPrinter().pprint(cluster)
-        security_groups = [security_group['SecurityGroupId'] for security_group in cluster['SecurityGroups']]
-        if len(security_groups) > 1:
-            raise Exception("I expect only 1 security group")
-        security_group = security_groups[0]
-        subnet_group = cluster['CacheSubnetGroupName']
 
-        response = self.delete_elasticache(elasticache)
-        cache_subnet_group_name = response['CacheCluster']['CacheSubnetGroupName']
+        cluster_id = self.buildCacheClusterId()
+        if self.cache_cluster_still_exists(elasticache, cluster_id):
+            response = self.delete_elasticache(elasticache)
 
-        while self.cache_cluster_still_exists(elasticache, self.buildCacheClusterId()):
+        while self.cache_cluster_still_exists(elasticache, cluster_id):
             print 'Waiting for cache cluster deletion...'
             time.sleep(15)
 
-        self.delete_subnet_group(elasticache, cache_subnet_group_name)
-        while self.subnet_group_still_exists(cache_subnet_group_name):
+        subnet_group = self.build_subnet_group_name()
+        if self.subnet_group_still_exists(elasticache, subnet_group):
+            self.delete_subnet_group(elasticache, subnet_group)
+
+        while self.subnet_group_still_exists(elasticache, subnet_group):
             print 'Waiting for subnet group deletion...'
             time.sleep(15)
 
+        for subnet in self.get_subnets(self.instance_id):
+            print "Deleting subnet %s" % subnet.id
+            subnet.delete()
+
+    def get_subnets(self, instance_id):
+        vpc = boto3.resource('ec2').Vpc(self.vpc_id)
+        subnets = vpc.subnets.filter(
+            Filters = [{'Name': 'tag:Instance ID', 'Values': [instance_id]}]
+        )
+        return list(subnets)
+
     def cache_cluster_still_exists(self, elasticache, cluster_id):
         try:
-            response = elasticache.describe_cache_clusters(CacheClusterId=self.buildCacheClusterId())
+            response = elasticache.describe_cache_clusters(CacheClusterId=cluster_id)
         except ClientError as e:
+            print 'ClientError'
             if e.response['Error']['Code'] == 'CacheClusterNotFound':
+                print 'CacheClusterNotFound'
+                return False
+            else:
+                raise e
+        pprint.PrettyPrinter().pprint(response)
+        return True
+
+    def subnet_group_still_exists(self, elasticache, cache_subnet_group_name):
+        try:
+            response = elasticache.describe_cache_subnet_groups(CacheSubnetGroupName=cache_subnet_group_name)
+        except ClientError as e:
+            print 'ClientError'
+            if e.response['Error']['Code'] == 'CacheSubnetGroupNotFoundFault':
+                print 'CacheSubnetGroupNotFoundFault'
                 return False
             else:
                 raise e
@@ -262,6 +283,9 @@ class ElasticacheBrokerTest(object):
 
     def buildApplicationSecurityGroupName(self):
         return 'elasticache-{}'.format(self.instance_id)
+
+    def build_subnet_group_name(self):
+        return 'cache-subnet-group-%s' % self.instance_id
 
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
