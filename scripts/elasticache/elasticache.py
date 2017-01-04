@@ -20,15 +20,13 @@ APP_GUID='appGuidProvidedByCloudController'
 BINDING_ID='someValueProvidedByCloudController'
 
 class ElasticacheBrokerTest(object):
-    def __init__(self, vpc_id, service_id, security_group_id, org_name=None, space_name=None):
+    def __init__(self, vpc_id, service_id, security_group_id):
         self.vpc_id = vpc_id
         self.service_id = service_id
-        self.org_name = org_name
-        self.space_name = space_name
         self.security_group_id = security_group_id
         self.port = 6379
 
-    def provision(self, instance_id, space_id, org_id, plan_id):
+    def provision(self, instance_id, space_name, space_id, org_id, plan_id):
         elasticache = boto3.client('elasticache')
         vpc = boto3.resource('ec2').Vpc(self.vpc_id)
 
@@ -36,13 +34,13 @@ class ElasticacheBrokerTest(object):
         subnets = self.create_subnets(vpc, self.select_subnets(existing_subnets))
 
         subnet_ids = map(lambda subnet: subnet.subnet_id, subnets)
-        self.create_tags(vpc, subnet_ids, instance_id, space_id, org_id, plan_id)
+        self.create_tags(vpc, subnet_ids, instance_id, space_name, org_id, plan_id)
         subnet_group = self.create_subnet_group(elasticache, subnet_ids, instance_id)
-        self.create_elasticache(elasticache, subnet_group, self.cache_node_type(), self.engine_version(), instance_id, space_id, org_id, plan_id)
+        self.create_elasticache(elasticache, subnet_group, self.cache_node_type(), self.engine_version(), instance_id, space_name, org_id, plan_id)
 
         subnet_cidrs = map(lambda subnet: subnet.cidr_block, subnets)
-        asg_name = self.create_application_security_group(subnet_group, subnet_cidrs, instance_id)
-        self.bind_application_security_group(asg_name)
+        security_group_id = self.create_application_security_group(subnet_group, subnet_cidrs, instance_id)
+        self.bind_application_security_group(security_group_id, space_id)
 
     def deprovision(self, instance_id):
         elasticache = boto3.client('elasticache')
@@ -139,14 +137,15 @@ class ElasticacheBrokerTest(object):
         return zip(available_subnets[:2], azs)
 
     def create_subnets(self, vpc, subnets_and_azs):
-        print "Creating subnets..."
-        print subnets_and_azs
+        print "Creating subnets: %s" % subnets_and_azs
         return map(lambda (subnet, az): create_subnet(vpc, subnet, az), subnets_and_azs)
 
 
     def create_subnet_group(self, elasticache, subnet_ids, instance_id):
+        subnet_group_name = self.build_subnet_group_name(instance_id)
+        print "Creating subnet group: %s" % subnet_group_name
         return elasticache.create_cache_subnet_group(
-            CacheSubnetGroupName='cache-subnet-group-%s' % instance_id,
+            CacheSubnetGroupName=subnet_group_name,
             CacheSubnetGroupDescription='Cache subnet group for %s' % instance_id,
             SubnetIds=subnet_ids
         )['CacheSubnetGroup']['CacheSubnetGroupName']
@@ -154,11 +153,13 @@ class ElasticacheBrokerTest(object):
     def delete_subnet_group(self, elasticache, subnet_group):
         elasticache.delete_cache_subnet_group( CacheSubnetGroupName=subnet_group)
 
-    def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version, instance_id, space_id, org_id, plan_id):
+    def create_elasticache(self, elasticache, subnet_group, cache_node_type, engine_version, instance_id, space_name, org_id, plan_id):
+        cluster_id = self.buildCacheClusterId(instance_id)
+        print "Creating elasticache cluster: %s" % cluster_id
         # http://boto3.readthedocs.io/en/latest/reference/services/elasticache.html#ElastiCache.Client.create_cache_cluster
         return elasticache.create_cache_cluster(
             #Note: has a 20 character limit
-            CacheClusterId=self.buildCacheClusterId(instance_id),
+            CacheClusterId=cluster_id,
             #ReplicationGroupId='string',
             NumCacheNodes=1,
             CacheNodeType=cache_node_type,
@@ -170,7 +171,7 @@ class ElasticacheBrokerTest(object):
             SecurityGroupIds=[
                 self.security_group_id,
             ],
-            Tags=self.build_tags(instance_id, space_id, org_id, plan_id),
+            Tags=self.build_tags(instance_id, space_name, org_id, plan_id),
             #SnapshotArns=[],
             #SnapshotName='string',
             PreferredMaintenanceWindow='Thu:03:00-Thu:04:00',
@@ -206,20 +207,25 @@ class ElasticacheBrokerTest(object):
         asg_rules = map(lambda subnet_cidr:
             {'protocol': 'tcp', 'destination': subnet_cidr, 'ports': '{}'.format(self.port)},
             subnet_cidrs)
-        with tempfile.NamedTemporaryFile() as temp_file:
-            json.dump(asg_rules, temp_file)
-            temp_file.flush()
-            subprocess.check_call(['cf', 'create-security-group', asg_name, temp_file.name])
-        return asg_name
+        body = json.dumps({
+            "name": asg_name,
+            "rules": asg_rules
+        })
+        print "Creating security group: %s" % asg_name
+        response_string = subprocess.check_output(['cf', 'curl', '-X', 'POST', '/v2/security_groups', '-d', body])
+        response = json.loads(response_string)
+        security_group_id = response['metadata']['guid']
+        return security_group_id
 
     def delete_application_security_group(self, instance_id):
         asg_name = self.buildApplicationSecurityGroupName(instance_id)
         subprocess.check_call(['cf', 'delete-security-group', asg_name, '-f'])
 
-    def bind_application_security_group(self, asg_name):
-        subprocess.check_call(['cf', 'bind-security-group', asg_name, self.org_name, self.space_name])
+    def bind_application_security_group(self, guid, space_id):
+        print "Binding security group {} to space {}".format(guid, space_id)
+        subprocess.check_call(['cf', 'curl', '-X', 'PUT', '/v2/security_groups/{}/spaces/{}'.format(guid, space_id)])
 
-    def build_tags(self, instance_id, space_id, org_id, plan_id):
+    def build_tags(self, instance_id, space_name, org_id, plan_id):
         return [
             {
                 'Key': 'Name',
@@ -239,7 +245,7 @@ class ElasticacheBrokerTest(object):
             },
             {
                 'Key': 'Space ID',
-                'Value': space_id
+                'Value': space_name
             },
             {
                 'Key': 'Broker Name',
@@ -255,11 +261,12 @@ class ElasticacheBrokerTest(object):
             },
         ]
 
-    def create_tags(self, vpc, subnet_ids, instance_id, space_id, org_id, plan_id):
+    def create_tags(self, vpc, subnet_ids, instance_id, space_name, org_id, plan_id):
+        print "Creating tags: %s" % self.build_tags(instance_id, space_name, org_id, plan_id)
         vpc.create_tags(
             DryRun=False,
             Resources=subnet_ids,
-            Tags=self.build_tags(instance_id, space_id, org_id, plan_id)
+            Tags=self.build_tags(instance_id, space_name, org_id, plan_id)
         )
 
     def buildCacheClusterId(self, instance_id):
@@ -271,11 +278,18 @@ class ElasticacheBrokerTest(object):
     def buildBindingTagKey(self):
         return 'binding-id-{}'.format(BINDING_ID)
 
-    def buildApplicationSecurityGroupName(instance_idself, instance_id):
+    def buildApplicationSecurityGroupName(self, instance_id):
         return 'elasticache-{}'.format(instance_id)
 
     def build_subnet_group_name(self, instance_id):
         return 'cache-subnet-group-%s' % instance_id
+
+def get_space_id(space_name):
+    response_string = subprocess.check_output(['cf', 'curl', '/v2/spaces'])
+    response = json.loads(response_string)
+    resources = response['resources']
+    space = filter(lambda space: space['entity']['name'] == space_name, resources)[0]
+    return space['metadata']['guid']
 
 def create_subnet(vpc, subnet, az):
     print "Calling vpc.create_subnet..."
@@ -305,17 +319,16 @@ if __name__ == '__main__':
     # A broker implementation would probably derive the org name from the org ID, but for simplicity and proof of concept
     # we will just pass it into this script
     parser.add_argument('--org-name', help='Org for new elasticache instance', required=True)
-    parser.add_argument('--space-id', help='Space for new elasticache instance', required=True)
-    # A broker implementation would probably derive the space name from the space ID, but for simplicity and proof of concept
-    # we will just pass it into this script
     parser.add_argument('--space-name', help='Space for new elasticache instance', required=True)
     parser.add_argument('--security-group-id', help='Security group for new elasticache instance', required=True)
 
     args = parser.parse_args()
 
-    ec = ElasticacheBrokerTest(args.vpc_id, args.service_id, args.security_group_id, args.org_name, args.space_name)
+    space_id = get_space_id(args.space_name)
+
+    ec = ElasticacheBrokerTest(args.vpc_id, args.service_id, args.security_group_id)
     if args.provision:
-        ec.provision(args.instance_id, args.space_id, args.org_id, args.plan_id)
+        ec.provision(args.instance_id, args.space_name, space_id, args.org_id, args.plan_id)
     elif args.deprovision:
         ec.deprovision(args.instance_id)
     elif args.bind:
