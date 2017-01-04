@@ -6,7 +6,6 @@ import subprocess
 import tempfile
 import json
 import os
-import pprint
 from botocore.exceptions import ClientError
 import time
 
@@ -198,7 +197,6 @@ class ElasticacheBrokerTest(object):
             CacheClusterId=self.buildCacheClusterId(instance_id),
             #FinalSnapshotIdentifier=self.buildCacheClusterId()
         )
-        print 'Deleting cache cluster:'
         return response
 
     def cache_node_type(self):
