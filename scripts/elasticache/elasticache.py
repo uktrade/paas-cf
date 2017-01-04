@@ -330,6 +330,9 @@ if __name__ == '__main__':
     parser.add_argument('--space-name', help='Space for new elasticache instance', required=True)
     # A broker implementation would receive the space id from the cloud controller, but for simplicity and proof of concept
     # we just pass name and the script retrieves the id
+    parser.add_argument('--org-id', help='Org for new elasticache instance', required=True)
+    # The cloud controller sends the org id. We only use it to create tags here, it can be set to anything
+    # for testing
 
     args = parser.parse_args()
 
