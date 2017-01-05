@@ -163,7 +163,7 @@ bosh-cli: ## Create interactive connnection to BOSH container
 
 .PHONY: pipelines
 pipelines: ## Upload pipelines to Concourse
-	concourse/scripts/pipelines-bosh-cloudfoundry.sh
+	concourse/scripts/pipelines-cloudfoundry.sh
 
 .PHONY: showenv
 showenv: ## Display environment information
