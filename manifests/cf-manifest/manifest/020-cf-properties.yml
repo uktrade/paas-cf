@@ -513,6 +513,8 @@ properties:
         require_ssl: false
       dropsonde_port: (( grab properties.metron_agent.dropsonde_incoming_port ))
       require_ssl: true
+      convergence:
+          repeate_interval_in_seconds: 50000000000
 
     file_server:
       dropsonde_port: (( grab properties.metron_agent.dropsonde_incoming_port ))
