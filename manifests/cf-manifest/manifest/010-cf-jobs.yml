@@ -10,7 +10,6 @@ meta:
     release: (( grab meta.consul_templates.consul_agent.release ))
   - name: cloud_controller_ng
     release: capi
-  - name: metron_agent
     release: (( grab meta.release.name ))
   - name: statsd-injector
     release: (( grab meta.release.name ))
@@ -41,7 +40,7 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
   - name: cloud_controller_worker
-    release: capi
+    release: (( grab meta.release.name ))
   - name: metron_agent
     release: (( grab meta.release.name ))
   - name: datadog-consul
@@ -55,8 +54,6 @@ meta:
   - name: datadog-consul
     release: datadog-for-cloudfoundry
   - name: cloud_controller_clock
-    release: capi
-  - name: metron_agent
     release: (( grab meta.release.name ))
 
   consul_templates:
@@ -422,8 +419,6 @@ jobs:
         release: datadog-for-cloudfoundry
       - name: ssh_proxy
         release: diego
-      - name: metron_agent
-        release: cf
       - name: file_server
         release: diego
       - name: cfdot
