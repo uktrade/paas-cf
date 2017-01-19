@@ -25,6 +25,8 @@ doppler,
 metron,
 trafficcontroller,
 saml
+auctioneer_server,auctioneer.service.cf.internal
+auctioneer_client
 "
 
 WORKING_DIR="$(mktemp -dt generate-cf-certs.XXXXXX)"

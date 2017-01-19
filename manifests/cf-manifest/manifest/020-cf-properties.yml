@@ -7,6 +7,7 @@ meta:
   secrets:
     consul_ca_cert: (( grab secrets.bosh_ca_cert ))
     bbs_ca_cert: (( grab secrets.bosh_ca_cert ))
+    auctioneer_ca_cert: (( grab secrets.bosh_ca_cert ))
 
   consul_servers: (( grab jobs.consul.networks.cf.static_ips ))
 
@@ -509,6 +510,9 @@ properties:
         client_cert: (( grab secrets.bbs_client_cert  ))
         client_key: (( grab secrets.bbs_client_key  ))
         require_ssl: true
+      ca_cert: (( grab meta.secrets.auctioneer_ca_cert ))
+      server_cert: (( grab secrets.auctioneer_server_cert ))
+      server_key: (( grab secrets.auctioneer_server_key ))
       dropsonde_port: (( grab properties.metron_agent.dropsonde_incoming_port ))
 
     bbs:
@@ -520,7 +524,10 @@ properties:
       server_cert: (( grab secrets.bbs_server_cert ))
       server_key: (( grab secrets.bbs_server_key ))
       auctioneer:
-        api_location: http://auctioneer.service.cf.internal:9016
+        api_location: https://auctioneer.service.cf.internal:9016
+        ca_cert: (( grab meta.secrets.auctioneer_ca_cert ))
+        server_cert: (( grab secrets.auctioneer_server_cert ))
+        server_key: (( grab secrets.auctioneer_server_key ))
       etcd:
         machines: []
         ca_cert: ""
