@@ -42,6 +42,45 @@ resource "datadog_monitor" "continuous-smoketests" {
   }
 }
 
+resource "datadog_monitor" "continuous-smoketests-failures" {
+  count              = "${var.enable_pagerduty_notifications}"
+  name               = "${format("%s concourse continuous smoketests failures", var.env)}"
+  type               = "query alert"
+  escalation_message = "Smoke test failures"
+  no_data_timeframe  = "15"
+  query              = "${format("sum(last_15m):count_nonzero(avg:concourse.build.finished{build_status:failed,deploy_env:%s,job:continuous-smoke-tests}) >= 3", var.env)}"
+
+  message = <<EOF
+  {{#is_alert}}
+    The `continuous-smoke-tests` have been failing for a while now.
+
+    We need to investigate.
+
+    Notify: @pagerduty-Datadog
+  {{/is_alert}}
+
+  {{#is_no_data}}
+    The `continuous-smoke-tests` have not reported any metrics for a while.
+
+    We need to investigate.
+
+    Notify: @pagerduty-Datadog_no_data
+  {{/is_no_data}}
+EOF
+
+  require_full_window = false
+  notify_no_data      = true
+
+  thresholds {
+    critical = "3"
+  }
+
+  tags {
+    "deployment" = "${var.env}"
+    "service"    = "${var.env}_monitors"
+  }
+}
+
 resource "datadog_timeboard" "concourse-jobs" {
   title       = "${format("%s job runtime difference", var.env) }"
   description = "vs previous hour"
