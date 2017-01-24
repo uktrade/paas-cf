@@ -6,3 +6,6 @@ cf_db_backup_retention_period = "0"
 cf_db_skip_final_snapshot = "true"
 cf_db_maintenance_window = "Mon:04:00-Mon:05:00"
 support_email="govpaas-alerting-dev@digital.cabinet-office.gov.uk"
+
+# FIXME: this is just for tesing and PR review
+enable_pagerduty_notifications = 1
