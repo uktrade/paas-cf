@@ -683,6 +683,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/terraform
+              tag: 161376949_TF_ruby
           inputs:
             - name: paas-cf
             - name: cf-certs-tfstate
@@ -786,6 +787,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/terraform
+              tag: 161376949_TF_ruby
           inputs:
             - name: terraform-variables
             - name: paas-cf
@@ -1515,6 +1517,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/terraform
+                tag: 161376949_TF_ruby
             inputs:
               - name: datadog-tfstate
               - name: paas-cf
