@@ -1550,6 +1550,12 @@ jobs:
                       -var-file=paas-cf/terraform/{{aws_account}}.tfvars \
                       -state=datadog-tfstate/datadog.tfstate -state-out=updated-tfstate/datadog.tfstate \
                       -var-file=config/job_instances.tfvars paas-cf/terraform/datadog
+
+                    echo "Applying require_full_window atributes for monitors that set it to false..."
+                    echo
+                    paas-cf/concourse/scripts/update_monitor_options.rb < datadog-tfstate/datadog.tfstate
+                    echo
+                    echo "Done"
                   else
                     echo "Datadog disabled, skipping terraform run..."
                     cp datadog-tfstate/datadog.tfstate updated-tfstate/datadog.tfstate
