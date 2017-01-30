@@ -1,14 +1,17 @@
 package scripts_test
 
 import (
+	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("UpdateDataDogMonitor", func() {
@@ -16,12 +19,102 @@ var _ = Describe("UpdateDataDogMonitor", func() {
 	var (
 		cmdInput string
 		session  *gexec.Session
+		server   *ghttp.Server
+
+		respJsonPut = []byte(`{
+  "tags": [
+    "deployment:fake",
+    "service:fake"
+  ],
+  "deleted": null,
+  "query": "fake query",
+  "message": "fake message",
+  "id": 1,
+  "multi": false,
+  "name": "concourse continuous smoketests failures",
+  "created": "1970-00-00T00:00:01.000000+00:00",
+  "created_at": 1,
+  "creator": {
+    "id": 1,
+    "handle": "fake.email@fake.com",
+    "name": "Mr Fake",
+    "email": "fake.email.@fake.com"
+  },
+  "org_id": 1,
+  "modified": "1970-00-00T00:00:02.000000+00:00",
+  "state": {
+    "groups": {}
+  },
+  "overall_state": "No Data",
+  "type": "query alert",
+  "options": {
+    "notify_audit": false,
+    "locked": false,
+    "silenced": {},
+    "thresholds": {
+      "critical": 3
+    },
+    "require_full_window": false,
+    "new_host_delay": 300,
+    "notify_no_data": false,
+    "escalation_message": "Smoke test failures"
+  }
+}`)
+
+		respJsonGet = []byte(`{
+  "tags": [
+    "deployment:fake",
+    "service:fake"
+  ],
+  "deleted": null,
+  "query": "fake query",
+  "message": "fake message",
+  "id": 1,
+  "multi": false,
+  "name": "concourse continuous smoketests failures",
+  "created": "1970-00-00T00:00:01.000000+00:00",
+  "created_at": 1,
+  "creator": {
+    "id": 1,
+    "handle": "fake.email@fake.com",
+    "name": "Mr Fake",
+    "email": "fake.email.@fake.com"
+  },
+  "org_id": 1,
+  "modified": "1970-00-00T00:00:02.000000+00:00",
+  "state": {
+    "groups": {}
+  },
+  "overall_state": "No Data",
+  "type": "query alert",
+  "options": {
+    "notify_audit": false,
+    "locked": false,
+    "silenced": {},
+    "thresholds": {
+      "critical": 3
+    },
+    "new_host_delay": 300,
+    "notify_no_data": false,
+    "escalation_message": "Smoke test failures"
+  }
+}`)
 	)
+
+	BeforeEach(func() {
+		server = ghttp.NewServer()
+		server.RouteToHandler("GET", "/api/v1/monitor/1", ghttp.RespondWith(http.StatusOK, respJsonGet))
+		server.RouteToHandler("PUT", "/api/v1/monitor/1", ghttp.RespondWith(http.StatusOK, respJsonPut))
+	})
+
+	AfterEach(func() {
+		server.Close()
+	})
 
 	JustBeforeEach(func() {
 		os.Setenv("TF_VAR_datadog_api_key", "aaaaaaaaaaaaa")
 		os.Setenv("TF_VAR_datadog_app_key", "bbbbbbbbbbbbb")
-		command := exec.Command("bundle", "exec", "./update_monitor_options.rb", "http://localhost:8080")
+		command := exec.Command("bundle", "exec", "./update_monitor_options.rb", server.URL())
 		command.Stdin = strings.NewReader(cmdInput)
 
 		var err error
