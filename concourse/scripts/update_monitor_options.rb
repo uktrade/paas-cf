@@ -21,7 +21,6 @@ def find_monitors(tfstate)
         end
       end
       if attributes != {}
-        attributes["query"] = name["primary"]["attributes"]["query"]
         monitor_ids[name["primary"]["id"]] = attributes
       end
     end
@@ -30,14 +29,16 @@ def find_monitors(tfstate)
 end
 
 def update_monitors(monitor_ids, api_client)
-  monitor_ids.each do |id, options|
-    query = options["query"]
-    options.delete("query")
-    printf("Updating monitor %s with attributes %s\n", id, options)
+  monitor_ids.each do |id, tfstate_options|
+    monitor = api_client.get_monitor(id)
+    options = monitor[1]["options"]
+    options.merge!(tfstate_options)
+    query = monitor[1]["query"]
     resp = api_client.update_monitor(id, query, options: options)
     if resp[0] != "200"
       return resp
     end
+    printf("Updated monitor %s with attributes %s\n", id, options)
   end
   nil
 end

@@ -78,9 +78,9 @@ var _ = Describe("UpdateDataDogMonitor", func() {
 			`
 		})
 
-		It("updates the monitor", func() {
+		It("updates the monitor and preserves all options", func() {
 			Eventually(session).Should(gexec.Exit(0))
-			Expect(session.Out).To(gbytes.Say("Updating monitor 1 with attributes {\"require_full_window\"=>false}\n"))
+			Expect(session.Out).To(gbytes.Say("Updated monitor 1 with attributes {\"notify_audit\"=>false, \"locked\"=>false, \"silenced\"=>{}, \"thresholds\"=>{\"critical\"=>3}, \"new_host_delay\"=>300, \"notify_no_data\"=>false, \"escalation_message\"=>\"Smoke test failures\", \"require_full_window\"=>false}\n"))
 		})
 	})
 
@@ -135,7 +135,7 @@ var _ = Describe("UpdateDataDogMonitor", func() {
 
 		It("doesn't update the monitor", func() {
 			Eventually(session).Should(gexec.Exit(0))
-			Expect(session.Out).ToNot(gbytes.Say("Updating monitor 1 with attributes {\"require_full_window\"=>false}\n"))
+			Expect(session.Out.Contents()).To(BeEmpty())
 		})
 	})
 })
