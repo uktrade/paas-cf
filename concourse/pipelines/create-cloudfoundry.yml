@@ -569,6 +569,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             run:
               path: sh
               args:
@@ -1237,6 +1238,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/cf-cli
+              tag: 137881471_update_cf_cli_6_23_1
           inputs:
             - name: paas-cf
             - name: config
@@ -1267,6 +1269,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             run:
               path: sh
               args:
@@ -1293,6 +1296,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             run:
               path: sh
               args:
@@ -1347,6 +1351,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             inputs:
               - name: paas-cf
               - name: config
@@ -1382,6 +1387,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             run:
               path: sh
               args:
@@ -1598,6 +1604,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             inputs:
               - name: paas-cf
               - name: config
@@ -1633,6 +1640,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             inputs:
               - name: paas-roadmap
               - name: paas-cf
@@ -1664,6 +1672,7 @@ jobs:
               type: docker-image
               source:
                 repository: governmentpaas/cf-cli
+                tag: 137881471_update_cf_cli_6_23_1
             inputs:
               - name: paas-cf
               - name: config
@@ -1747,6 +1756,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/cf-cli
+              tag: 137881471_update_cf_cli_6_23_1
           params:
             DISABLE_HEALTHCHECK_DB: {{disable_healthcheck_db}}
           inputs:
