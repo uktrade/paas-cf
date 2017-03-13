@@ -9,6 +9,14 @@ releases:
     version: "251"
     url: https://bosh.io/d/github.com/cloudfoundry/cf-release?v=251
     sha1: 2d5c34cb2dc4c9c536f6f436b8c39f58df8a4cbb
+  - name: uaa
+    version: "27"
+    url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=27
+    sha1: e935b37f1860a885046eab7dcb4a57a1de683ee1
+  - name: capi
+    version: "1.21.0"
+    url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.21.0
+    sha1: 6dbeb9fad3cb8f3af5ec396ea9de5eaff79a71a1
   - name: diego
     version: 1.5.3
     url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=1.5.3
