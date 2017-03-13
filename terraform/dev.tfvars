@@ -9,3 +9,4 @@ support_email="govpaas-alerting-dev@digital.cabinet-office.gov.uk"
 pingdom_contact_ids = [ 11089310 ]
 datadog_notification_24x7 = "@govpaas-alerting-dev@digital.cabinet-office.gov.uk"
 datadog_notification_in_hours = "@govpaas-alerting-dev@digital.cabinet-office.gov.uk"
+tenant_cidrs = [ "54.171.102.153/32" ]
