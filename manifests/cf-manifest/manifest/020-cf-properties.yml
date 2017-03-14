@@ -203,6 +203,10 @@ properties:
     audit_events:
       cutoff_age_in_days: 31
 
+    mutual_tls:
+      ca_cert: (( grab secrets.bosh_ca_cert ))
+      public_cert: (( grab secrets.cc_cert ))
+      private_key: (( grab secrets.cc_key ))
     users_can_select_backend: true
     default_to_diego_backend: true
     allow_app_ssh_access: true

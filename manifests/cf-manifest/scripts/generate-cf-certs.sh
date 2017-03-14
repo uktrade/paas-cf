@@ -13,6 +13,7 @@ APPS_DOMAINS="*.${APPS_DNS_ZONE_NAME},${APPS_DNS_ZONE_NAME}"
 SYSTEM_DOMAINS="*.${SYSTEM_DNS_ZONE_NAME},${SYSTEM_DNS_ZONE_NAME}"
 
 CERTS_TO_GENERATE="
+cc,cc.service.cf.internal
 bbs_server,bbs.service.cf.internal
 bbs_client,
 router_internal,${APPS_DOMAINS}
