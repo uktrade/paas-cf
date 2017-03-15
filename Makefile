@@ -91,6 +91,7 @@ dev: globals ## Set Environment to DEV
 	$(eval export CONCOURSE_AUTH_DURATION=48h)
 	$(eval export DISABLE_PIPELINE_LOCKING=true)
 	$(eval export TEST_HEAVY_LOAD=true)
+	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=the-multi-cloud-paas-team+dev@digital.cabinet-office.gov.uk)
 	@true
 
 .PHONY: ci
