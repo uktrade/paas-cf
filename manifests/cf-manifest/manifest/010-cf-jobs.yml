@@ -231,7 +231,7 @@ jobs:
   - name: uaa
     azs: [z1, z2]
     templates: (( grab meta.uaa_templates ))
-    instances: 2
+    instances: 1
     vm_type: medium
     vm_extensions:
       - cf_uaa_elb
