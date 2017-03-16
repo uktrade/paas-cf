@@ -8,6 +8,7 @@ image_resource:
   type: docker-image
   source:
     repository: governmentpaas/cf-cli
+    tag: "139179971_update_cf_cli"
 run:
   path: sh
   args:
