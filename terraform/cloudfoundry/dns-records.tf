@@ -16,7 +16,7 @@ resource "aws_route53_record" "cf_uaa" {
 
 resource "aws_route53_record" "cf_login" {
   zone_id = "${var.system_dns_zone_id}"
-  name    = "login.${var.system_dns_zone_name}."
+  name    = "auth.${var.system_dns_zone_name}."
   type    = "CNAME"
   ttl     = "60"
   records = ["${aws_elb.cf_uaa.dns_name}"]
