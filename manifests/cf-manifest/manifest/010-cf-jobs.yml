@@ -37,8 +37,6 @@ meta:
     release: (( grab meta.release.name ))
   - name: staticfile-buildpack
     release: (( grab meta.release.name ))
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: datadog-cc
     release: datadog-for-cloudfoundry
 
@@ -51,8 +49,6 @@ meta:
     consumes: {nats: nil}
   - name: metron_agent
     release: (( grab meta.release.name ))
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: datadog-cc-worker
     release: datadog-for-cloudfoundry
 
@@ -69,8 +65,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.release.name ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: etcd
     release: (( grab meta.release.name ))
   - name: etcd_metrics_server
@@ -82,8 +76,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: doppler
     release: (( grab meta.release.name ))
   - name: syslog_drain_binder
@@ -95,8 +87,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: loggregator_trafficcontroller
     release: (( grab meta.release.name ))
   - name: metron_agent
@@ -106,8 +96,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: nats
     consumes: {nats: nil}
     release: (( grab meta.release.name ))
@@ -122,8 +110,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: gorouter
     release: (( grab meta.release.name ))
     consumes: {nats: nil}
@@ -142,8 +128,6 @@ meta:
   - name: consul_agent
     release: (( grab meta.consul_templates.consul_agent.release ))
     consumes: {consul: nil}
-  - name: datadog-consul
-    release: datadog-for-cloudfoundry
   - name: uaa
     release: (( grab meta.release.name ))
   - name: metron_agent
@@ -210,8 +194,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: datadog-bbs
         release: datadog-for-cloudfoundry
       - name: bbs
@@ -337,8 +319,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: auctioneer
         release: diego
       - name: cfdot
@@ -356,8 +336,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: rep
         release: diego
       - name: garden
@@ -392,8 +370,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: stager
         release: cf
       - name: nsync
@@ -417,8 +393,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: route_emitter
         release: diego
       - name: cfdot
@@ -438,8 +412,6 @@ jobs:
     templates:
       - name: consul_agent
         release: cf
-      - name: datadog-consul
-        release: datadog-for-cloudfoundry
       - name: ssh_proxy
         release: diego
       - name: metron_agent
