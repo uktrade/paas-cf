@@ -1,0 +1,94 @@
+<script type='text/javascript'>
+  $(function () {
+      var rows = 3;
+      Dashing.numColumns = 3;
+      Dashing.widget_base_dimensions = [(window.innerWidth - 20) / Dashing.numColumns - 10, (window.innerHeight - 10) / rows - 10];
+      Dashing.gridsterLayout('[{"col":3,"row":1,"size_x":1,"size_y":1},{"col":3,"row":2,"size_x":1,"size_y":1},{"col":3,"row":3,"size_x":1,"size_y":1},{"col":1,"row":1,"size_x":1,"size_y":1},{"col":1,"row":2,"size_x":1,"size_y":1},{"col":1,"row":3,"size_x":1,"size_y":1},{"col":2,"row":1,"size_x":1,"size_y":1},{"col":2,"row":2,"size_x":1,"size_y":1},{"col":2,"row":3,"size_x":1,"size_y":1}]');
+  });
+</script>
+
+<div class="gridster">
+  <ul>
+    <li data-row="3" data-col="1" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="Pipeline"
+         data-id="production_concourse"
+         data-view="Status"
+      ></a>
+    </li>
+
+    <li data-row="3" data-col="2" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="Pipeline"
+         data-id="staging_concourse"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="3" data-col="3" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="Pipeline"
+         data-id="ci_concourse"
+         data-view="Health"
+      ></a>
+    </li>
+
+
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="PagerDury"
+         data-id="pagerduty_counts"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="1" data-col="2" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="DeskPro"
+         data-id="dp_counts"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="1" data-col="3" data-sizex="1" data-sizey="1">
+      <a href=""
+         target="_blank"
+         data-title="Pivotal Tracker"
+         data-id="piv_counts"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="2" data-col="1" data-sizex="1" data-sizey="1">
+      <a href="https://app.datadoghq.com/monitors#triggered?query=service:prod_monitors"
+         target="_blank"
+         data-title="Production"
+         data-id="prod_counts"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="2" data-col="2" data-sizex="1" data-sizey="1">
+      <a href="https://app.datadoghq.com/monitors#triggered?query=service:staging_monitors"
+         target="_blank"
+         data-title="Staging"
+         data-id="staging_counts"
+         data-view="Health"
+      ></a>
+    </li>
+
+    <li data-row="2" data-col="3" data-sizex="1" data-sizey="1">
+      <a href="https://app.datadoghq.com/monitors#triggered?query=service:master_monitors"
+         target="_blank"
+         data-title="CI"
+         data-id="ci_counts"
+         data-view="Health"
+      ></a>
+    </li>
+  </ul>
+</div>
