@@ -1,0 +1,18 @@
+<ul>
+    <li data-bind-class="status">
+        <h1 class="title" data-bind="title"></h1>
+        <div data-showif="status | equals 'error'"> <!-- error -->
+            <span class="h4" data-bind="error">Error</span>
+            <p class="updated-at" data-bind="updatedAtMessage"></p>
+        </div> <!-- /error -->
+        <div data-hideif="status | equals 'error'"> <!-- no error -->
+            <div data-hideif="counter | equals 0">
+                <h3>x</h3>
+            </div>
+            <div data-showif="counter | equals 0">
+                <h3>&#10003;</h3>
+            </div>
+            <p class="updated-at" data-bind="updatedAtMessage"></p>
+        </div> <!-- /no error -->
+    </li>
+</ul>
