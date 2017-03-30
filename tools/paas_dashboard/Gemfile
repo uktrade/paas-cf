@@ -9,3 +9,6 @@ gem 'therubyracer'
 
 # talk to datadog
 gem 'dogapi'
+
+# talk to pivotal-tracker
+gem 'pivotal-tracker'
