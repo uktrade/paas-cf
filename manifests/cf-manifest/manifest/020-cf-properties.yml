@@ -126,6 +126,7 @@ properties:
 
   doppler:
     maxRetainedLogMessages: 100
+    message_drain_buffer_size: 100000
     debug: false
     blacklisted_syslog_ranges: ~
     unmarshaller_count: 5
