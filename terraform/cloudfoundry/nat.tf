@@ -14,7 +14,7 @@ resource "aws_route_table" "internet" {
   count  = "${var.zone_count}"
 }
 
-resource "aws_route" "internet" {
+resource "aws_route" "interne" {
   count                  = "${var.zone_count}"
   route_table_id         = "${element(aws_route_table.internet.*.id, count.index)}"
   destination_cidr_block = "0.0.0.0/0"
