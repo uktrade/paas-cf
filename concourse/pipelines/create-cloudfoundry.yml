@@ -52,6 +52,7 @@ groups:
   - name: health
     jobs:
       - continuous-smoke-tests
+      - continuous-loggregator-tests
   - name: credentials
     jobs:
       - clear-cloudfoundry-credentials
@@ -241,6 +242,11 @@ resources:
     type: time
     source:
       interval: 5m
+
+  - name: loggregator-tests-timer
+    type: time
+    source:
+      interval: 3m
 
   - name: paas-rubbernecker
     type: git
@@ -2538,3 +2544,69 @@ jobs:
               uuid=$(bosh status --uuid)
               sed -e "s/^director_uuid:.*$/director_uuid: ${uuid}/" cf-manifest/cf-manifest.yml > cf-manifest-with-uuid.yml
               bosh deployment ./cf-manifest-with-uuid.yml
+
+  - name: continuous-loggregator-tests
+    build_logs_to_retain: 10000
+    plan:
+      - aggregate:
+        - get: paas-cf
+        - get: bosh-CA
+        - get: loggregator-tests-timer
+          trigger: true
+        - get: cf-secrets
+          passed: ['cf-deploy']
+        - get: cf-manifest
+          passed: ['cf-deploy']
+
+      - do:
+        - task: create-temp-user
+          file: paas-cf/concourse/tasks/create_admin.yml
+          params:
+            PREFIX: cont-smoketest-user
+
+        - task: run-test
+          config:
+            platform: linux
+            image: docker:///governmentpaas/cf-cli
+            inputs:
+              - name: paas-cf
+              - name: cf-secrets
+              - name: cf-manifest
+              - name: bosh-CA
+            outputs:
+              - name: loggregator_config
+            params:
+              SYSTEM_DNS_ZONE_NAME: {{system_dns_zone_name}}
+              DATADOG_API_KEY: {{datadog_api_key}}
+              APPS_DNS_ZONE_NAME: {{apps_dns_zone_name}}
+            run:
+              path: sh
+              args:
+              - -c
+              - -e
+              - |
+                ./paas-cf/concourse/scripts/import_bosh_ca.sh
+                VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+                CF_ADMIN=admin
+                CF_PASS=$($VAL_FROM_YAML secrets.uaa_admin_password cf-secrets/cf-secrets.yml)
+                API_ENDPOINT=$($VAL_FROM_YAML properties.cc.srv_api_uri cf-manifest/cf-manifest.yml)
+                export CF_SYSTEM_DOMAIN=${APPS_DNS_ZONE_NAME}
+                export CF_SPACE=admin
+                export CF_ORG=admin
+                export CYCLES=10000
+                export DELAY_US=5
+                export DRAIN_URLS=""
+                export DATADOG_API_KEY=${DATADOG_API_KEY}
+                export DRAIN_VERSION=""
+                export NUM_APPS=1
+
+                cf login -a ${API_ENDPOINT} -u ${CF_ADMIN} -p ${CF_PASS} \
+                  -o admin -s admin
+
+                cd ./paas-cf/platform-tests/loggregator
+                ./hammer.sh
+                ./report.sh
+
+        ensure:
+          task: remove-temp-user
+          file: paas-cf/concourse/tasks/delete_admin.yml
