@@ -54,6 +54,10 @@ output "cf_cc_elb_name" {
   value = "${aws_elb.cf_cc.name}"
 }
 
+output "cf_uaa_alb_target_group_name" {
+  value = "${aws_alb_target_group.cf_uaa.name}"
+}
+
 output "cf_uaa_elb_name" {
   value = "${aws_elb.cf_uaa.name}"
 }
