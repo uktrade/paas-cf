@@ -42,6 +42,56 @@ resource "aws_lb_ssl_negotiation_policy" "cf_cc" {
   }
 }
 
+resource "aws_alb" "cf_uaa" {
+  name            = "${var.env}-cf-uaa"
+  subnets         = ["${split(",", var.infra_subnet_ids)}"]
+  idle_timeout              = 19
+  /*internal        = false*/
+
+  security_groups = [
+    "${aws_security_group.cf_api_elb.id}",
+  ]
+
+  access_logs {
+    bucket        = "${aws_s3_bucket.elb_access_log.id}"
+    prefix        = "cf-uaa"
+  }
+}
+
+resource "aws_alb_target_group" "cf_uaa" {
+  name     = "${var.env}-cf-uaa"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+  /*deregistration_delay*/
+
+  stickiness {
+    type = "lb_cookie"
+    cookie_duration = 300
+  }
+
+  health_check {
+    interval            = "${var.health_check_interval}"
+    path                = "/healthz"
+    timeout             = "${var.health_check_timeout}"
+    healthy_threshold   = "${var.health_check_healthy}"
+    unhealthy_threshold = "${var.health_check_unhealthy}"
+  }
+}
+
+resource "aws_alb_listener" "cf_uaa" {
+  load_balancer_arn = "${aws_alb.cf_uaa.arn}"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "${var.default_elb_security_policy}"
+  certificate_arn   = "${var.system_domain_cert_arn}"
+
+  default_action {
+    target_group_arn = "${aws_alb_target_group.cf_uaa.arn}"
+    type             = "forward"
+  }
+}
+
 resource "aws_elb" "cf_uaa" {
   name                      = "${var.env}-cf-uaa"
   subnets                   = ["${split(",", var.infra_subnet_ids)}"]
