@@ -1,8 +1,8 @@
 releases:
 - name: datadog-firehose-nozzle
-  url: https://bosh.io/d/github.com/cloudfoundry-incubator/datadog-firehose-nozzle-release?v=51
-  version: "51"
-  sha1: b358712488c44a09e815f278d6b767f3e82cd3e3
+  url: https://bosh.io/d/github.com/cloudfoundry-incubator/datadog-firehose-nozzle-release?v=59
+  version: "59"
+  sha1: 6ebe59075bde3be44c6a788fdd02a07b7d950aee
 
 jobs:
 - name: nozzle
