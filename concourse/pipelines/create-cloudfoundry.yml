@@ -79,7 +79,7 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-cf.git
       branch: {{branch_name}}
-      tag_filter: {{paas_cf_tag_filter}}
+      tag_filter: prod-0.0.558
       commit_verification_key_ids: {{gpg_ids}}
 
   - name: graphite-nozzle
