@@ -3,7 +3,7 @@ resource "datadog_monitor" "ec2-cpu-credits" {
   type           = "query alert"
   message        = "${format("Instance is {{#is_warning}}low on{{/is_warning}}{{#is_alert}}out of{{/is_alert}} on CPU credits and may perform badly. See: https://government-paas-team-manual.readthedocs.io/en/latest/support/responding_to_alerts/#cpu-credits @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.aws_account)}"
   notify_no_data = false
-  query          = "${format("avg(last_30m):avg:aws.ec2.cpucredit_balance{deploy_env:%s} by {bosh-job,bosh-index} <= 0", var.env)}"
+  query          = "${format("avg(last_30m):avg:aws.ec2.cpucredit_balance{deploy_env:%s} by {bosh-job,bosh-index} <= 0", "master")}"
 
   thresholds {
     warning  = "20"
