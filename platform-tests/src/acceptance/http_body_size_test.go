@@ -26,17 +26,16 @@ var _ = FDescribe("request and response body sizes", func() {
 		).Wait(CF_PUSH_TIMEOUT)).To(Exit(0))
 	})
 
-	for sizekB := 1; sizekB <= 200; sizekB += 10 {
-		Context(fmt.Sprintf("request body of %d kB", sizekB), func() {
-			It(fmt.Sprintf("should have response body of %d kB", sizekB), func() {
-				reqBody := make([]byte, sizekB*1000)
-				for i, _ := range reqBody {
-					reqBody[i] = byte('1')
-				}
+	It("should serve request and response bodies of increasing sizes", func() {
+		for sizekB := 1; sizekB <= 200; sizekB += 10 {
+			By("body size of %d kB", sizekB)
+			reqBody := make([]byte, sizekB*1000)
+			for i, _ := range reqBody {
+				reqBody[i] = byte('1')
+			}
 
-				respBody := helpers.CurlApp(appName, "/", "-f", "-d", fmt.Sprint(reqBody))
-				Expect(respBody).To(Equal(reqBody))
-			})
-		})
-	}
+			respBody := helpers.CurlApp(appName, "/", "-f", "-d", fmt.Sprint(reqBody))
+			Expect(respBody).To(Equal(reqBody))
+		}
+	})
 })
