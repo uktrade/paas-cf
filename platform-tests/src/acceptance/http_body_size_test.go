@@ -8,11 +8,15 @@ import (
 	"github.com/cloudfoundry-incubator/cf-test-helpers/cf"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/generator"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/helpers"
+
+	"fmt"
 )
 
 var _ = FDescribe("request and response body sizes", func() {
+	var appName string
+
 	BeforeEach(func() {
-		appName := generator.PrefixedRandomName("CATS-APP-")
+		appName = generator.PrefixedRandomName("CATS-APP-")
 		Expect(cf.Cf(
 			"push", appName,
 			"-b", config.GoBuildpackName,
@@ -30,7 +34,7 @@ var _ = FDescribe("request and response body sizes", func() {
 					reqBody[i] = byte('1')
 				}
 
-				curlArgs := []string{"-f", "-d", reqBody}
+				curlArgs := []string{"-f", "-d", fmt.Sprint(reqBody)}
 				respBody := helpers.CurlApp(appName, "/", curlArgs)
 				Expect(respBody).To(Equal(reqBody))
 			})
