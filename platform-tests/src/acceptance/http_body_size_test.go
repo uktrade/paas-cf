@@ -29,13 +29,13 @@ var _ = FDescribe("request and response body sizes", func() {
 	It("should serve request and response bodies of increasing sizes", func() {
 		for sizekB := 1; sizekB <= 200; sizekB += 10 {
 			By(fmt.Sprintf("body size of %d kB", sizekB))
-			reqBody := make([]byte, sizekB*1000)
-			for i, _ := range reqBody {
-				reqBody[i] = byte('1')
+			var reqBody bytes.Buffer
+			for i := 1; i <= sizekB*1000; i++ {
+				reqBody.WriteString(fmt.Sprintf("%d", i%10))
 			}
 
-			respBody := helpers.CurlApp(appName, "/", "-f", "-d", fmt.Sprint(reqBody))
-			Expect(respBody).To(Equal(reqBody))
+			respBody := helpers.CurlApp(appName, "/", "-f", "-d", reqBody.String())
+			Expect(respBody).To(Equal(reqBody.String()))
 		}
 	})
 })
