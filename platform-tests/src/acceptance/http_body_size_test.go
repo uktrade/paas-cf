@@ -28,7 +28,7 @@ var _ = FDescribe("request and response body sizes", func() {
 
 	It("should serve request and response bodies of increasing sizes", func() {
 		for sizekB := 1; sizekB <= 200; sizekB += 10 {
-			By("body size of %d kB", sizekB)
+			By(fmt.Sprintf("body size of %d kB", sizekB))
 			reqBody := make([]byte, sizekB*1000)
 			for i, _ := range reqBody {
 				reqBody[i] = byte('1')
