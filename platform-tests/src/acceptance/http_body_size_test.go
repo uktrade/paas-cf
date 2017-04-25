@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry-incubator/cf-test-helpers/helpers"
 )
 
-var _ = Describe("request and response body sizes", func() {
+var _ = FDescribe("request and response body sizes", func() {
 	BeforeEach(func() {
 		appName := generator.PrefixedRandomName("CATS-APP-")
 		Expect(cf.Cf(
