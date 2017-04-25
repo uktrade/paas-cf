@@ -34,8 +34,7 @@ var _ = FDescribe("request and response body sizes", func() {
 					reqBody[i] = byte('1')
 				}
 
-				curlArgs := []string{"-f", "-d", fmt.Sprint(reqBody)}
-				respBody := helpers.CurlApp(appName, "/", curlArgs)
+				respBody := helpers.CurlApp(appName, "/", "-f", "-d", fmt.Sprint(reqBody))
 				Expect(respBody).To(Equal(reqBody))
 			})
 		})
