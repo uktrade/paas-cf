@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("request and response body sizes", func() {
-	var _ = BeforeEach(func() {
+	BeforeEach(func() {
 		appName := generator.PrefixedRandomName("CATS-APP-")
 		Expect(cf.Cf(
 			"push", appName,
