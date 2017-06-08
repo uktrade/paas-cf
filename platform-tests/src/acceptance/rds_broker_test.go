@@ -23,7 +23,7 @@ const (
 	DB_CREATE_TIMEOUT = 30 * time.Minute
 )
 
-var _ = Describe("RDS broker", func() {
+var _ = XDescribe("RDS broker", func() {
 	const (
 		serviceName              = "postgres"
 		testPlanName             = "Free"
