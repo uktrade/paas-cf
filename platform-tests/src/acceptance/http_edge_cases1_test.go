@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	letters  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	utfchars = "スタック・オーバーフロー はプログラマ"
+	letters1  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	utfchars1 = "スタック・オーバーフロー はプログラマ"
 )
 
 var _ = Describe("HTTP edge cases", func() {
@@ -99,7 +99,7 @@ var _ = Describe("HTTP edge cases", func() {
 			for headerkB := 1; headerkB <= 7; headerkB += 1 {
 				By(fmt.Sprintf("request header size of %d kB", headerkB))
 
-				curlArgs := []string{"-H", fmt.Sprintf("test-header: %s", randStringBytes(headerkB*int(KILOBYTE)))}
+				curlArgs := []string{"-H", fmt.Sprintf("test-header: %s", randStringBytes1(headerkB*int(KILOBYTE)))}
 				response := helpers.CurlApp(appName, "/header-size", curlArgs...)
 
 				Expect(response).To(BeEquivalentTo(strconv.Itoa(headerkB * int(KILOBYTE))))
@@ -160,7 +160,7 @@ var _ = Describe("HTTP edge cases", func() {
 			for i := 1; i <= numberOfParams; i++ {
 				keyName := "p" + strconv.Itoa(i)
 				valueLength := paramLength - len("&"+keyName+"=")
-				parameters.Add(keyName, randStringBytes(valueLength))
+				parameters.Add(keyName, randStringBytes1(valueLength))
 			}
 			requestURL.RawQuery = parameters.Encode()
 			response := helpers.CurlApp(appName, requestURL.RequestURI())
@@ -172,21 +172,21 @@ var _ = Describe("HTTP edge cases", func() {
 			requestURL, err := url.Parse("/long-url")
 			Expect(err).ToNot(HaveOccurred())
 			parameters := url.Values{}
-			parameters.Add("q", utfchars)
+			parameters.Add("q", utfchars1)
 			requestURL.RawQuery = parameters.Encode()
 			response := helpers.CurlApp(appName, requestURL.RequestURI())
 			parsedQuery, err := url.ParseQuery(response)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(parsedQuery["q"][0]).To(BeEquivalentTo(utfchars))
+			Expect(parsedQuery["q"][0]).To(BeEquivalentTo(utfchars1))
 		})
 	})
 })
 
-func randStringBytes(n int) string {
+func randStringBytes1(n int) string {
 	rand.Seed(time.Now().UnixNano())
 	b := make([]byte, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters1[rand.Intn(len(letters1))]
 	}
 	return string(b)
 }

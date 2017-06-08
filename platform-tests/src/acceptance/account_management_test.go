@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry-incubator/cf-test-helpers/generator"
 )
 
-var _ = Describe("AccountManagement", func() {
+var _ = XDescribe("AccountManagement", func() {
 	const email = "the-multi-cloud-paas-team+account-test@digital.cabinet-office.gov.uk"
 
 	var (

@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("ComposeBroker", func() {
+var _ = XDescribe("ComposeBroker", func() {
 
 	const (
 		serviceName = "mongo"
