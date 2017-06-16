@@ -80,17 +80,12 @@ globals:
 .PHONY: dev
 dev: globals ## Set Environment to DEV
 	$(eval export AWS_ACCOUNT=dev)
-	$(eval export ENABLE_DESTROY=true)
-	$(eval export ENABLE_AUTODELETE=true)
 	$(eval export SYSTEM_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipeline.digital)
 	$(eval export APPS_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipelineapps.digital)
-	$(eval export SKIP_COMMIT_VERIFICATION=true)
+	$(eval export ALERT_EMAIL_ADDRESS=the-multi-cloud-paas-team+ci@digital.cabinet-office.gov.uk)
+	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=${ALERT_EMAIL_ADDRESS})
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-default.yml)
-	$(eval export DISABLE_HEALTHCHECK_DB=true)
-	$(eval export ENABLE_DATADOG ?= false)
-	$(eval export CONCOURSE_AUTH_DURATION=48h)
-	$(eval export DISABLE_PIPELINE_LOCKING=true)
-	$(eval export TEST_HEAVY_LOAD=true)
+	$(eval export ENABLE_DATADOG=true)
 	@true
 
 .PHONY: ci
