@@ -1,0 +1,7 @@
+---
+applications:
+- name: pinger
+  memory: 256M
+  buildpack: go_buildpack
+  health-check-type: process
+  no-route: true
