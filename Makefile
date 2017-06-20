@@ -73,6 +73,7 @@ list_merge_keys: ## List all GPG keys allowed to sign merge commits.
 .PHONY: globals
 PASSWORD_STORE_DIR?=${HOME}/.paas-pass
 globals:
+	$(eval export ENABLE_MORNING_DEPLOYMENT=false)
 	$(eval export AWS_DEFAULT_REGION=eu-west-1)
 	$(eval export PASSWORD_STORE_DIR=${PASSWORD_STORE_DIR})
 	@true
@@ -91,6 +92,7 @@ dev: globals ## Set Environment to DEV
 	$(eval export CONCOURSE_AUTH_DURATION=48h)
 	$(eval export DISABLE_PIPELINE_LOCKING=true)
 	$(eval export TEST_HEAVY_LOAD=true)
+	$(eval export ENABLE_MORNING_DEPLOYMENT=true)
 	@true
 
 .PHONY: ci
