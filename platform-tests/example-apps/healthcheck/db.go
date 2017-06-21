@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,6 +32,10 @@ func testDBConnection(ssl bool, service string) error {
 	var sslOn string
 	var sslOff string
 
+	if service == "" {
+		service = "postgres"
+	}
+
 	dbu := os.Getenv("DATABASE_URL")
 
 	switch service {
@@ -42,15 +47,12 @@ func testDBConnection(ssl bool, service string) error {
 		if err != nil {
 			return err
 		}
-		break
 	case "postgres":
-		fallthrough
-	default:
-		service = "postgres"
-
 		sslTrigger = "sslmode"
 		sslOn = "verify-full"
 		sslOff = "disable"
+	default:
+		return errors.New("unknown service: " + service)
 	}
 
 	dbURL, err := url.Parse(dbu)
