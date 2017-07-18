@@ -56,6 +56,8 @@ get_pagerduty_api_token() {
 prepare_environment() {
   "${SCRIPT_DIR}/fly_sync_and_login.sh"
 
+  branch_name=$(git rev-parse --abbrev-ref HEAD)
+
   export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-eu-west-1}
 
   pipelines_to_update="${PIPELINES_TO_UPDATE:-create-cloudfoundry deployment-kick-off destroy-cloudfoundry autodelete-cloudfoundry failure-testing}"
@@ -118,7 +120,7 @@ deploy_env: ${DEPLOY_ENV}
 state_bucket: ${state_bucket}
 test_artifacts_bucket: gds-paas-${DEPLOY_ENV}-test-artifacts
 pipeline_trigger_file: ${pipeline_name}.trigger
-branch_name: ${BRANCH:-master}
+branch_name: ${branch_name}
 aws_region: ${AWS_DEFAULT_REGION}
 debug: ${DEBUG:-}
 cf_release_version: v${cf_release_version}

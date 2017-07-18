@@ -88,7 +88,6 @@ jobs:
             - name: concourse-manifest
           params:
             DEPLOY_ENV: {{deploy_env}}
-            BRANCH: {{branch_name}}
             AWS_ACCOUNT: {{aws_account}}
             SELF_UPDATE_PIPELINE: {{self_update_pipeline}}
             PIPELINES_TO_UPDATE: {{pipeline_name}}

@@ -57,6 +57,10 @@ make dev pipelines
 ```
 if you want to deploy to DEV account.
 
+It will always configure the pipeline to use the branch that you've
+currently checked out. If this is a feature branch then you should ensure
+that it has been pushed to GitHub.
+
 ### Deploy
 
 Run the `create-cloudfoundry` pipeline. This configure and deploy CloudFoundry.
@@ -105,17 +109,6 @@ pipeline if it finishes successfully.
 In occasions it might be required to check the state or force the release
 of the lock. For that you can manually trigger the jobs `pipeline-check-lock`
 and `pipeline-release-lock` in the job group `Operator`.
-
-
-## Optionally override the branch used by pipelines
-
-All of the pipeline scripts honour a
-`BRANCH` environment variable which allows you to override the git branch
-used within the pipeline. This is useful for development and code review:
-
-```
-BRANCH=$(git rev-parse --abbrev-ref HEAD) make dev pipelines
-```
 
 ## Optionally override pipeline self updating
 
