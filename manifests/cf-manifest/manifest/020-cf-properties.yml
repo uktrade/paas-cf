@@ -18,7 +18,7 @@ properties:
   app_ssh:
     host_key_fingerprint: (( grab secrets.ssh_proxy_host_key.public_fingerprint ))
 
-  support_address: "https://docs.cloud.service.gov.uk"
+  support_address: "https://www.gov.uk"
   description: null
   ssl:
     skip_cert_verify: false
@@ -372,6 +372,8 @@ properties:
       serviceProviderCertificate: ((grab secrets.saml_cert))
     enabled: true
     brand: oss
+    branding:
+      company_name: GOV.UK PaaS
     self_service_links_enabled: "false"
     links:
       passwd: (( concat "https://login." properties.system_domain "/forgot_password" ))
