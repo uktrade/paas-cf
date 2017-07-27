@@ -36,11 +36,26 @@ resource "pingdom_check" "paas_http_healthcheck" {
   contactids               = ["${var.pingdom_contact_ids}"]
 }
 
-resource "pingdom_check" "paas_db_healthcheck" {
+resource "pingdom_check" "paas_postgres_healthcheck" {
   type                     = "http"
-  name                     = "PaaS DB - ${var.env}"
+  name                     = "PaaS Postgres DB - ${var.env}"
   host                     = "healthcheck.${var.apps_dns_zone_name}"
-  url                      = "/db"
+  url                      = "/db?service=postgres"
+  shouldcontain            = "\"success\": true"
+  encryption               = true
+  resolution               = 1
+  uselegacynotifications   = true
+  sendtoemail              = true
+  sendnotificationwhendown = 2
+  notifywhenbackup         = true
+  contactids               = ["${var.pingdom_contact_ids}"]
+}
+
+resource "pingdom_check" "paas_mysql_healthcheck" {
+  type                     = "http"
+  name                     = "PaaS MySQL DB - ${var.env}"
+  host                     = "healthcheck.${var.apps_dns_zone_name}"
+  url                      = "/db?service=mysql"
   shouldcontain            = "\"success\": true"
   encryption               = true
   resolution               = 1

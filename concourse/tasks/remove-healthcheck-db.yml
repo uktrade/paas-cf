@@ -34,3 +34,6 @@ run:
       if cf services | grep -q healthcheck-db; then
         cf delete-service healthcheck-db -f
       fi
+      if cf services | grep -q healthcheck-mysql-db; then
+        cf delete-service healthcheck-mysql-db -f
+      fi

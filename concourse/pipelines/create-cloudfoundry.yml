@@ -1716,14 +1716,19 @@ jobs:
 
                   if  [ "${DISABLE_HEALTHCHECK_DB:-}" != "true" ] ; then
                     cf create-service postgres Free healthcheck-db
+                    cf create-service mysql Free healthcheck-mysql-db
                     while ! cf service healthcheck-db | grep -q 'Status: create succeeded'; do
-                      echo "Waiting for creation of service to complete..."
+                      echo "Waiting for creation of postgres service to complete..."
+                      sleep 30
+                    done
+                    while ! cf service healthcheck-mysql-db | grep -q 'Status: create succeeded'; do
+                      echo "Waiting for creation of mysql service to complete..."
                       sleep 30
                     done
 
                     ruby -ryaml -e '
                       manifest = YAML.load_file("manifest.yml")
-                      manifest["applications"].each { |app| app["services"] = ["healthcheck-db"] }
+                      manifest["applications"].each { |app| app["services"] = ["healthcheck-db", "healthcheck-mysql-db"] }
                       File.write("manifest.yml", manifest.to_yaml)
                     '
                   fi
