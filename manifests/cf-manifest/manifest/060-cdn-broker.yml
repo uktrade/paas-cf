@@ -1,8 +1,8 @@
 releases:
   - name: cdn-broker
-    version: 0.0.1501166813
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/cdn-broker-0.0.1501166813.tgz
-    sha1: 23bbe7b471535b4c76c4e7cc1fb5a7595c2b2dcd
+    version: 0.0.1501493425
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/cdn-broker-0.0.1501493425.tgz
+    sha1: af8def639921da7ab91b7d713e9a01a5c851be17
 
 jobs:
   - name: cdn_broker
