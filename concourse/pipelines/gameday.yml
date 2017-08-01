@@ -1,0 +1,147 @@
+---
+resource_types:
+- name: s3-iam
+  type: docker-image
+  source:
+    repository: governmentpaas/s3-resource
+    tag: 9e7cf1dd32699c091e22e46b349e050443d9ac1a
+
+resources:
+  - name: cf-acceptance-tests
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/cf-acceptance-tests.git
+      branch: master
+
+  - name: paas-cf
+    type: git
+    source:
+      uri: https://github.com/alphagov/paas-cf.git
+      branch: {{branch_name}}
+
+  - name: cf-secrets
+    type: s3-iam
+    source:
+      bucket: {{state_bucket}}
+      region_name: {{aws_region}}
+      versioned_file: cf-secrets.yml
+
+  - name: cf-manifest
+    type: s3-iam
+    source:
+      bucket: {{state_bucket}}
+      region_name: {{aws_region}}
+      versioned_file: cf-manifest.yml
+
+  - name: bosh-CA
+    type: s3-iam
+    source:
+      bucket: {{state_bucket}}
+      region_name: {{aws_region}}
+      versioned_file: bosh-CA.tar.gz
+
+jobs:
+  - name: setup-gameday
+    serial: true
+    plan:
+      - aggregate:
+        - get: cf-acceptance-tests
+        - get: paas-cf
+        - get: bosh-CA
+        - get: cf-secrets
+        - get: cf-manifest
+      - task: setup
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: 895cf6752c8ec64af05a3a735186b90acd3db65a
+          inputs:
+            - name: cf-acceptance-tests
+            - name: paas-cf
+            - name: bosh-CA
+            - name: cf-secrets
+            - name: cf-manifest
+          run:
+            path: sh
+            args:
+              - -e
+              - -u
+              - -c
+              - |
+                ./paas-cf/concourse/scripts/import_bosh_ca.sh
+                VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+                API_ENDPOINT=$($VAL_FROM_YAML properties.cc.srv_api_uri cf-manifest/cf-manifest.yml)
+                CF_ADMIN=admin
+                CF_PASS=$($VAL_FROM_YAML secrets.uaa_admin_password cf-secrets/cf-secrets.yml)
+                echo | cf login -a ${API_ENDPOINT} -u ${CF_ADMIN} -p ${CF_PASS}
+
+                apk add --update cracklib-words
+
+                for i in $(seq 1 64); do
+                  ORG_NAME=$(
+                    shuf /usr/share/dict/cracklib-words \
+                    | awk '{printf tolower($0)} NR>1{printf "\n"; exit} {printf "-"}' \
+                  )
+                  cf create-org "${ORG_NAME}"
+                  ORG_GUID=$(cf org "${ORG_NAME}" --guid)
+
+                  for SPACE_NAME in development staging production; do
+                    #cf create-space -o "${ORG_NAME}" "${SPACE_NAME}"
+                    cf curl /v2/spaces \
+                      -X POST \
+                      -d "{\"name\": \"${SPACE_NAME}\", \"organization_guid\": \"${ORG_GUID}\"}"
+                    cf target -o "${ORG_NAME}" -s "${SPACE_NAME}"
+
+                    APP_NAME=$( \
+                      shuf /usr/share/dict/cracklib-words \
+                      | awk '{printf tolower($0)} NR>2{printf "\n"; exit} {printf "-"}' \
+                    )
+                    cf push \
+                      -b ruby_buildpack \
+                      -p cf-acceptance-tests/assets/dora \
+                      -i 1 -m 256M \
+                      "${APP_NAME}"
+                  done
+                done
+
+  - name: reset-gameday
+    serial: true
+    plan:
+      - aggregate:
+        - get: paas-cf
+        - get: bosh-CA
+        - get: cf-secrets
+        - get: cf-manifest
+      - task: reset
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: 895cf6752c8ec64af05a3a735186b90acd3db65a
+          inputs:
+            - name: paas-cf
+            - name: bosh-CA
+            - name: cf-secrets
+            - name: cf-manifest
+          run:
+            path: sh
+            args:
+              - -e
+              - -u
+              - -c
+              - |
+                ./paas-cf/concourse/scripts/import_bosh_ca.sh
+                VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+                API_ENDPOINT=$($VAL_FROM_YAML properties.cc.srv_api_uri cf-manifest/cf-manifest.yml)
+                CF_ADMIN=admin
+                CF_PASS=$($VAL_FROM_YAML secrets.uaa_admin_password cf-secrets/cf-secrets.yml)
+                echo | cf login -a ${API_ENDPOINT} -u ${CF_ADMIN} -p ${CF_PASS}
+
+                for ORG_NAME in $(cf orgs | egrep -v 'service-brokers|govuk-paas' | egrep '^[^-]+-[^-]+$'); do
+                  cf delete-org -f "${ORG_NAME}"
+                done
