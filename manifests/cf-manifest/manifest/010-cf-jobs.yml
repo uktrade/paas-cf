@@ -183,9 +183,9 @@ jobs:
           mode: server
 
   - name: nats
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates: (( grab meta.nats_templates ))
-    instances: 2
+    instances: 3
     vm_type: medium
     stemcell: default
     networks:
@@ -193,6 +193,7 @@ jobs:
         static_ips:
           - 10.0.16.11
           - 10.0.17.11
+          - 10.0.18.11
 
   - name: etcd
     azs: [z1, z2, z3]
@@ -216,7 +217,7 @@ jobs:
             etcd: {}
 
   - name: database
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates:
       - name: consul_agent
         release: cf
@@ -230,7 +231,7 @@ jobs:
         release: diego
       - name: metron_agent
         release: cf
-    instances: 2
+    instances: 3
     vm_type: medium
     vm_extensions:
       - cf_rds_client_sg
@@ -244,9 +245,9 @@ jobs:
           url: (( concat "https://" meta.bbs.api_location "/v1/actual_lrp_groups/list" ))
 
   - name: uaa
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates: (( grab meta.uaa_templates ))
-    instances: 2
+    instances: 3
     vm_type: medium
     vm_extensions:
       - cf_uaa_elb
@@ -299,9 +300,9 @@ jobs:
             uaa: {}
 
   - name: api
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates: (( grab meta.api_templates ))
-    instances: 2
+    instances: 3
     vm_type: large
     vm_extensions:
       - 64g_ephemeral_disk
@@ -317,9 +318,9 @@ jobs:
           services: (( grab meta.api_consul_services ))
 
   - name: api_worker
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates: (( grab meta.api_worker_templates ))
-    instances: 2
+    instances: 3
     vm_type: medium
     vm_extensions:
       - 64g_ephemeral_disk
@@ -344,9 +345,9 @@ jobs:
             doppler: {}
 
   - name: loggregator_trafficcontroller
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates: (( grab meta.loggregator_trafficcontroller_templates ))
-    instances: 2
+    instances: 3
     vm_type: medium
     vm_extensions:
       - cf_loggregator_elbs
@@ -381,7 +382,7 @@ jobs:
           targets: (( grab terraform_outputs.cell_subnet_cidr_blocks ))
 
   - name: brain
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates:
       - name: consul_agent
         release: cf
@@ -393,7 +394,7 @@ jobs:
         release: diego
       - name: metron_agent
         release: cf
-    instances: 2
+    instances: 3
     vm_type: medium
     stemcell: default
     networks:
@@ -436,7 +437,7 @@ jobs:
           targets: (( grab terraform_outputs.router_subnet_cidr_blocks ))
 
   - name: cc_bridge
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates:
       - name: consul_agent
         release: cf
@@ -454,14 +455,14 @@ jobs:
         release: diego
       - name: metron_agent
         release: cf
-    instances: 2
+    instances: 3
     vm_type: medium
     stemcell: default
     networks:
       - name: cf
 
   - name: route_emitter
-    azs: [z1, z2]
+    azs: [z1, z2, z3]
     templates:
       - name: consul_agent
         release: cf
@@ -475,7 +476,7 @@ jobs:
         release: cf
       - name: datadog-route-emitter
         release: datadog-for-cloudfoundry
-    instances: 2
+    instances: 3
     vm_type: medium
     stemcell: default
     networks:

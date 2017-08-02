@@ -6,7 +6,7 @@ releases:
 
 jobs:
 - name: nozzle
-  azs: [z1, z2]
+  azs: [z1, z2, z3]
   templates:
   - name: datadog-firehose-nozzle
     release: datadog-firehose-nozzle
@@ -26,7 +26,7 @@ jobs:
 
   vm_type: small
   stemcell: default
-  instances: 2
+  instances: 3
   networks:
   - name: cf
 

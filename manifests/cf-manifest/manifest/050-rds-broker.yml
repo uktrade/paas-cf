@@ -36,8 +36,8 @@ releases:
 
 jobs:
   - name: rds_broker
-    azs: [z1, z2]
-    instances: 2
+    azs: [z1, z2, z3]
+    instances: 3
     vm_type: rds_broker
     stemcell: default
     templates:

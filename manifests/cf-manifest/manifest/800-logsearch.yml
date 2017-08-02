@@ -12,18 +12,19 @@ jobs:
 - (( append ))
 - name: queue
   release: logsearch
-  azs: [z1, z2]
+  azs: [z1, z2, z3]
   templates:
   - name: queue
     release: logsearch
   vm_type: small
   stemcell: default
-  instances: 2
+  instances: 3
   networks:
   - name: cf
     static_ips:
       - 10.0.16.13
       - 10.0.17.13
+      - 10.0.18.13
   persistent_disk_type: queue
 
 - name: parser_z1
@@ -64,6 +65,26 @@ jobs:
   properties:
     redis:
       host: (( grab jobs.queue.networks.cf.static_ips.[1] ))
+    logstash: (( grab properties.parser_logstash ))
+
+- name: parser_z3
+  release: logsearch
+  azs: [z3]
+  templates:
+  - name: parser
+    release: logsearch
+  - name: logsearch-for-cloudfoundry-filters
+    release: logsearch-for-cloudfoundry
+  vm_type: medium
+  stemcell: default
+  instances: 1
+  networks:
+  - name: cf
+    static_ips:
+      - 10.0.18.14
+  properties:
+    redis:
+      host: (( grab jobs.queue.networks.cf.static_ips.[2] ))
     logstash: (( grab properties.parser_logstash ))
 
 - name: elasticsearch_master
@@ -162,6 +183,26 @@ jobs:
   properties:
     redis:
       host: (( grab jobs.queue.networks.cf.static_ips.[1] ))
+  update:
+    serial: true
+
+- name: ingestor_z3
+  release: logsearch
+  azs: [z3]
+  templates:
+  - name: ingestor_syslog
+    release: logsearch
+  vm_type: ingestor
+  stemcell: default
+  instances: 1
+  networks:
+  - name: cf
+    default: [gateway, dns]
+    static_ips:
+      - 10.0.18.12
+  properties:
+    redis:
+      host: (( grab jobs.queue.networks.cf.static_ips.[2] ))
   update:
     serial: true
 
