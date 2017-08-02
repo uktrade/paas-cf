@@ -82,7 +82,7 @@ dev: globals ## Set Environment to DEV
 	$(eval export AWS_ACCOUNT=dev)
 	$(eval export SYSTEM_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipeline.digital)
 	$(eval export APPS_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipelineapps.digital)
-	$(eval export ALERT_EMAIL_ADDRESS=the-multi-cloud-paas-team+ci@digital.cabinet-office.gov.uk)
+	$(eval export ALERT_EMAIL_ADDRESS=the-multi-cloud-paas-team+dev@digital.cabinet-office.gov.uk)
 	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=${ALERT_EMAIL_ADDRESS})
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-default.yml)
 	$(eval export ENABLE_DATADOG=true)
