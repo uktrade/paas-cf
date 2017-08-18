@@ -400,6 +400,8 @@ properties:
             - openid
             - cloud_controller.admin
             - doppler.firehose
+      groups:
+        cloud_controller.global_auditor: 'CF Global Auditor group'
 
     port: 8080
     ssl:
