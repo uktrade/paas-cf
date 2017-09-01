@@ -442,7 +442,6 @@ properties:
         redirect-uri: (( concat "https://login." properties.system_domain ))
         secret: (( grab secrets.uaa_clients_login_secret ))
       cf:
-        id: cf
         override: true
         authorized-grant-types: password,refresh_token
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,cloud_controller.admin_read_only,cloud_controller.global_auditor,scim.read,scim.write,scim.invite,doppler.firehose,uaa.user,routing.router_groups.read,routing.router_groups.write
@@ -510,13 +509,13 @@ properties:
       cdn_broker:
         authorities: uaa.none
         authorized-grant-types: password
-        id: cdn_broker
         scope: cloud_controller.admin_read_only
         secret: (( grab secrets.uaa_clients_cdn_broker_secret ))
       prometheus-firehose:
         secret: "prometheus-client-secret"
         authorized-grant-types: client_credentials,refresh_token
         authorities: doppler.firehose
+        scope: openid,oauth.approvals
 
     zones:
       internal:
