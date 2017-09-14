@@ -1,12 +1,12 @@
 releases:
 - name: logsearch
-  url: https://bosh.io/d/github.com/logsearch/logsearch-boshrelease?v=203.0.0
-  version: 203.0.0
-  sha1: 4872c3d89fb2587d844dabbc93b124fb43b720d8
+  url: https://bosh.io/d/github.com/cloudfoundry-community/logsearch-boshrelease?v=208.0.0
+  version: 208.0.0
+  sha1: 578283fd9d8dbbd02e7f4f35e6d60671953a924f
 - name: logsearch-for-cloudfoundry
-  version: 0.1.2
-  url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/logsearch-for-cloudfoundry-0.1.2.tgz
-  sha1: 9e124f94e36fbc2521b8bf12c3f1ffa7eec03ffd
+  url: https://bosh.io/d/github.com/cloudfoundry-community/logsearch-for-cloudfoundry
+  version: 206.0.0
+  sha1: 574720bed4d453ed4153f48d5244e2b4fde16354
 
 jobs:
 - (( append ))
@@ -90,6 +90,10 @@ jobs:
       discovery:
         minimum_master_nodes: 2
       master_hosts: (( grab properties.elasticsearch.master_hosts ))
+  update:
+    canaries: 0
+    max_in_flight: 3
+    serial: true
 
 - name: maintenance
   instances: 1
