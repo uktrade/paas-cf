@@ -46,7 +46,7 @@ releases:
     url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/ipsec-0.1.3.tgz
     sha1: 6a9e252162519e50f6c511c489ba304a286d496a
   - name: nginx
-    version: nginx-1.12.1+dev.5.tgz
+    version: nginx-1.12.1+dev.5
     url: https://s3-eu-west-1.amazonaws.com/gds-paas-henry-state/nginx-1.12.1%2Bdev.5.tgz
     sha1: a124d97ac631c66a08b9ed25db024ce1cafb8390
 
