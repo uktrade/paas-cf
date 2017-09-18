@@ -56,6 +56,8 @@ resource "aws_db_instance" "cf" {
   vpc_security_group_ids     = ["${aws_security_group.cf_rds.id}"]
   auto_minor_version_upgrade = true
 
+  snapshot_identifier = "mmokrysz-cf-restore"
+
   tags {
     Name       = "${var.env}-cf"
     deploy_env = "${var.env}"

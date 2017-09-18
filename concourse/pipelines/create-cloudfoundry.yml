@@ -943,9 +943,14 @@ jobs:
                 mkdir generated-certificates
                 tar xzf cf-certs/cf-certs.tar.gz -C generated-certificates
 
+                terraform rm aws_db_instance.cf \
+                  -var-file=paas-cf/terraform/{{aws_account}}.tfvars \
+                  -var-file=vpc-peering-tfvars/vpc-peers.tfvars \
+                  -state=cf-tfstate/cf.tfstate -state-out=rmd-cf-tfstate/cf.tfstate paas-cf/terraform/cloudfoundry
+
                 terraform apply -var-file=paas-cf/terraform/{{aws_account}}.tfvars \
                   -var-file=vpc-peering-tfvars/vpc-peers.tfvars \
-                  -state=cf-tfstate/cf.tfstate -state-out=updated-tfstate/cf.tfstate paas-cf/terraform/cloudfoundry
+                  -state=rmd-cf-tfstate/cf.tfstate -state-out=updated-tfstate/cf.tfstate paas-cf/terraform/cloudfoundry
         ensure:
           put: cf-tfstate
           params:
