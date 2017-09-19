@@ -49,6 +49,10 @@ releases:
     version: 1.11.7
     url: https://github.com/cloudfoundry-community/nginx-release/releases/download/v1.11.7/nginx-1.11.7.tgz
     sha1: 133bb2260411b197924fff08d4cbd923cc8ec7eb
+  - name: uaa
+    version: test1
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-hbuild-releases/uaa-test1.tgz
+    sha1: b6de3b56826ef1a0f70bad94c98e21a83ef0b76c
 
 stemcells:
   - alias: default
