@@ -145,7 +145,7 @@ meta:
   - name: datadog-consul-agent-client
     release: datadog-for-cloudfoundry
   - name: uaa
-    release: (( grab meta.release.name ))
+    release: uaa
   - name: metron_agent
     release: (( grab meta.release.name ))
   - name: statsd_injector
