@@ -247,7 +247,6 @@ jobs:
     networks:
       - name: cf
     properties:
-      UAAHOST: (( concat "https://uaa." properties.system_domain ))
       nginx_conf: |
         worker_processes  2;
         error_log syslog:server=127.0.0.1,severity=error,tag=uaa_nginx_error error;
@@ -355,7 +354,7 @@ jobs:
         DEADLINE=$(($(date +%s) + TIMEOUT))
         HEALTH=
         while [ "$HEALTH" != "200" ]; do
-        	HEALTH="$(curl -k --connect-timeout 1 -s -o /dev/null -w '%{http_code}' https://localhost:9443/login)"
+        	HEALTH="$(curl -k --connect-timeout 1 -s -o /dev/null -w '%{http_code}' https://localhost:8080/login)"
         	sleep 1
         	if [ "$(date +%s)" -gt ${DEADLINE} ] ; then
               echo "Took longer than ${TIMEOUT} for UAA to become healthy."
