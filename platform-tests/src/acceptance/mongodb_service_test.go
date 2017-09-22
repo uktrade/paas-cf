@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("MongoDB backing service", func() {
+var _ = PDescribe("MongoDB backing service", func() {
 	const (
 		serviceName  = "mongodb"
 		testPlanName = "tiny"

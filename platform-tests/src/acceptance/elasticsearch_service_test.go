@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Elasticsearch backing service", func() {
+var _ = PDescribe("Elasticsearch backing service", func() {
 	const (
 		serviceName  = "elasticsearch"
 		testPlanName = "tiny"

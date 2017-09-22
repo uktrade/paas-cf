@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Redis backing service", func() {
+var _ = PDescribe("Redis backing service", func() {
 	const (
 		serviceName  = "redis"
 		testPlanName = "tiny"
