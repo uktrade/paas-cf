@@ -5,3 +5,5 @@ applications:
   buildpack: go_buildpack
   health-check-type: process
   no-route: true
+  env:
+    GOPACKAGENAME: github.com/alphagov/paas-cf/platform-tests/example-apps/filler

@@ -33,13 +33,15 @@ func init() {
 
 func main() {
 	var dbs []*dbInstance
+	var err error
 
 	postgresUris, err := getVCAPServiceUris("postgres")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	for _, postgresUri := range postgresUris {
-		pqDB, err := connectDB("postgres", postgresUri)
+
+	for _, postgresURI := range postgresUris {
+		pqDB, err := connectDB("postgres", postgresURI)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -50,8 +52,9 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	for _, mysqlUri := range mysqlUris {
-		mysqlDB, err := connectDB("mysql", mysqlUri)
+
+	for _, mysqlURI := range mysqlUris {
+		mysqlDB, err := connectDB("mysql", mysqlURI)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -69,7 +72,13 @@ func main() {
 func getVCAPServiceUris(label string) ([]string, error) {
 	var allServices map[string][]struct {
 		Credentials struct {
-			URI string `json:"uri"`
+			URI      string `json:"uri"`
+			Host     string `json:"host"`
+			Jdbcuri  string `json:"jdbcuri"`
+			Name     string `json:"name"`
+			Password string `json:"password"`
+			Port     int64  `json:"port"`
+			Username string `json:"username"`
 		} `json:"credentials"`
 	}
 
@@ -81,7 +90,11 @@ func getVCAPServiceUris(label string) ([]string, error) {
 
 	var uris []string
 	for _, service := range services {
-		uris = append(uris, service.Credentials.URI)
+		if label == "mysql" {
+			uris = append(uris, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", service.Credentials.Username, service.Credentials.Password, service.Credentials.Host, service.Credentials.Port, service.Credentials.Name))
+		} else {
+			uris = append(uris, service.Credentials.URI)
+		}
 	}
 
 	return uris, nil
@@ -124,7 +137,7 @@ func (i *dbInstance) create() error {
 }
 
 func (i *dbInstance) insert() error {
-	statement := fmt.Sprintf("INSERT INTO \"%s\" VALUES (%d);", dbtable, value)
+	statement := fmt.Sprintf("INSERT INTO \"%s\" VALUES (%s);", dbtable, story)
 	_, err := i.Connection.Exec(statement)
 	if err != nil {
 		return err
