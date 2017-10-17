@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -48,52 +50,45 @@ func connectDB(engine, url string) (*dbInstance, error) {
 }
 
 func main() {
-	pqDB, err := connectDB("postgres", "")
+	var dbs []*dbInstance
+
+	postgresUris, err := getVCAPServiceUris("postgres")
 	if err != nil {
 		log.Fatalln(err)
 	}
+	for postgresUri := range postgresUris {
+		pqDB, err := connectDB("postgres", postgresUri)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		dbs = append(dbs, pqDB)
+	}
 
-	mysqlDB, err := connectDB("mysql", "")
+	mysqlUris, err := getVCAPServiceUris("mysql")
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	for {
-		err = pqDB.insert()
+	for mysqlUri := range mysqlUris {
+		mysqlDB, err := connectDB("mysql", mysqlUri)
 		if err != nil {
 			log.Fatalln(err)
 		}
+		dbs = append(dbs, pqDB)
+	}
 
-		err = mysqlDB.insert()
+	for db, _ := range dbs {
+		err = insertUntilErr(db)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
-
-		time.Sleep(200 * time.Millisecond)
 	}
 }
 
-// func (i *dbInstance) check() error {
-// 	statement := fmt.Sprintf("SELECT * FROM \"%s\" LIMIT 1;", dbtable)
-// 	rows, err := i.Connection.Query(statement)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	for rows.Next() {
-// 		var val int64
-// 		err := rows.Scan(&val)
-// 		if err != nil {
-// 			return err
-// 		}
-//
-// 		if val != value {
-// 			log.Fatalf("Expected %d got %d", value, val)
-// 		}
-// 	}
-//
-// 	return nil
-// }
+func insertUntilErr(db *dbInstance) (err error) {
+	for err == nil {
+		err = db.insert()
+	}
+}
 
 func (i *dbInstance) create() error {
 	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (value integer);", dbtable)
