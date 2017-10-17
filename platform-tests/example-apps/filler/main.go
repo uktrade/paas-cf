@@ -31,24 +31,6 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func connectDB(engine, url string) (*dbInstance, error) {
-	dbtable = RandStringRunes(16)
-
-	conn, err := sql.Open(engine, url)
-	if err != nil {
-		return nil, err
-	}
-
-	db := dbInstance{conn}
-
-	err = db.create()
-	if err != nil {
-		return nil, err
-	}
-
-	return &db, nil
-}
-
 func main() {
 	var dbs []*dbInstance
 
@@ -82,6 +64,45 @@ func main() {
 			log.Println(err)
 		}
 	}
+}
+
+func getVCAPServiceUris(label string) ([]string, error) {
+	var allServices map[string][]struct {
+		Credentials struct {
+			URI string `json:"uri"`
+		} `json:"credentials"`
+	}
+
+	err := json.Unmarshal([]byte(os.Getenv("VCAP_SERVICES")), &allServices)
+	if err != nil {
+		return nil, err
+	}
+	services, _ := allServices[label]
+
+	var uris []string
+	for _, service := range services {
+		uris = append(uris, service.Credentials.URI)
+	}
+
+	return uris, nil
+}
+
+func connectDB(engine, url string) (*dbInstance, error) {
+	dbtable = RandStringRunes(16)
+
+	conn, err := sql.Open(engine, url)
+	if err != nil {
+		return nil, err
+	}
+
+	db := dbInstance{conn}
+
+	err = db.create()
+	if err != nil {
+		return nil, err
+	}
+
+	return &db, nil
 }
 
 func insertUntilErr(db *dbInstance) (err error) {
