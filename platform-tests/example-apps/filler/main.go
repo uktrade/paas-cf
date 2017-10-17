@@ -131,7 +131,7 @@ func insertUntilErr(db *dbInstance) (err error) {
 }
 
 func (i *dbInstance) create() error {
-	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (value text);", dbtable)
+	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (value text);", dbtable)
 	_, err := i.Connection.Exec(table)
 	if err != nil {
 		return err
@@ -141,7 +141,7 @@ func (i *dbInstance) create() error {
 }
 
 func (i *dbInstance) insert() error {
-	statement := fmt.Sprintf("INSERT INTO \"%s\" VALUES (%s);", dbtable, story)
+	statement := fmt.Sprintf("INSERT INTO %s VALUES (\"%s\");", dbtable, story)
 	_, err := i.Connection.Exec(statement)
 	if err != nil {
 		return err
