@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -9,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	mysql "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
 
@@ -91,6 +92,9 @@ func getVCAPServiceUris(label string) ([]string, error) {
 	var uris []string
 	for _, service := range services {
 		if label == "mysql" {
+			if err := mysql.RegisterTLSConfig("custom", &tls.Config{ServerName: service.Credentials.Host}); err != nil {
+				return nil, err
+			}
 			uris = append(uris, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?tls=custom", service.Credentials.Username, service.Credentials.Password, service.Credentials.Host, service.Credentials.Port, service.Credentials.Name))
 		} else {
 			uris = append(uris, service.Credentials.URI)
