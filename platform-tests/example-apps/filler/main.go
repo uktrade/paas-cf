@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	for postgresUri := range postgresUris {
+	for _, postgresUri := range postgresUris {
 		pqDB, err := connectDB("postgres", postgresUri)
 		if err != nil {
 			log.Fatalln(err)
@@ -50,15 +50,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	for mysqlUri := range mysqlUris {
+	for _, mysqlUri := range mysqlUris {
 		mysqlDB, err := connectDB("mysql", mysqlUri)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		dbs = append(dbs, pqDB)
+		dbs = append(dbs, mysqlDB)
 	}
 
-	for db, _ := range dbs {
+	for _, db := range dbs {
 		err = insertUntilErr(db)
 		if err != nil {
 			log.Println(err)
@@ -109,10 +109,12 @@ func insertUntilErr(db *dbInstance) (err error) {
 	for err == nil {
 		err = db.insert()
 	}
+
+	return err
 }
 
 func (i *dbInstance) create() error {
-	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (value integer);", dbtable)
+	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (value text);", dbtable)
 	_, err := i.Connection.Exec(table)
 	if err != nil {
 		return err
