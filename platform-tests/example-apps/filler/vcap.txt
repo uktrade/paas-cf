@@ -1,0 +1,50 @@
+{
+ "VCAP_SERVICES": {
+  "mysql": [
+   {
+    "credentials": {
+     "host": "",
+     "jdbcuri": "",
+     "name": "",
+     "password": "",
+     "port": 3306,
+     "uri": "",
+     "username": ""
+    },
+    "label": "mysql",
+    "name": "mydb",
+    "plan": "Free",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "mysql",
+     "relational"
+    ],
+    "volume_mounts": []
+   }
+  ],
+  "postgres": [
+   {
+    "credentials": {
+     "host": "",
+     "jdbcuri": "",
+     "name": "",
+     "password": "",
+     "port": 5432,
+     "uri": "",
+     "username": ""
+    },
+    "label": "postgres",
+    "name": "mydb2",
+    "plan": "Free",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": [
+     "postgres",
+     "relational"
+    ],
+    "volume_mounts": []
+   }
+  ]
+ }
+}
