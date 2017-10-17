@@ -23,8 +23,6 @@ const (
 )
 
 var (
-	dbtable string
-
 	chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_")
 )
 
@@ -105,8 +103,6 @@ func getVCAPServiceUris(label string) ([]string, error) {
 }
 
 func connectDB(engine, url string) (*dbInstance, error) {
-	dbtable = RandStringRunes(16)
-
 	conn, err := sql.Open(engine, url)
 	if err != nil {
 		return nil, err
@@ -131,7 +127,7 @@ func insertUntilErr(db *dbInstance) (err error) {
 }
 
 func (i *dbInstance) create() error {
-	table := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (value text);", dbtable)
+	table := "CREATE TABLE IF NOT EXISTS test (value text);"
 	_, err := i.Connection.Exec(table)
 	if err != nil {
 		return err
@@ -141,20 +137,11 @@ func (i *dbInstance) create() error {
 }
 
 func (i *dbInstance) insert() error {
-	statement := fmt.Sprintf("INSERT INTO %s VALUES (\"%s\");", dbtable, story)
+	statement := fmt.Sprintf("INSERT INTO test VALUES (\"%s\");", story)
 	_, err := i.Connection.Exec(statement)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// RandStringRunes asda
-func RandStringRunes(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
-	}
-	return string(b)
 }
