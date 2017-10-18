@@ -37,7 +37,7 @@ resource "datadog_monitor" "rds-disk-utilisation" {
   type           = "query alert"
   message        = "${format("Instance is {{#is_warning}}low on{{/is_warning}}{{#is_alert}}critically low on{{/is_alert}} storage space. @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.aws_account)}"
   notify_no_data = false
-  query          = "${format("min(last_1h):min:aws.rds.free_storage_space{deploy_env:%s} by {hostname} / min:aws.rds.total_storage_space{deploy_env:%s} by {hostname} <= 0.1", var.env, var.env)}"
+  query          = "${format("min(last_1h):min:aws.rds.free_storage_space{deploy_env:%s} by {hostname} / min:aws.rds.total_storage_space{deploy_env:%s} by {hostname} <= 0.1", "staging", "staging")}"
 
   thresholds {
     warning  = "0.2"
