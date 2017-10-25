@@ -140,7 +140,7 @@ jobs:
     vm_extensions:
       - cf_uaa_elb
       - cf_rds_client_sg
-    stemcell: uaa
+    stemcell: default
     networks:
       - name: cf
     properties:
