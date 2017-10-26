@@ -1,0 +1,243 @@
+{
+  "board_title": "User Impact",
+  "height": 80,
+  "width": "100%",
+  "widgets": [
+    {
+      "type": "manage_status",
+
+      "titleAlign": "left",
+      "titleSize": "20",
+      "titleText": "prod",
+
+      "width": 47,
+      "height": 12,
+      "x": 0,
+      "y": 0,
+
+      "colorPreference": "background",
+      "displayFormat": "counts",
+      "hideZeroCounts": true,
+
+      "timeframe": "1h",
+      "params": {
+        "count": 50,
+        "sort": "status,asc",
+        "start": 0,
+        "text": "service:prod_monitors muted:false"
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_align": "left",
+      "title_size": 16,
+      "title_text": "gorouter requests/sec",
+
+      "height": 18,
+      "width": 47,
+      "x": 0,
+      "y": 12,
+
+      "timeframe": "1d",
+      "legend": true,
+      "tile_def": {
+        "viz": "timeseries",
+        "autoscale": true,
+        "requests": [
+          {
+            "q": "per_second(sum:cf.gorouter.responses{deployment:prod})",
+            "type": "area",
+            "alias": "Total"
+          },
+          {
+            "q": "per_second(sum:cf.gorouter.responses.4xx{deployment:prod})",
+            "type": "area",
+            "alias": "4xx"
+          },
+          {
+            "q": "per_second(sum:cf.gorouter.responses.5xx{deployment:prod})",
+            "type": "area",
+            "alias": "5xx"
+          }
+        ]
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_text": "Application Instances",
+      "title_size": 16,
+      "title_align": "left",
+
+      "height": 16,
+      "width": 47,
+      "x": 0,
+      "y": 32,
+
+
+      "timeframe": "1d",
+      "legend": true,
+      "tile_def": {
+        "viz": "timeseries",
+        "autoscale": true,
+        "requests": [
+          {
+            "q": "max:cf.bbs.LRPsDesired{deployment:prod}",
+            "type": "area",
+            "alias": "Desired"
+          },
+          {
+            "q": "max:cf.bbs.LRPsRunning{deployment:prod}",
+            "type": "area",
+            "alias": "Running"
+          }
+        ]
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_align": "left",
+      "title_size": 16,
+      "title_text": "Cell free memory (including cache)",
+
+      "height": 12,
+      "width": 47,
+      "x": 0,
+      "y": 50,
+
+
+      "timeframe": "1d",
+      "legend": false,
+      "tile_def": {
+          "viz": "timeseries",
+          "autoscale": true,
+          "requests": [
+              {
+                  "aggregator": "avg",
+                  "q": "max:system.mem.free{deploy_env:prod,bosh-job:cell} by {bosh-index} + max:system.mem.cached{deploy_env:prod,bosh-job:cell} by {bosh-index}",
+                  "type": "line"
+              }
+          ]
+      }
+    },
+    {
+      "type": "manage_status",
+
+      "titleAlign": "left",
+      "titleSize": "20",
+      "titleText": "staging",
+
+      "width": 47,
+      "height": 12,
+      "x": 47,
+      "y": 0,
+
+      "colorPreference": "background",
+      "displayFormat": "counts",
+      "hideZeroCounts": true,
+
+      "timeframe": "1h",
+      "params": {
+        "count": 50,
+        "sort": "status,asc",
+        "start": 0,
+        "text": "service:staging_monitors muted:false"
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_align": "left",
+      "title_size": 16,
+      "title_text": "API requests/sec",
+
+      "height": 18,
+      "width": 47,
+      "x": 47,
+      "y": 12,
+
+      "timeframe": "1d",
+      "legend": true,
+      "tile_def": {
+        "viz": "timeseries",
+        "autoscale": true,
+        "requests": [
+          {
+            "q": "per_second(sum:cf.cc.http_status.2XX{deployment:prod})",
+            "alias": "2xx",
+            "type": "area"
+          },
+          {
+            "q": "per_second(sum:cf.cc.http_status.4XX{deployment:prod})",
+            "alias": "4xx",
+            "type": "area"
+          },
+          {
+            "q": "per_second(sum:cf.cc.http_status.5XX{deployment:prod})",
+            "alias": "5xx",
+            "type": "area"
+          }
+        ]
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_text": "CC Job Queue",
+      "title_align": "left",
+      "title_size": 16,
+
+      "height": 11,
+      "width": 47,
+      "x": 47,
+      "y": 32,
+
+
+      "timeframe": "1d",
+      "legend": false,
+      "tile_def": {
+        "viz": "timeseries",
+        "autoscale": true,
+        "requests": [
+          {
+            "q": "max:cf.cc.job_queue_length.total{deployment:prod}",
+            "type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "type": "timeseries",
+
+      "title": true,
+      "title_align": "left",
+      "title_size": 16,
+      "title_text": "Users registered in CC",
+
+      "height": 13,
+      "width": 47,
+      "x": 47,
+      "y": 45,
+
+      "timeframe": "1d",
+      "legend": false,
+      "tile_def": {
+        "viz": "timeseries",
+        "autoscale": true,
+        "requests": [
+          {
+            "q": "max:cf.cc.total_users{deployment:prod}",
+            "type": "area"
+          }
+        ]
+      }
+    }
+  ]
+}
