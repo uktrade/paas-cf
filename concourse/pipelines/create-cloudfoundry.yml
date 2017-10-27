@@ -2191,6 +2191,37 @@ jobs:
                       echo "Datadog disabled, skipping attribute applying..."
                     fi
 
+          - task: datadog-sync-screenboards
+            config:
+              platform: linux
+              image_resource:
+                type: docker-image
+                source:
+                  repository: ruby
+                  tag: 2.2-alpine
+              inputs:
+                - name: datadog-screenboard-state
+                - name: paas-cf
+              params:
+                TF_VAR_env: ((deploy_env))
+                TF_VAR_datadog_api_key: ((datadog_api_key))
+                TF_VAR_datadog_app_key: ((datadog_app_key))
+                TF_VAR_aws_account: ((aws_account))
+                ENABLE_DATADOG: ((enable_datadog))
+              run:
+                path: sh
+                args:
+                  - -e
+                  - -c
+                  - |
+                    if [ "${ENABLE_DATADOG}" != "true" ]; then
+                      echo "Datadog disabled, skipping syncing screenboards..."
+                      exit 0
+                    fi
+                    BUNDLE_GEMFILE=paas-cf/Gemfile bundle install --without=default
+                    paas-cf/concourse/scripts/update_monitor_options.rb < datadog-tfstate/datadog.tfstate
+
+
         - task: deploy-paas-dashboard
           config:
             platform: linux
