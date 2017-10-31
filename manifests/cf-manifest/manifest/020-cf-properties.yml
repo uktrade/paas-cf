@@ -162,19 +162,6 @@ properties:
       client_cert: (( grab properties.etcd.client_cert ))
       client_key: (( grab properties.etcd.client_key ))
 
-  ha_proxy:
-    enable_proxy_protocol: true
-    disable_http: true
-    go_router:
-      servers: [ "127.0.0.1" ]
-      port: 80
-    additional_frontend_config: |
-      capture response header strict-transport-security len 128
-      http-response add-header Strict-Transport-Security max-age=31536000;\ includeSubDomains;\ preload unless { capture.res.hdr(0) -m found }
-    enable_healthcheck_frontend: true
-    ssl_pem: (( concat secrets.router_internal_cert secrets.router_internal_key ))
-    enable_http_redirect_frontend: true
-
   router:
     enable_ssl: false
     enable_access_log_streaming: true

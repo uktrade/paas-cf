@@ -334,8 +334,6 @@ jobs:
         consumes: {nats: nil}
       - name: metron_agent
         release: (( grab meta.release.name ))
-      - name: haproxy
-        release: paas-haproxy
       - name: datadog-router
         release: datadog-for-cloudfoundry
       - name: racoon
