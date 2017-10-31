@@ -163,7 +163,7 @@ properties:
       client_key: (( grab properties.etcd.client_key ))
 
   router:
-    enable_ssl: false
+    enable_ssl: true
     enable_access_log_streaming: true
     status:
       user: router_user

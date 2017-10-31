@@ -160,8 +160,8 @@ resource "aws_elb" "cf_router" {
   }
 
   listener {
-    instance_port      = 80
-    instance_protocol  = "http"
+    instance_port      = 443
+    instance_protocol  = "ssl"
     lb_port            = 443
     lb_protocol        = "ssl"
     ssl_certificate_id = "${var.apps_domain_cert_arn}"
