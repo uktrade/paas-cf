@@ -164,7 +164,8 @@ properties:
 
   router:
     tls_pem:
-      - (( concat secrets.router_internal_cert secrets.router_internal_key ))
+      - private_key: (( grab secrets.router_internal_key ))
+        cert_chain: (( grab secrets.router_internal_cert ))
     enable_ssl: true
     enable_access_log_streaming: true
     status:
