@@ -152,7 +152,7 @@ resource "aws_elb" "cf_router" {
   }
 
   health_check {
-    target              = "HTTP:82/"
+    target              = "HTTP:8080/health"
     interval            = "${var.health_check_interval}"
     timeout             = "${var.health_check_timeout}"
     healthy_threshold   = "${var.health_check_healthy}"
