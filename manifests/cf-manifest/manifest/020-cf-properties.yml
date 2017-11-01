@@ -167,7 +167,7 @@ properties:
       - private_key: (( grab secrets.router_internal_key ))
         cert_chain: (( grab secrets.router_internal_cert ))
     enable_ssl: true
-    cipher_suite: "ECDHE-ECDSA-AES128-GCM-SHA256"
+    cipher_suites: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256"
     enable_access_log_streaming: true
     enable_proxy: true
     status:
