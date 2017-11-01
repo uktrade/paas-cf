@@ -64,7 +64,6 @@ var _ = Describe("X-Forwarded headers", func() {
 		Expect(xffIPs).To(ConsistOf(
 			fakeProxyIP,
 			egressIP,
-			"127.0.0.1", // FIXME: haproxy -> gorouter, undesirable.
 		))
 	})
 })
