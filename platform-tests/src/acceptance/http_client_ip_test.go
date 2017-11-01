@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-var _ = Describe("X-Forwarded headers", func() {
+var _ = Describe("Client IP headers", func() {
 	const (
 		egressURL   = "https://icanhazip.com/"
 		fakeProxyIP = "1.2.3.4"
@@ -27,6 +27,7 @@ var _ = Describe("X-Forwarded headers", func() {
 		egressIP string
 		headers  struct {
 			X_Forwarded_For []string `json:"X-Forwarded-For"`
+			X_Real_IP       []string `json:"X-Real-IP"`
 		}
 	)
 
@@ -63,6 +64,13 @@ var _ = Describe("X-Forwarded headers", func() {
 
 		Expect(xffIPs).To(ConsistOf(
 			fakeProxyIP,
+			egressIP,
+		))
+	})
+
+	It("should only contain real egress IP in X-Real-IP request header", func() {
+		Expect(headers.X_Real_IP).To(HaveLen(1))
+		Expect(headers.X_Real_IP).To(ConsistOf(
 			egressIP,
 		))
 	})
