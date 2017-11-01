@@ -164,7 +164,6 @@ resource "aws_elb" "cf_router" {
     instance_protocol  = "tcp"
     lb_port            = 443
     lb_protocol        = "tcp"
-    ssl_certificate_id = "${var.apps_domain_cert_arn}"
   }
 
   listener {
