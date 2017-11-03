@@ -330,7 +330,7 @@ jobs:
       - name: datadog-consul-agent-client
         release: datadog-for-cloudfoundry
       - name: gorouter
-        release: (( grab meta.release.name ))
+        release: routing
         consumes: {nats: nil}
       - name: metron_agent
         release: (( grab meta.release.name ))

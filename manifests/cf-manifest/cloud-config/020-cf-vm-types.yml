@@ -49,8 +49,10 @@ vm_types:
       ephemeral_disk:
         size: 10240
         type: gp2
+      lb_target_groups:
+        - (( grab terraform_outputs.cf_router_alb_gorouter_target_group ))
       elbs:
-        - (( grab terraform_outputs.cf_router_elb_name ))
+        - (( grab terraform_outputs.cf_uaa_elb_name ))
 
 # Diego below
 

@@ -54,8 +54,12 @@ output "cdn_db_connection_string" {
   value = "${format("postgresql://%v:%v@%v/%v", aws_db_instance.cdn.username, var.secrets_cdn_db_master_password, aws_db_instance.cdn.address, aws_db_instance.cdn.name)}"
 }
 
-output "cf_router_elb_name" {
-  value = "${aws_elb.cf_router.name}"
+output "cf_router_alb_name" {
+  value = "${aws_alb.cf_router.name}"
+}
+
+output "cf_router_alb_gorouter_target_group" {
+  value = "${aws_alb_target_group.cf_router_https.name}"
 }
 
 output "cf_cc_elb_name" {

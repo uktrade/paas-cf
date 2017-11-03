@@ -163,6 +163,10 @@ properties:
       client_key: (( grab properties.etcd.client_key ))
 
   router:
+    backends:
+      enable_tls: true
+      cert_chain: (( grab secrets.router_internal_cert ))
+      private_key: (( grab secrets.router_internal_key ))
     tls_pem:
       - private_key: (( grab secrets.router_internal_key ))
         cert_chain: (( grab secrets.router_internal_cert ))

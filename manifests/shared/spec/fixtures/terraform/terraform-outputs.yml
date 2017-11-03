@@ -20,7 +20,8 @@ terraform_outputs:
   default_security_group: default_sg
   cf_rds_client_security_group: rds_client_sg
   cf_db_address: abcd.postgres.aws
-  cf_router_elb_name: unit-test-cf-router-elb
+  cf_router_alb_name: unit-test-cf-router-alb
+  cf_router_alb_gorouter_target_group: stub_cf_gorouter_target_group
   cf_cc_elb_name: stub_cf_cc_elb
   cf_uaa_elb_name: stub_cf_uaa_elb
   cf_doppler_elb_name: stub_cf_doppler_elb
