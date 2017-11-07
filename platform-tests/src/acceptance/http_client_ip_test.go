@@ -62,10 +62,8 @@ var _ = Describe("Client IP headers", func() {
 		xffNoWhitespace := strings.Replace(headers.X_Forwarded_For[0], " ", "", -1)
 		xffIPs := strings.Split(xffNoWhitespace, ",")
 
-		Expect(xffIPs).To(ConsistOf(
-			fakeProxyIP,
-			egressIP,
-		))
+		Expect(xffIPs).Should(ConsistOf(ContainSubstring(fakeProxyIP), egressIP))
+		Expect(xffIPs).ShouldNot(ConsistOf(ContainSubstring("127.0.0.1")))
 	})
 
 	It("should only contain real egress IP in X-Real-IP request header", func() {
