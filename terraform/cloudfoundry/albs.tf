@@ -13,14 +13,14 @@ resource "aws_alb" "cf_router" {
 }
 
 resource "aws_alb_target_group" "cf_router_http" {
-  name     = "gorouter-http"
+  name     = "${var.env}-gorouter-http"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
 }
 
 resource "aws_alb_target_group" "cf_router_https" {
-  name     = "gorouter-https"
+  name     = "${var.env}-gorouter-https"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = "${var.vpc_id}"
