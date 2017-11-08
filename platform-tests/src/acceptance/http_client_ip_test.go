@@ -62,8 +62,12 @@ var _ = Describe("Client IP headers", func() {
 		xffNoWhitespace := strings.Replace(headers.X_Forwarded_For[0], " ", "", -1)
 		xffIPs := strings.Split(xffNoWhitespace, ",")
 
-		Expect(xffIPs).Should(ConsistOf(ContainSubstring(fakeProxyIP), egressIP))
-		Expect(xffIPs).ShouldNot(ConsistOf(ContainSubstring("127.0.0.1")))
+		Expect(xffIPs).To(HaveLen(3))
+		Expect(xffIPs[0]).To(Equal(fakeProxyIP))
+		Expect(xffIPs[1]).To(Equal(egressIP))
+
+		elbIP := xffIPs[2]
+		Expect(inPrivateV4Subnet(elbIP)).To(BeTrue())
 	})
 
 	It("should only contain real egress IP in X-Real-IP request header", func() {
@@ -73,3 +77,55 @@ var _ = Describe("Client IP headers", func() {
 		))
 	})
 })
+
+type ipRange struct {
+	start net.IP
+	end   net.IP
+}
+
+func (r ipRange) contains(ipAddress net.IP) bool {
+	// strcmp type byte comparison
+	if bytes.Compare(ipAddress, r.start) >= 0 && bytes.Compare(ipAddress, r.end) < 0 {
+		return true
+	}
+	return false
+}
+
+var privateRanges = []ipRange{
+	ipRange{
+		start: net.ParseIP("10.0.0.0"),
+		end:   net.ParseIP("10.255.255.255"),
+	},
+	ipRange{
+		start: net.ParseIP("100.64.0.0"),
+		end:   net.ParseIP("100.127.255.255"),
+	},
+	ipRange{
+		start: net.ParseIP("172.16.0.0"),
+		end:   net.ParseIP("172.31.255.255"),
+	},
+	ipRange{
+		start: net.ParseIP("192.0.0.0"),
+		end:   net.ParseIP("192.0.0.255"),
+	},
+	ipRange{
+		start: net.ParseIP("192.168.0.0"),
+		end:   net.ParseIP("192.168.255.255"),
+	},
+	ipRange{
+		start: net.ParseIP("198.18.0.0"),
+		end:   net.ParseIP("198.19.255.255"),
+	},
+}
+
+func inPrivateV4Subnet(ipAddress net.IP) bool {
+	// my use case is only concerned with ipv4 atm
+	if ipCheck := ipAddress.To4(); ipCheck != nil {
+		for _, privateRange := range privateRanges {
+			if privateRange.contains(ipAddress) {
+				return true
+			}
+		}
+	}
+	return false
+}
