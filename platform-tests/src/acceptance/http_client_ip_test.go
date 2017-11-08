@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry-incubator/cf-test-helpers/generator"
 	"github.com/cloudfoundry-incubator/cf-test-helpers/helpers"
 
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -66,7 +67,7 @@ var _ = Describe("Client IP headers", func() {
 		Expect(xffIPs[0]).To(Equal(fakeProxyIP))
 		Expect(xffIPs[1]).To(Equal(egressIP))
 
-		elbIP := xffIPs[2]
+		elbIP := net.ParseIP(xffIPs[2])
 		Expect(inPrivateV4Subnet(elbIP)).To(BeTrue())
 	})
 
