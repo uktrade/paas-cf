@@ -10,9 +10,9 @@ releases:
     url: https://bosh.io/d/github.com/cloudfoundry/cf-release?v=275
     sha1: 87410553bea310476ea44641bccf8c6cc3280180
   - name: routing
-    version: "0.0.1510149838"
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/routing-0.0.1510149838.tgz
-    sha1: 469e738dbedb4ec99638c3d1cf315308b10890f7
+    version: "0.0.1510153279"
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/routing-0.0.1510153279.tgz
+    sha1: 2ae177748455cbbed8cbd23fdfe5caba1114ce85
   - name: diego
     version: 1.26.0
     url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=1.26.0
