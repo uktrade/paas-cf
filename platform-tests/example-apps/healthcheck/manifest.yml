@@ -6,6 +6,7 @@ applications:
    instances: 2
    command: "./bin/healthcheck"
    buildpack: go_buildpack
+   health-check-type: http
    env:
      GOVERSION: go1.8
      GOPACKAGENAME: github.com/alphagov/paas-cf/platform-tests/example-apps/healthcheck
