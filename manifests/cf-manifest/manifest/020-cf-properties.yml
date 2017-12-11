@@ -35,7 +35,7 @@ properties:
         lan: (( grab meta.consul_servers ))
       dns_config:
         allow_stale: true
-        max_stale: "30s"
+        max_stale: "34s"
     ca_cert: (( grab secrets.bosh_ca_cert ))
     agent_cert: (( grab secrets.consul_agent_cert ))
     agent_key: (( grab secrets.consul_agent_key ))
