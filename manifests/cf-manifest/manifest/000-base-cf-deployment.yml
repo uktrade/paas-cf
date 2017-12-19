@@ -69,9 +69,9 @@ releases:
     url: https://bosh.io/d/github.com/cloudfoundry/nodejs-buildpack-release?v=1.6.8
     sha1: 767d39e4ccdc971b017264cad6eb0d2afc60b74f
   - name: php-buildpack
-    version: "4.3.42"
-    url: https://bosh.io/d/github.com/cloudfoundry/php-buildpack-release?v=4.3.42
-    sha1: 8161798443f31242968797da14f2aa905672cac3
+    version: "4.3.46"
+    url: https://bosh.io/d/github.com/cloudfoundry/php-buildpack-release?v=4.3.46
+    sha1: 468a05abe050a54a402f82b87f6ee956f63fb3f2
   - name: python-buildpack
     version: "1.5.26"
     url: https://bosh.io/d/github.com/cloudfoundry/python-buildpack-release?v=1.5.26
