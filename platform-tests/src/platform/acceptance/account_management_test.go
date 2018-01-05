@@ -79,7 +79,7 @@ var _ = Describe("AccountManagement", func() {
 	})
 
 	Describe("login server /forgot_password endpoint", func() {
-		It("should not allow access to the forgot password page", func() {
+		It("should allow access to the forgot password page", func() {
 			resetPasswordURL := authURL
 			resetPasswordURL.Path = "/forgot_password"
 
@@ -91,11 +91,11 @@ var _ = Describe("AccountManagement", func() {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusNotFound), "wrong status code, body:\n\n %s", body)
-			Expect(body).To(ContainSubstring("Something went amiss"))
+			Expect(resp.StatusCode).To(Equal(http.StatusOK), "wrong status code, body:\n\n %s", body)
+			Expect(body).To(ContainSubstring("Reset Password"))
 		})
 
-		It("should not allow users to reset forgotten passwords", func() {
+		It("should allow users to reset forgotten passwords", func() {
 			resetPasswordURL := authURL
 			resetPasswordURL.Path = "/forgot_password.do"
 
@@ -107,8 +107,8 @@ var _ = Describe("AccountManagement", func() {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusNotFound), "wrong status code, body:\n\n %s", body)
-			Expect(body).To(ContainSubstring("Something went amiss"))
+			Expect(resp.StatusCode).To(Equal(http.StatusOK), "wrong status code, body:\n\n %s", body)
+			Expect(body).To(ContainSubstring("EVERYTHING_OK_STRING"))
 		})
 	})
 })
