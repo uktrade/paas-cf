@@ -398,7 +398,7 @@ properties:
       serviceProviderKeyPassword: ""
       serviceProviderCertificate: ((grab secrets.saml_cert))
     enabled: true
-    self_service_links_enabled: false
+    self_service_links_enabled: true
     links:
       passwd: (( concat "https://login." properties.system_domain "/forgot_password" ))
       signup: (( concat "https://login." properties.system_domain "/create_account" ))
