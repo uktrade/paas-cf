@@ -399,9 +399,17 @@ properties:
       serviceProviderCertificate: ((grab secrets.saml_cert))
     enabled: true
     self_service_links_enabled: true
+    smtp:
+      auth: true
+      from_address: gov-uk-paas-support@digital.cabinet-office.gov.uk
+      host: email-smtp.eu-west-1.amazonaws.com
+      port: 587
+      starttls: true
+      user: IAM_USER_ACCESS_ID_HERE
+      password: GENERATED_PASSWORD_HERE
     links:
       passwd: (( concat "https://login." properties.system_domain "/forgot_password" ))
-      signup: (( concat "https://login." properties.system_domain "/create_account" ))
+      signup: "https://www.cloud.service.gov.uk/get-started"
       homeRedirect: (( concat "https://www." properties.system_domain "/next-steps" ))
     branding:
       company_name: "GOV.UK PaaS"
