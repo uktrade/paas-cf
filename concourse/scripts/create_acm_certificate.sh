@@ -84,9 +84,6 @@ for _ in $(seq 40); do
     echo
     echo "Cert issued successfully."
 
-    echo "Deleting DNS validation record."
-    aws route53 change-resource-record-sets --hosted-zone-id "${zone_id}" --change-batch "$(get_route53_change_batch DELETE)" > /dev/null
-
     exit 0
   fi
 done
