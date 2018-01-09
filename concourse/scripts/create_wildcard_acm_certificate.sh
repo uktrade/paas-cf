@@ -32,7 +32,7 @@ arn=$(aws acm list-certificates --query "CertificateSummaryList[?DomainName==\`$
 
 if [ -z "${arn}" ] || [ "${arn}" = "None" ]; then
   echo "Requesting certificate for ${fqdn}"
-  arn=$(aws acm request-certificate --domain-name "${fqdn}" --validation-method "DNS" --output text)
+  arn=$(aws acm request-certificate --domain-name "*.${fqdn}" --subject-alternative-names "*.${fqdn}" "${fqdn}" --validation-method "DNS" --output text)
 fi
 
 cert_status=$(aws acm describe-certificate --certificate-arn "${arn}" --query 'Certificate.Status' --output text)

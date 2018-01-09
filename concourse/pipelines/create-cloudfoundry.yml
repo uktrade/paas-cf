@@ -531,8 +531,8 @@ jobs:
                 - -e
                 - -c
                 - |
-                  ./paas-cf/concourse/scripts/create_acm_certificate.sh "*.${APPS_DNS_ZONE_NAME}" "${APPS_DNS_ZONE_ID}"
-                  ./paas-cf/concourse/scripts/create_acm_certificate.sh "*.${SYSTEM_DNS_ZONE_NAME}" "${SYSTEM_DNS_ZONE_ID}"
+                  ./paas-cf/concourse/scripts/create_wildcard_acm_certificate.sh "${APPS_DNS_ZONE_NAME}" "${APPS_DNS_ZONE_ID}"
+                  ./paas-cf/concourse/scripts/create_wildcard_acm_certificate.sh "${SYSTEM_DNS_ZONE_NAME}" "${SYSTEM_DNS_ZONE_ID}"
 
         - task: generate-cf-certs
           config:
