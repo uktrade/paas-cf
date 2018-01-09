@@ -136,23 +136,3 @@ variable "apps_dns_zone_id" {
 variable "apps_dns_zone_name" {
   description = "Amazon Route53 DNS zone name for hosted apps. Differs per account."
 }
-
-data "aws_acm_certificate" "system" {
-  domain   = "*.${var.system_dns_zone_name}"
-  statuses = ["ISSUED"]
-}
-
-data "aws_acm_certificate" "apps" {
-  domain   = "*.${var.apps_dns_zone_name}"
-  statuses = ["ISSUED"]
-}
-
-variable "system_domain_cert_arn" {
-  description = "Amazon ARN for the public facing certificate to be used for the system components"
-  default = "*.${aws_acm_certificate.system.arn}"
-}
-
-variable "apps_domain_cert_arn" {
-  description = "Amazon ARN for the public facing certificate to be used for apps"
-  default = "*.${aws_acm_certificate.apps.arn}"
-}
