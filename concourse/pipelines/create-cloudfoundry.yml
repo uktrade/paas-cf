@@ -509,6 +509,31 @@ jobs:
                   params:
                     file: generated-ssh-public-key/id_rsa.pub
 
+        - task: generate-acm-wildcard-certificates-for-root-domains
+          config:
+            platform: linux
+            inputs:
+              - name: paas-cf
+            params:
+              AWS_DEFAULT_REGION: ((aws_region))
+              SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
+              SYSTEM_DNS_ZONE_ID: ((system_dns_zone_id))
+              APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+              APPS_DNS_ZONE_ID: ((apps_dns_zone_id))
+            image_resource:
+              type: docker-image
+              source:
+                repository: governmentpaas/awscli
+                tag: latest
+            run:
+              path: sh
+              args:
+                - -e
+                - -c
+                - |
+                  ./paas-cf/concourse/scripts/create_acm_certificate.sh "*.${APPS_DNS_ZONE_NAME}" "${APPS_DNS_ZONE_ID}"
+                  ./paas-cf/concourse/scripts/create_acm_certificate.sh "*.${SYSTEM_DNS_ZONE_NAME}" "${SYSTEM_DNS_ZONE_ID}"
+
         - task: generate-cf-certs
           config:
             platform: linux

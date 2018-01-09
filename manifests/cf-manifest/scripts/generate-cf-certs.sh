@@ -10,7 +10,6 @@ CA_NAME="bosh-CA"
 # shellcheck disable=SC2154
 # Allow referencing unassigned variables (set -u catches problems)
 APPS_DOMAINS="*.${APPS_DNS_ZONE_NAME},${APPS_DNS_ZONE_NAME}"
-SYSTEM_DOMAINS="*.${SYSTEM_DNS_ZONE_NAME},${SYSTEM_DNS_ZONE_NAME}"
 
 # List of certs to generate
 # Format:
@@ -29,8 +28,6 @@ uaa_jwt_signing,
 uaa_internal,uaa.service.cf.internal
 consul_server,server.dc1.cf.internal,server.dc2.cf.internal
 consul_agent,
-apps_domain,${APPS_DOMAINS}
-system_domain,${SYSTEM_DOMAINS}
 doppler,
 metron,
 trafficcontroller,

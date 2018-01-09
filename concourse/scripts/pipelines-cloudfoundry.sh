@@ -102,7 +102,9 @@ cf_skip_ssl_validation: ${CF_SKIP_SSL_VALIDATION:-}
 paas_cf_tag_filter: ${PAAS_CF_TAG_FILTER:-}
 TAG_PREFIX: ${TAG_PREFIX:-}
 system_dns_zone_name: ${SYSTEM_DNS_ZONE_NAME}
+system_dns_zone_id: ${SYSTEM_DNS_ZONE_ID}
 apps_dns_zone_name: ${APPS_DNS_ZONE_NAME}
+apps_dns_zone_id: ${APPS_DNS_ZONE_ID}
 git_concourse_pool_clone_full_url_ssh: ${git_concourse_pool_clone_full_url_ssh}
 ALERT_EMAIL_ADDRESS: ${ALERT_EMAIL_ADDRESS:-}
 NEW_ACCOUNT_EMAIL_ADDRESS: "${NEW_ACCOUNT_EMAIL_ADDRESS:-}"
