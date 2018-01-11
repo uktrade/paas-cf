@@ -55,8 +55,8 @@ var _ = Describe("AccountManagement", func() {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusNotFound), "wrong status code, body:\n\n %s", body)
-			Expect(body).To(ContainSubstring("Something went amiss"))
+			Expect(resp.StatusCode).To(Equal(http.StatusOK), "wrong status code, body:\n\n %s", body)
+			Expect(body).To(ContainSubstring("Account creation has been disabled"))
 		})
 
 		It("should not allow anonymous users to create accounts", func() {
@@ -107,8 +107,8 @@ var _ = Describe("AccountManagement", func() {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(resp.StatusCode).To(Equal(http.StatusNotFound), "wrong status code, body:\n\n %s", body)
-			Expect(body).To(ContainSubstring("Something went amiss"))
+			Expect(resp.StatusCode).To(Equal(http.StatusOK), "wrong status code, body:\n\n %s", body)
+			Expect(body).To(ContainSubstring("Account creation has been disabled"))
 		})
 	})
 })
