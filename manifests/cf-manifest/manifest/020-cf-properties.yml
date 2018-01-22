@@ -455,7 +455,7 @@ properties:
       policy:
         keys:
           key_2016: (( grab secrets.uaa_jwt_signing_key ))
-          key_2018: (( grab secrets.uaa_jwt_signing_key_2018 ))
+          key_2018: (( grab secrets.uaa_jwt_signing_2018_key ))
         active_key_id: key_2018
         refreshTokenValiditySeconds: 604800
         global:
