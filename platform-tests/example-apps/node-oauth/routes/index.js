@@ -1,28 +1,54 @@
 var express = require('express');
-var router = express.Router();
-var OAuth = require('oauth');
+const app = express();
+const simpleOauthModule = require('simple-oauth2')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-})
 
- router.post('/login', function(req, res, next){
-   var OAuth2 = OAuth.OAuth2
-   var clientId = process.env.CLIENT_ID
-   var clientSecret = process.env.CLIENT_SECRET
-   var baseSite = ''
-   var authorizePath = process.env.AUTHORIZE_PATH
-   var accessTokenPath = process.env.ACCESS_TOKEN_PATH
-   var customHeaders = ''
-   var oauth2 = new OAuth2(clientId,
-     clientSecret,
-     baseSite,
-     authorizePath,
-     accessTokenPath,
-     customHeaders,
-   );
+  // Set the configuration settings
+  const oauth2 = simpleOauthModule.create({
+    client: {
+      id: process.env.CLIENT_ID,
+      secret: process.env.CLIENT_SECRET
+    },
+    auth: {
+      tokenHost: process.env.ACCESS_TOKEN_HOST,
+      tokenPath: process.env.ACCESS_TOKEN_PATH,
+      authorizePath: process.env.AUTHORIZE_PATH
+    }
+  });
 
-});
+  // Authorization uri definition
+  const authorizationUri = oauth2.authorizationCode.authorizeURL({
+    redirect_uri: 'http://localhost:3000/auth/cloudfoundry/callback',
+    scope: 'cloud_controller.read,cloud_controller.admin_read_only,cloud_controller.global_auditor,openid,oauth.approvals',
+    state: 'thisencodeswell',
+  });
 
-module.exports = router;
+  // Initial page redirecting to Github
+  app.get('/auth', (req, res) => {
+    console.log(authorizationUri);
+    res.redirect(authorizationUri);
+  });
+
+  // Callback service parsing the authorization token and asking for the access token
+  app.get('/auth/cloudfoundry/callback', (req, res) => {
+    const code = req.query.code;
+    const options = {
+      code,
+    };
+
+    oauth2.authorizationCode.getToken(options, (error, result) => {
+      if (error) {
+        console.error('Access Token Error', error.message);
+        return res.json('Authentication failed');
+      }
+
+      console.log('The resulting token: ', result);
+      const token = oauth2.accessToken.create(result);
+
+      return res
+        .status(200)
+        .json(token);
+    });
+  });
+
+module.exports = app;
