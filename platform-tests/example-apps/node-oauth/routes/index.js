@@ -13,6 +13,9 @@ const simpleOauthModule = require('simple-oauth2')
       tokenHost: process.env.ACCESS_TOKEN_HOST,
       tokenPath: process.env.ACCESS_TOKEN_PATH,
       authorizePath: process.env.AUTHORIZE_PATH
+    },
+    http: {
+      rejectUnauthorized: false
     }
   });
 
