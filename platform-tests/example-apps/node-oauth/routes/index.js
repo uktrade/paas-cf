@@ -23,7 +23,7 @@ const simpleOauthModule = require('simple-oauth2')
   const authorizationUri = oauth2.authorizationCode.authorizeURL({
     redirect_uri: 'http://localhost:3000/auth/cloudfoundry/callback',
     scope: 'cloud_controller.read,cloud_controller.admin_read_only,cloud_controller.global_auditor,openid,oauth.approvals',
-    state: 'thisencodeswell',
+    state: 'some-non-empty-value',
   });
 
   // Initial page redirecting to Github
@@ -37,6 +37,7 @@ const simpleOauthModule = require('simple-oauth2')
     const code = req.query.code;
     const options = {
       code,
+      'redirect_uri': 'http://localhost:3000/auth/cloudfoundry/callback',
     };
 
     oauth2.authorizationCode.getToken(options, (error, result) => {
