@@ -391,8 +391,8 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: governmentpaas/curl-ssl
-              tag: 465642da06051a55630d39c899697b678f66a7f7
+              repository: governmentpaas/awscli
+              tag: b2495d6ed07f680125d19aa7d1701da7efabb289
           inputs:
             - name: paas-cf
           run:
@@ -401,17 +401,30 @@ jobs:
               - -e
               - -c
               - |
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" ipsec-CA.tar.gz paas-cf/concourse/init_files/empty.tar.gz
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" cf-secrets.yml paas-cf/concourse/init_files/zero_bytes
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" google-oauth-secrets.yml paas-cf/concourse/init_files/zero_bytes
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" cf.tfstate paas-cf/concourse/init_files/terraform.tfstate.tpl
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" cf-certs.tar.gz paas-cf/concourse/init_files/empty.tar.gz
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" cf-certs.tfstate paas-cf/concourse/init_files/terraform.tfstate.tpl
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" datadog.tfstate paas-cf/concourse/init_files/terraform.tfstate.tpl
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" git-keys.tar.gz paas-cf/concourse/init_files/empty.tar.gz
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" id_rsa paas-cf/concourse/init_files/zero_bytes
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" id_rsa.pub paas-cf/concourse/init_files/zero_bytes
-                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" healthcheck-deployed paas-cf/concourse/init_files/string-no
+                put_if_not_exists() {
+                  source=$1
+                  target=$2
+                  set +e
+                  if aws s3api head-object --bucket "((state_bucket))" --key "$target" 2>&1 | grep -q 'Not Found'; then
+                    set -e
+                    echo "$target does not already exist. Uploading..."
+                    aws s3 cp "$source" "s3://((state_bucket))/$target"
+                  else
+                    echo "$target already exists in bucket"
+                  fi
+                }
+
+                put_if_not_exists paas-cf/concourse/init_files/empty.tar.gz ipsec-CA.tar.gz
+                put_if_not_exists paas-cf/concourse/init_files/zero_bytes cf-secrets.yml
+                put_if_not_exists paas-cf/concourse/init_files/zero_bytes google-oauth-secrets.yml
+                put_if_not_exists paas-cf/concourse/init_files/terraform.tfstate.tpl cf.tfstate
+                put_if_not_exists paas-cf/concourse/init_files/empty.tar.gz cf-certs.tar.gz
+                put_if_not_exists paas-cf/concourse/init_files/terraform.tfstate.tpl cf-certs.tfstate
+                put_if_not_exists paas-cf/concourse/init_files/terraform.tfstate.tpl datadog.tfstate
+                put_if_not_exists paas-cf/concourse/init_files/empty.tar.gz git-keys.tar.gz
+                put_if_not_exists paas-cf/concourse/init_files/zero_bytes id_rsa
+                put_if_not_exists paas-cf/concourse/init_files/zero_bytes id_rsa.pub
+                put_if_not_exists paas-cf/concourse/init_files/string-no healthcheck-deployed
 
   - name: generate-secrets
     serial_groups: [cf-deploy]
