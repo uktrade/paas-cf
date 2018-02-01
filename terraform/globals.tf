@@ -8,7 +8,7 @@ variable "env" {
 
 variable "region" {
   description = "AWS region"
-  default     = "eu-west-1"
+  default     = "eu-west-2"
 }
 
 variable "vpc_cidr" {
@@ -25,9 +25,9 @@ variable "zones" {
   description = "AWS availability zones"
 
   default = {
-    zone0 = "eu-west-1a"
-    zone1 = "eu-west-1b"
-    zone2 = "eu-west-1c"
+    zone0 = "eu-west-2a"
+    zone1 = "eu-west-2b"
+    zone2 = "eu-west-2c"
   }
 }
 
@@ -35,9 +35,9 @@ variable "zone_index" {
   description = "AWS availability zone indices"
 
   default = {
-    eu-west-1a = "0"
-    eu-west-1b = "1"
-    eu-west-1c = "2"
+    eu-west-2a = "0"
+    eu-west-2b = "1"
+    eu-west-2c = "2"
   }
 }
 
@@ -45,9 +45,9 @@ variable "zone_labels" {
   description = "AWS availability zone labels as used in BOSH manifests (z1-z3)"
 
   default = {
-    eu-west-1a = "z1"
-    eu-west-1b = "z2"
-    eu-west-1c = "z3"
+    eu-west-2a = "z1"
+    eu-west-2b = "z2"
+    eu-west-2c = "z3"
   }
 }
 
@@ -80,9 +80,9 @@ variable "microbosh_ips" {
   description = "MicroBOSH IPs per zone"
 
   default = {
-    eu-west-1a = "10.0.0.6"
-    eu-west-1b = "10.0.1.6"
-    eu-west-1c = "10.0.2.6"
+    eu-west-2a = "10.0.0.6"
+    eu-west-2b = "10.0.1.6"
+    eu-west-2c = "10.0.2.6"
   }
 }
 
@@ -131,6 +131,7 @@ variable "elb_account_ids" {
     us-west-1      = "027434742980"
     us-west-2      = "797873946194"
     eu-west-1      = "156460612806"
+    eu-west-2      = "652711504416"
     eu-central-1   = "054676820928"
     ap-northeast-1 = "582318560864"
     ap-northeast-2 = "600734575887"
