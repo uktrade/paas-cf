@@ -45,7 +45,7 @@ vm_types:
     network: router
     env: (( grab meta.default_env ))
     cloud_properties:
-      instance_type: c3.large
+      instance_type: c4.large
       ephemeral_disk:
         size: 10240
         type: gp2
