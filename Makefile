@@ -76,7 +76,7 @@ list_merge_keys: ## List all GPG keys allowed to sign merge commits.
 .PHONY: globals
 PASSWORD_STORE_DIR?=${HOME}/.paas-pass
 globals:
-	$(eval export AWS_DEFAULT_REGION=eu-west-1)
+	$(eval export AWS_DEFAULT_REGION=eu-west-2)
 	$(eval export PASSWORD_STORE_DIR=${PASSWORD_STORE_DIR})
 	@true
 
