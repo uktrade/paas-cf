@@ -21,7 +21,7 @@ jobs:
         broker_username: "elasticache-broker"
         broker_password: (( grab secrets.elasticache_broker_admin_password ))
         auth_token_seed: (( grab secrets.elasticache_broker_auth_token_seed ))
-        region: "eu-west-1"
+        region: "eu-west-2"
         cache_subnet_group_name: (( grab terraform_outputs.elasticache_broker_subnet_group_name ))
         vpc_security_group_ids:
         - (( grab terraform_outputs.elasticache_broker_instances_security_group_id ))
