@@ -8,7 +8,8 @@ cf_db_maintenance_window = "Mon:07:00-Mon:08:00"
 api_access_cidrs = [
   "52.211.37.21/32",
   "34.242.228.52/32",
-  "34.243.99.146/32"
+  "34.243.99.146/32",
+  "52.209.167.58/32"
 ]
 cdn_db_multi_az = "false"
 cdn_db_backup_retention_period = "0"
