@@ -412,56 +412,56 @@ properties:
     asset_base_url: (( concat "https://paas-uaa-assets." terraform_outputs.cf_apps_domain ))
 
   uaa:
-    url: (( concat "https://uaa." properties.system_domain ))
-    internal_url: "https://uaa.service.cf.internal:8443"
-    issuer: (( grab properties.uaa.url ))
+    url: https://uaa.andras2.dev.cloudpipeline.digital
+    internal_url: "https://uaa.andras2.dev.cloudpipeline.digital:8443"
+    #issuer: (( grab properties.uaa.url ))
     token_url: (( concat properties.uaa.url "/oauth/token" ))
-    require_https: false
-    logging_level: INFO
-    scim:
-      userids_enabled: true
-      users:
-        - name: admin
-          password: (( grab secrets.uaa_admin_password ))
-          groups:
-            - scim.write
-            - scim.read
-            - scim.invite
-            - openid
-            - cloud_controller.admin
-            - cloud_controller.admin_read_only
-            - doppler.firehose
-      groups:
-        cloud_controller.global_auditor: 'Global Auditor read only group'
+    #require_https: false
+    #logging_level: INFO
+    # scim:
+    #   userids_enabled: true
+    #   users:
+    #     - name: admin
+    #       password: (( grab secrets.uaa_admin_password ))
+    #       groups:
+    #         - scim.write
+    #         - scim.read
+    #         - scim.invite
+    #         - openid
+    #         - cloud_controller.admin
+    #         - cloud_controller.admin_read_only
+    #         - doppler.firehose
+    #   groups:
+    #     cloud_controller.global_auditor: 'Global Auditor read only group'
 
 
-    port: 8080
+    #port: 8080
     ssl:
       port: 8443
-    sslCertificate: (( grab secrets.uaa_internal_cert ))
-    sslPrivateKey: (( grab secrets.uaa_internal_key ))
+    #sslCertificate: (( grab secrets.uaa_internal_cert ))
+    #sslPrivateKey: (( grab secrets.uaa_internal_key ))
     ca_cert: (( grab secrets.bosh_ca_cert ))
 
-    password:
-      policy:
-        minLength: 8
-
+    # password:
+    #   policy:
+    #     minLength: 8
+    #
     admin:
       client_secret: (( grab secrets.uaa_admin_client_secret ))
     cc:
       client_secret: (( grab secrets.uaa_cc_client_secret ))
-
-    jwt:
-      policy:
-        active_key_id: default
-        keys:
-          default:
-            signingKey: (( grab secrets.uaa_jwt_signing_key ))
-          previous:
-            signingKey: (( grab secrets.uaa_jwt_signing_old_key || secrets.uaa_jwt_signing_key ))
-        refreshTokenValiditySeconds: 604800
-        global:
-          refreshTokenValiditySeconds: 604800
+    #
+    # jwt:
+    #   policy:
+    #     active_key_id: default
+    #     keys:
+    #       default:
+    #         signingKey: (( grab secrets.uaa_jwt_signing_key ))
+    #       previous:
+    #         signingKey: (( grab secrets.uaa_jwt_signing_old_key || secrets.uaa_jwt_signing_key ))
+    #     refreshTokenValiditySeconds: 604800
+    #     global:
+    #       refreshTokenValiditySeconds: 604800
 
     clients:
       login:
@@ -579,23 +579,23 @@ properties:
         scope: openid,password.write,scim.read,scim.write,scim.invite,uaa.user
         secret: (( grab secrets.uaa_clients_login_secret ))
 
-    zones:
-      internal:
-        hostnames:
-          - uaa.service.cf.internal
+    # zones:
+    #   internal:
+    #     hostnames:
+    #       - uaa.service.cf.internal
 
-  uaadb:
-    db_scheme: postgresql
-    address: (( grab terraform_outputs.cf_db_address ))
-    port: 5432
-    roles:
-      - tag: admin
-        name: uaa
-        password: (( grab secrets.cf_db_uaa_password ))
-    databases:
-      - tag: uaa
-        name: uaa
-        citext: true
+  # uaadb:
+  #   db_scheme: postgresql
+  #   address: (( grab terraform_outputs.cf_db_address ))
+  #   port: 5432
+  #   roles:
+  #     - tag: admin
+  #       name: uaa
+  #       password: (( grab secrets.cf_db_uaa_password ))
+  #   databases:
+  #     - tag: uaa
+  #       name: uaa
+  #       citext: true
 
   diego:
     ssl:

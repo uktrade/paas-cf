@@ -114,52 +114,52 @@ jobs:
       bbs:
           url: (( concat "https://" meta.bbs.api_location "/v1/actual_lrp_groups/list" ))
 
-  - name: uaa
-    azs: [z1, z2]
-    templates:
-      - name: consul_agent
-        release: (( grab jobs.consul.templates.consul_agent.release ))
-        consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
-      - name: datadog-consul-agent-client
-        release: datadog-for-cloudfoundry
-      - name: uaa
-        release: uaa
-      - name: metron_agent
-        release: loggregator
-      - name: statsd_injector
-        release: statsd-injector
-      - name: route_registrar
-        release: routing
-    instances: 2
-    vm_type: medium
-    vm_extensions:
-      - cf_rds_client_sg
-    stemcell: default
-    networks:
-      - name: cf
-    properties:
-      ssl_key: (( grab secrets.uaa_internal_key ))
-      ssl_chained_cert: (( grab secrets.uaa_internal_cert ))
-      consul:
-        agent:
-          services:
-            uaa: {}
-      route_registrar:
-        routes:
-          - name: uaa
-            registration_interval: 10s
-            health_check:
-              name: cf_uaa_health_check
-              script_path: /var/vcap/jobs/uaa/bin/health_check
-              timeout: "5s"
-            port: 8081
-            tls_port: 8443
-            server_cert_domain_san: "uaa.service.cf.internal"
-            tags:
-              component: uaa
-            uris:
-              - (( concat "uaa." properties.system_domain ))
-              - (( concat "login." properties.system_domain ))
+  # - name: uaa
+  #   azs: [z1, z2]
+  #   templates:
+  #     - name: consul_agent
+  #       release: (( grab jobs.consul.templates.consul_agent.release ))
+  #       consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
+  #     - name: datadog-consul-agent-client
+  #       release: datadog-for-cloudfoundry
+  #     - name: uaa
+  #       release: uaa
+  #     - name: metron_agent
+  #       release: loggregator
+  #     - name: statsd_injector
+  #       release: statsd-injector
+  #     - name: route_registrar
+  #       release: routing
+  #   instances: 2
+  #   vm_type: medium
+  #   vm_extensions:
+  #     - cf_rds_client_sg
+  #   stemcell: default
+  #   networks:
+  #     - name: cf
+  #   properties:
+  #     ssl_key: (( grab secrets.uaa_internal_key ))
+  #     ssl_chained_cert: (( grab secrets.uaa_internal_cert ))
+  #     consul:
+  #       agent:
+  #         services:
+  #           uaa: {}
+  #     route_registrar:
+  #       routes:
+  #         - name: uaa
+  #           registration_interval: 10s
+  #           health_check:
+  #             name: cf_uaa_health_check
+  #             script_path: /var/vcap/jobs/uaa/bin/health_check
+  #             timeout: "5s"
+  #           port: 8081
+  #           tls_port: 8443
+  #           server_cert_domain_san: "uaa.service.cf.internal"
+  #           tags:
+  #             component: uaa
+  #           uris:
+  #             - (( concat "uaa." properties.system_domain ))
+  #             - (( concat "login." properties.system_domain ))
 
   - name: api
     azs: [z1, z2]
