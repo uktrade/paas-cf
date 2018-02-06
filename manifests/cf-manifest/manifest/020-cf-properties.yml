@@ -194,6 +194,8 @@ properties:
       enable_zipkin: true
 
   cc:
+    uaa:
+      internal_url: "https://uaa.andras.dev.cloudpipeline.digital"
     jobs:
       global:
         timeout_in_seconds: 14400 # 4 hours
