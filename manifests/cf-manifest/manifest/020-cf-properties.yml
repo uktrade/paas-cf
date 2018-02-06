@@ -389,6 +389,7 @@ properties:
 
 
   login:
+    url: https://login.andras.dev.cloudpipeline.digital
     saml:
       serviceProviderKey: ((grab secrets.saml_key))
       serviceProviderKeyPassword: ""
@@ -404,7 +405,7 @@ properties:
     enabled: true
     self_service_links_enabled: true
     links:
-      passwd: (( concat "https://login." properties.system_domain "/forgot_password" ))
+      passwd: https://login.andras.dev.cloudpipeline.digital/forgot_password
       signup: "https://www.cloud.service.gov.uk/signup"
       homeRedirect: "https://www.cloud.service.gov.uk/next-steps?account-updated"
     branding:
@@ -412,8 +413,8 @@ properties:
     asset_base_url: (( concat "https://paas-uaa-assets." terraform_outputs.cf_apps_domain ))
 
   uaa:
-    url: https://uaa.andras2.dev.cloudpipeline.digital
-    internal_url: "https://uaa.andras2.dev.cloudpipeline.digital"
+    url: https://uaa.andras.dev.cloudpipeline.digital
+    internal_url: "https://uaa.andras.dev.cloudpipeline.digital"
     #issuer: (( grab properties.uaa.url ))
     token_url: (( concat properties.uaa.url "/oauth/token" ))
     #require_https: false
@@ -547,7 +548,7 @@ properties:
         scope: openid,oauth.approvals
         authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
         authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: (( concat "https://login." properties.system_domain ))
+        redirect-uri: https://login.andras.dev.cloudpipeline.digital
         secret: (( grab secrets.uaa_clients_login_secret ))
       cf:
         override: true
@@ -601,7 +602,7 @@ properties:
         override: true
         authorized-grant-types: authorization_code
         autoapprove: true
-        redirect-uri: (( concat "https://login." properties.system_domain "/login" ))
+        redirect-uri: https://login.andras.dev.cloudpipeline.digital/login
         scope: openid,cloud_controller.read,cloud_controller.write,cloud_controller.admin
         secret: (( grab secrets.uaa_clients_ssh_proxy_secret ))
       graphite-nozzle:
@@ -611,7 +612,7 @@ properties:
         secret: (( grab secrets.uaa_clients_firehose_password ))
         scope: openid,oauth.approvals,doppler.firehose
         authorities: oauth.login,doppler.firehose
-        redirect-uri: (( concat "https://login." properties.system_domain "/login" ))
+        redirect-uri: https://login.andras.dev.cloudpipeline.digital/login
       paas-metrics:
         override: true
         access-token-validity: 1209600
@@ -619,7 +620,7 @@ properties:
         secret: (( grab secrets.uaa_clients_paas_metrics_secret ))
         scope: openid,oauth.approvals,cloud_controller.global_auditor
         authorities: oauth.login,cloud_controller.global_auditor
-        redirect-uri: (( concat "https://login." properties.system_domain ))
+        redirect-uri: https://login.andras.dev.cloudpipeline.digital
       paas-billing:
         override: true
         access-token-validity: 1209600
@@ -642,7 +643,7 @@ properties:
         secret: (( grab secrets.uaa_clients_cc_service_dashboards_password ))
         authorities: clients.read,clients.write,clients.admin
         authorized-grant-types: client_credentials
-        redirect-uri: (( concat "https://login." properties.system_domain ))
+        redirect-uri: https://login.andras.dev.cloudpipeline.digital
       cdn_broker:
         override: true
         authorities: uaa.none
