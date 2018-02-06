@@ -440,7 +440,7 @@ properties:
       port: 8443
     #sslCertificate: (( grab secrets.uaa_internal_cert ))
     #sslPrivateKey: (( grab secrets.uaa_internal_key ))
-    ca_cert: (( grab secrets.bosh_ca_cert ))
+    ca_cert: (( grab secrets.uaa_ca_cert ))
 
     # password:
     #   policy:
