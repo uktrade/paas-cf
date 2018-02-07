@@ -29,7 +29,6 @@ properties:
           redirectUrl: (( concat "https://login." properties.system_domain "/uaa" ))
           scopes:
             - openid
-            - email
           linkText: Andras UAA server
           showLinkText: true
           addShadowUserOnLogin: false
