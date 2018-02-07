@@ -167,3 +167,6 @@ variable "peer_cidrs" {
   description = "The CIDR of the VPC to peer with"
   default     = []
 }
+variable "uaa_tcp_access_cidrs" {
+  default = []
+}

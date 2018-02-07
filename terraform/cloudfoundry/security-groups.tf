@@ -42,6 +42,37 @@ resource "aws_security_group" "cf_api_elb" {
   }
 }
 
+resource "aws_security_group" "cf_uaa_tcp_elb" {
+  name_prefix = "${var.env}-cf-uaa-tcp-elb-"
+  description = "Security group for CF UAA TCP endpoints"
+  vpc_id      = "${var.vpc_id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 8443
+    to_port   = 8443
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "${compact(var.uaa_tcp_access_cidrs)}"
+    ]
+  }
+
+  tags {
+    Name = "${var.env}-cf-uaa-tcp"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_security_group" "metrics_elb" {
   name_prefix = "${var.env}-metrics-"
   description = "Security group for graphite/grafana ELB. Allows access from admin IP ranges."

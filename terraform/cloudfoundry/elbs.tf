@@ -93,6 +93,40 @@ resource "aws_proxy_protocol_policy" "cf_uaa_haproxy" {
   instance_ports = ["443"]
 }
 
+resource "aws_elb" "cf_uaa_tcp" {
+  name                        = "${var.env}-cf-uaa-tcp"
+  subnets                     = ["${split(",", var.infra_subnet_ids)}"]
+  idle_timeout                = 19
+  cross_zone_load_balancing   = "true"
+  connection_draining         = true
+  connection_draining_timeout = 20
+
+  security_groups = [
+    "${aws_security_group.cf_uaa_tcp_elb.id}",
+  ]
+
+  access_logs {
+    bucket        = "${aws_s3_bucket.elb_access_log.id}"
+    bucket_prefix = "cf-uaa"
+    interval      = 5
+  }
+
+  health_check {
+    target              = "HTTPS:8443/healthz"
+    interval            = "${var.health_check_interval}"
+    timeout             = "${var.health_check_timeout}"
+    healthy_threshold   = "${var.health_check_healthy}"
+    unhealthy_threshold = "${var.health_check_unhealthy}"
+  }
+
+  listener {
+    instance_port      = 8443
+    instance_protocol  = "tcp"
+    lb_port            = 8443
+    lb_protocol        = "tcp"
+  }
+}
+
 resource "aws_elb" "cf_doppler" {
   name                      = "${var.env}-cf-doppler"
   subnets                   = ["${split(",", var.infra_subnet_ids)}"]
