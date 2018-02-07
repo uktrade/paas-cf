@@ -37,5 +37,5 @@ properties:
           relyingPartyId: (( grab $REMOTE_OIDC_OAUTH_CLIENT_ID ))
           relyingPartySecret: (( grab $REMOTE_OIDC_OAUTH_CLIENT_SECRET ))
           skipSslValidation: false
-          attributeMappings:
-            user_name: email
+          # attributeMappings:
+          #   user_name: email
