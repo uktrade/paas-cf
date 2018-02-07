@@ -15,6 +15,9 @@ $("${SCRIPT_DIR}/environment.sh" "$@")
 # shellcheck disable=SC1090
 . "${SCRIPT_DIR}/lib/google-oauth.sh"
 
+# shellcheck disable=SC1090
+. "${SCRIPT_DIR}/lib/remote-oidc-oauth.sh"
+
 download_git_id_rsa() {
   git_id_rsa_file=$(mktemp -t id_rsa.XXXXXX)
 
@@ -61,6 +64,7 @@ prepare_environment() {
   get_datadog_secrets
   get_compose_secrets
   get_google_oauth_secrets
+  get_remote_oidc_oauth_secrets
 
   if [ "${ENABLE_DATADOG}" = "true" ] ; then
     # shellcheck disable=SC2154
@@ -119,6 +123,8 @@ enable_datadog: ${ENABLE_DATADOG}
 concourse_atc_password: ${CONCOURSE_ATC_PASSWORD}
 oauth_client_id: ${oauth_client_id:-}
 oauth_client_secret: ${oauth_client_secret:-}
+remote_oidc_oauth_client_id: ${remote_oidc_client_id:-}
+remote_oidc_oauth_client_secret: ${remote_oidc_client_secret:-}
 enable_billing_app: ${ENABLE_BILLING_APP}
 auto_deploy: $([ "${ENABLE_AUTO_DEPLOY:-}" ] && echo "true" || echo "false")
 continuous_smoke_tests_trigger: $([ "${ALERT_EMAIL_ADDRESS:-}" ] && echo "true" || echo "false")

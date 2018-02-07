@@ -1155,6 +1155,8 @@ jobs:
               DISABLE_USER_CREATION: ((disable_user_creation))
               OAUTH_CLIENT_ID: ((oauth_client_id))
               OAUTH_CLIENT_SECRET: ((oauth_client_secret))
+              REMOTE_OIDC_OAUTH_CLIENT_ID: ((remote_oidc_oauth_client_id))
+              REMOTE_OIDC_OAUTH_CLIENT_SECRET: ((remote_oidc_oauth_client_secret))
             run:
               path: sh
               args:

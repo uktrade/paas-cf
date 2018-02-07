@@ -34,8 +34,8 @@ properties:
           showLinkText: true
           addShadowUserOnLogin: false
           # FIXME: hardcoded secrets in the .yml
-          relyingPartyId: (( grab secrets.uaa_remote_oidc_client_name ))
-          relyingPartySecret: (( grab secrets.uaa_remote_oidc_client_secret ))
+          relyingPartyId: (( grab $REMOTE_OIDC_OAUTH_CLIENT_ID ))
+          relyingPartySecret: (( grab $REMOTE_OIDC_OAUTH_CLIENT_SECRET ))
           skipSslValidation: false
           attributeMappings:
             user_name: email
