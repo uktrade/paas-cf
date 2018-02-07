@@ -53,6 +53,17 @@ vm_types:
         - (( grab terraform_outputs.cf_router_elb_name ))
         - (( grab terraform_outputs.cf_uaa_elb_name ))
 
+  - name: uaa
+    network: cf
+    env: (( grab meta.default_env ))
+    cloud_properties:
+      instance_type: m3.medium
+      ephemeral_disk:
+        size: 10240
+        type: gp2
+      elbs:
+        - (( grab terraform_outputs.cf_uaa_tcp_elb_name ))
+
 # Diego below
 
   - name: cell

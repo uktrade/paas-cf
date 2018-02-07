@@ -131,7 +131,7 @@ jobs:
       - name: route_registrar
         release: routing
     instances: 2
-    vm_type: medium
+    vm_type: uaa
     vm_extensions:
       - cf_rds_client_sg
     stemcell: default

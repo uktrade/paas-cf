@@ -66,6 +66,10 @@ output "cf_uaa_elb_name" {
   value = "${aws_elb.cf_uaa.name}"
 }
 
+output "cf_uaa_tcp_elb_name" {
+  value = "${aws_elb.cf_uaa_tcp.name}"
+}
+
 output "cf_doppler_elb_name" {
   value = "${aws_elb.cf_doppler.name}"
 }
