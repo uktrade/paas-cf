@@ -1188,10 +1188,8 @@ jobs:
                                     ./paas-cf/manifests/cf-manifest/stubs/datadog-nozzle.yml"
                   fi
 
-                  if [ "${DISABLE_USER_CREATION}" = "false" ] ; then
-                     MANIFEST_STUBS="${MANIFEST_STUBS}
-                                    ./paas-cf/manifests/cf-manifest/stubs/oauth.yml"
-                  fi
+                  MANIFEST_STUBS="${MANIFEST_STUBS}
+                                ./paas-cf/manifests/cf-manifest/stubs/oauth.yml"
 
                   # shellcheck disable=SC2086
                   ./paas-cf/manifests/shared/build_manifest.sh $MANIFEST_STUBS > cf-manifest/cf-manifest.yml
