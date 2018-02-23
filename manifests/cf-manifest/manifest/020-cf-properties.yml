@@ -639,7 +639,7 @@ properties:
         client_key: (( grab secrets.bbs_client_key ))
         require_ssl: true
       preloaded_rootfses:
-        - cflinuxfs2:/var/vcap/packages/cflinuxfs2/rootfs.tar
+        - "cflinuxfs2:/var/vcap/packages/cflinuxfs2/rootfs"
 
     executor:
       memory_capacity_mb: (( calc "floor(meta.cell.rep_commit_percentage * meta.cell.instance_memory_mb)" ))
@@ -712,6 +712,8 @@ properties:
   garden:
     log_level: error
     cleanup_process_dirs_on_wait: true
+    # FIXME: Workaround https://www.pivotaltracker.com/n/projects/1158420/stories/155391026
+    deprecated_use_garden_shed: true
   racoon:
     certificate_authority_cert: (( grab secrets.ipsec_ca_cert ))
     certificate_authority_private_key: (( grab secrets.ipsec_ca_key ))
