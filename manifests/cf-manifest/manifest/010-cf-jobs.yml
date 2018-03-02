@@ -61,6 +61,8 @@ instance_groups:
       max_in_flight: 1
 
   - name: scheduler
+    migrated_from:
+    - name: brain
     azs: [z1, z2, z3]
     instances: 3
     vm_type: small
@@ -269,7 +271,9 @@ instance_groups:
           services:
             cloud_controller_ng: {}
 
-  - name: api_worker
+  - name: cc-worker
+    migrated_from:
+    - name: api_worker
     azs: [z1, z2]
     jobs:
       - name: consul_agent
@@ -296,7 +300,9 @@ instance_groups:
     properties:
       max_in_flight: 1
 
-  - name: loggregator_trafficcontroller
+  - name: log-api
+    migrated_from:
+    - name: loggregator_trafficcontroller
     azs: [z1, z2]
     jobs:
       - name: consul_agent
@@ -369,27 +375,9 @@ instance_groups:
         - name: router
           targets: ((terraform_outputs_cell_subnet_cidr_blocks))
 
-  - name: brain
-    azs: [z1, z2]
-    jobs:
-      - name: consul_agent
-        release: consul
-        consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
-      - name: datadog-consul-agent-client
-        release: datadog-for-cloudfoundry
-      - name: auctioneer
-        release: diego
-      - name: cfdot
-        release: diego
-      - name: metron_agent
-        release: loggregator
-    instances: 2
-    vm_type: medium
-    stemcell: default
-    networks:
-      - name: cf
-
-  - name: cell
+  - name: diego-cell
+    migrated_from:
+    - name: cell
     azs: [z1, z2, z3]
     jobs:
       - name: consul_agent
