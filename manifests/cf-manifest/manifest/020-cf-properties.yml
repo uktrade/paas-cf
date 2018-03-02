@@ -652,6 +652,7 @@ properties:
       memory_capacity_mb: ((cell_memory_capacity_mb))
 
     route_emitter:
+      local_mode: true
       dropsonde_port: ((dropsonde_incoming_port))
       bbs:
         api_location: bbs.service.cf.internal:8889

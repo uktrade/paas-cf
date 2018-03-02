@@ -378,6 +378,7 @@ instance_groups:
   - name: diego-cell
     migrated_from:
     - name: cell
+    - name: route_emitter
     azs: [z1, z2, z3]
     jobs:
       - name: consul_agent
@@ -395,6 +396,14 @@ instance_groups:
         release: diego
       - name: metron_agent
         release: loggregator
+      - name: route_emitter
+        release: diego
+        properties:
+          diego:
+            route_emitter:
+              local_mode: true
+      - name: datadog-route-emitter
+        release: datadog-for-cloudfoundry
       - name: datadog-rep
         release: datadog-for-cloudfoundry
       - name: datadog-garden
@@ -432,28 +441,6 @@ instance_groups:
         release: capi
       - name: metron_agent
         release: loggregator
-    instances: 2
-    vm_type: medium
-    stemcell: default
-    networks:
-      - name: cf
-
-  - name: route_emitter
-    azs: [z1, z2]
-    jobs:
-      - name: consul_agent
-        release: consul
-        consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
-      - name: datadog-consul-agent-client
-        release: datadog-for-cloudfoundry
-      - name: route_emitter
-        release: diego
-      - name: cfdot
-        release: diego
-      - name: metron_agent
-        release: loggregator
-      - name: datadog-route-emitter
-        release: datadog-for-cloudfoundry
     instances: 2
     vm_type: medium
     stemcell: default
