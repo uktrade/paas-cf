@@ -63,6 +63,8 @@ instance_groups:
   - name: scheduler
     migrated_from:
     - name: brain
+    - name: cc_bridge
+    - name: access
     azs: [z1, z2, z3]
     instances: 3
     vm_type: small
@@ -215,6 +217,9 @@ instance_groups:
               - "login.((system_domain))"
 
   - name: api
+    migrated_from:
+    - name: cc_bridge
+    - name: access
     azs: [z1, z2]
     jobs:
       - name: consul_agent
@@ -426,50 +431,6 @@ instance_groups:
         ca_cert: ((certs_bosh_ca_cert))
         cert: ((certs_cc_client_cert))
         key: ((certs_cc_client_key))
-
-  - name: cc_bridge
-    azs: [z1, z2]
-    jobs:
-      - name: consul_agent
-        release: consul
-        consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
-      - name: datadog-consul-agent-client
-        release: datadog-for-cloudfoundry
-      - name: tps
-        release: capi
-      - name: cc_uploader
-        release: capi
-      - name: metron_agent
-        release: loggregator
-    instances: 2
-    vm_type: medium
-    stemcell: default
-    networks:
-      - name: cf
-
-  - name: access
-    azs: [z1, z2]
-    jobs:
-      - name: consul_agent
-        release: consul
-        consumes: {consul_client: nil, consul_server: nil, consul_common: nil}
-      - name: datadog-consul-agent-client
-        release: datadog-for-cloudfoundry
-      - name: ssh_proxy
-        release: diego
-      - name: metron_agent
-        release: loggregator
-      - name: file_server
-        release: diego
-      - name: cfdot
-        release: diego
-    instances: 2
-    vm_type: small
-    vm_extensions:
-      - ssh_proxy_elb
-    stemcell: default
-    networks:
-      - name: cf
 
   - name: doppler
     azs: [z1, z2, z3]
