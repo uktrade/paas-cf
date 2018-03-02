@@ -51,9 +51,9 @@ RSpec.describe "the instance_groups definitions block" do
     end
   end
 
-  describe "in order to apply BBS migrations before upgrading the cells" do
+  describe "in order to apply BBS migrations before upgrading the diego-cells" do
     it "has database before the cells" do
-      expect("diego-api").to be_ordered_before("cell")
+      expect("diego-api").to be_ordered_before("diego-cell")
     end
 
     it "has database serial" do
@@ -67,11 +67,11 @@ RSpec.describe "the instance_groups definitions block" do
     end
 
     it "has brain before the cells" do
-      expect("brain").to be_ordered_before("cell")
+      expect("brain").to be_ordered_before("diego-cell")
     end
 
     it "has the cells before cc_bridge" do
-      expect("cell").to be_ordered_before("cc_bridge")
+      expect("diego-cell").to be_ordered_before("cc_bridge")
     end
 
     it "has cc_bridge before route_emitter" do
