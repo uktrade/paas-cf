@@ -63,8 +63,6 @@ instance_groups:
   - name: scheduler
     migrated_from:
     - name: brain
-    - name: cc_bridge
-    - name: access
     azs: [z1, z2, z3]
     instances: 3
     vm_type: small
@@ -217,9 +215,6 @@ instance_groups:
               - "login.((system_domain))"
 
   - name: api
-    migrated_from:
-    - name: cc_bridge
-    - name: access
     azs: [z1, z2]
     jobs:
       - name: consul_agent
@@ -383,7 +378,6 @@ instance_groups:
   - name: diego-cell
     migrated_from:
     - name: cell
-    - name: route_emitter
     azs: [z1, z2, z3]
     jobs:
       - name: consul_agent
