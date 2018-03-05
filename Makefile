@@ -84,7 +84,7 @@ globals:
 dev: globals ## Set Environment to DEV
 	$(eval export AWS_ACCOUNT=dev)
 	$(eval export PERSISTENT_ENVIRONMENT=true)
-	$(eval export ENABLE_BILLING_APP ?= false)
+	$(eval export ENABLE_BILLING_APP=true)
 	$(eval export ENABLE_AUTO_DEPLOY=true)
 	$(eval export SYSTEM_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipeline.digital)
 	$(eval export APPS_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipelineapps.digital)
