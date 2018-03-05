@@ -401,7 +401,7 @@ instance_groups:
         release: datadog-for-cloudfoundry
       - name: datadog-agent
         release: datadog-agent
-        properties:
+        properties: # tmp
           datadog: (( inject meta.datadog ))
           tags:
             bosh-job: bosh
