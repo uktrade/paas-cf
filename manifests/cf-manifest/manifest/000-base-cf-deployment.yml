@@ -1,6 +1,21 @@
 meta:
   environment: ((terraform_outputs_environment))
 
+  datadog:
+    enabled: (( grab $ENABLE_DATADOG ))
+    api_key: (( grab $DATADOG_API_KEY || "undefined" ))
+    application_key: (( grab $DATADOG_APP_KEY || "undefined" ))
+    use_dogstatsd: false
+    include_bosh_tags: true
+    tags:
+      deploy_env: ((environment))
+    integrations:
+      process:
+        init_config:
+
+        instances:
+          - name: btrfs
+            search_string: ["btrfs"]
 name: ((environment))
 
 releases:
@@ -94,6 +109,10 @@ releases:
     version: "1.4.21"
     url: https://bosh.io/d/github.com/cloudfoundry/staticfile-buildpack-release?v=1.4.21
     sha1: 0629f6cc368475e914f9219d3f87d78b820c3b00
+  - name: datadog-agent
+    version: 0.1.4
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/datadog-agent-0.1.4.tgz
+    sha1: a1902a885ef465617eae4f1de184ecaed0d1feb8
 
 stemcells:
   - alias: default

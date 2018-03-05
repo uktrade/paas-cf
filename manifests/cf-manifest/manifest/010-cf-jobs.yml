@@ -399,6 +399,18 @@ instance_groups:
         release: ipsec
       - name: datadog-ipsec
         release: datadog-for-cloudfoundry
+      - name: datadog-agent
+        release: datadog-agent
+        properties:
+          datadog: (( inject meta.datadog ))
+          tags:
+            bosh-job: bosh
+          hm:
+            datadog_enabled: (( grab meta.datadog.enabled ))
+            datadog:
+                api_key: (( grab meta.datadog.api_key ))
+                application_key: (( grab meta.datadog.application_key ))
+
     instances: ((cell_instances))
     vm_type: cell
     stemcell: default
