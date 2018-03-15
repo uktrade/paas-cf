@@ -116,8 +116,7 @@ instance_groups:
       - name: datadog-nats
         release: datadog-for-cloudfoundry
         consumes:
-          - name: nats
-            type: nats
+          nats: {from: nats}
       - name: metron_agent
         <<: *metron_agent_job
 
