@@ -92,38 +92,33 @@ instance_groups:
       serial: true
 
   - name: nats
-    azs: [z1, z2]
+    azs:
+    - z1
+    - z2
+    instances: 2
+    vm_type: medium
+    stemcell: default
+    networks:
+    - name: cf
     jobs:
       - name: consul_agent
         <<: *consul_agent_job
       - name: datadog-consul-agent-client
         release: datadog-for-cloudfoundry
       - name: nats
-        consumes: {nats: nil}
         release: nats
+        provides:
+          nats: {as: nats, shared: true}
         properties:
           nats:
-            port: ((nats_port))
-            machines: ((nats_static_ips))
-            debug: false
-            trace: false
-            monitor_port: 0
-            prof_port: 0
+            password: "((secrets_nats_password))"
             user: nats_user
-            password: ((secrets_nats_password))
       - name: datadog-nats
         release: datadog-for-cloudfoundry
-        properties:
-          nats:
-            port: ((nats_port))
+        consumes:
+          nats: nil
       - name: metron_agent
         <<: *metron_agent_job
-    instances: 2
-    vm_type: medium
-    stemcell: default
-    networks:
-      - name: cf
-        static_ips: ((nats_static_ips))
 
   - name: adapter
     azs: [z1, z2, z3]
@@ -454,12 +449,9 @@ instance_groups:
         <<: *statsd_injector_job
       - name: route_registrar
         release: routing
+        consumes:
+          nats: nil
         properties:
-          nats:
-            machines: ((nats_static_ips))
-            port: ((nats_port))
-            user: nats_user
-            password: ((secrets_nats_password))
           route_registrar:
             routes:
               - name: uaa
@@ -933,11 +925,8 @@ instance_groups:
             tracing:
               enable_zipkin: true
           request_timeout_in_seconds: 900
-          nats:
-            user: nats_user
-            password: ((secrets_nats_password))
-            port: ((nats_port))
-            machines: ((nats_static_ips))
+          consumes:
+            nats: nil
           uaa:
             clients:
               gorouter:
@@ -1266,6 +1255,8 @@ instance_groups:
         <<: *metron_agent_job
       - name: route_emitter
         release: diego
+        consumes:
+          nats: nil
         properties:
           diego:
             route_emitter:
@@ -1277,11 +1268,6 @@ instance_groups:
                 client_cert: ((certs_bbs_client_cert))
                 client_key: ((certs_bbs_client_key))
                 require_ssl: true
-              nats:
-                machines: ((nats_static_ips))
-                user: nats_user
-                password: ((secrets_nats_password))
-                port: ((nats_port))
       - name: datadog-route-emitter
         release: datadog-for-cloudfoundry
       - name: datadog-rep
