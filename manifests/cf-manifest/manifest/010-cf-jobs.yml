@@ -116,7 +116,8 @@ instance_groups:
       - name: datadog-nats
         release: datadog-for-cloudfoundry
         consumes:
-          nats: nil
+          - name: nats
+            type: nats
       - name: metron_agent
         <<: *metron_agent_job
 
@@ -492,7 +493,6 @@ instance_groups:
                 cloud_controller_ng: {}
       - name: cloud_controller_ng
         release: capi
-        consumes: {nats: nil}
         properties:
           description: null
 
@@ -786,7 +786,6 @@ instance_groups:
         <<: *consul_agent_job
       - name: cloud_controller_worker
         release: capi
-        consumes: {nats: nil}
         properties:
           system_domain: ((terraform_outputs_cf_root_domain))
           ssl:
@@ -906,7 +905,6 @@ instance_groups:
         release: datadog-for-cloudfoundry
       - name: gorouter
         release: routing
-        consumes: {nats: nil}
         properties:
           router:
             backends:
@@ -925,8 +923,6 @@ instance_groups:
             tracing:
               enable_zipkin: true
           request_timeout_in_seconds: 900
-          consumes:
-            nats: nil
           uaa:
             clients:
               gorouter:
