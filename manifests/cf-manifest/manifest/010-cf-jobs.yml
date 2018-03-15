@@ -450,8 +450,6 @@ instance_groups:
         <<: *statsd_injector_job
       - name: route_registrar
         release: routing
-        consumes:
-          nats: nil
         properties:
           route_registrar:
             routes:
@@ -1251,8 +1249,6 @@ instance_groups:
         <<: *metron_agent_job
       - name: route_emitter
         release: diego
-        consumes:
-          nats: nil
         properties:
           diego:
             route_emitter:
