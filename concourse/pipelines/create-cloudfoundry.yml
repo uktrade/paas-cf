@@ -263,6 +263,12 @@ resources:
     source:
       interval: 720h
 
+  - name: paas-cf-app-discovery
+    type: git
+    source:
+      uri: https://github.com/alphagov/cf_app_discovery
+      branch: paas-mods
+
   - name: paas-compose-broker
     type: git
     source:
@@ -1559,6 +1565,7 @@ jobs:
       - get: bosh-CA-crt
       - get: graphite-nozzle
       - get: datadog-tfstate
+      - get: paas-cf-app-discovery
       - get: paas-compose-broker
       - get: paas-compose-scraper
       - get: paas-billing
@@ -1609,6 +1616,7 @@ jobs:
               export COMPOSE_BROKER_IP_WHITELIST=$($VAL_FROM_YAML terraform_outputs_nat_public_ips_csv cf-terraform-outputs.yml)
               export ELASTICACHE_BROKER_PASS=$($VAL_FROM_YAML secrets_elasticache_broker_admin_password cf-secrets/cf-secrets.yml)
               export ELASTICACHE_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_elasticache_broker_elb_dns_name cf-terraform-outputs.yml)
+              export PROMETHEUS_BROKER_PASS=$($VAL_FROM_YAML secrets_prometheus_broker_admin_password cf-secrets/cf-secrets.yml)
               export METRICS_AWS_ACCESS_KEY_ID=$($VAL_FROM_YAML terraform_outputs_metrics_exporter_aws_access_key_id cf-terraform-outputs.yml)
               export METRICS_AWS_SECRET_ACCESS_KEY=$($VAL_FROM_YAML terraform_outputs_metrics_exporter_aws_secret_access_key cf-terraform-outputs.yml)
               EOT
@@ -1905,6 +1913,62 @@ jobs:
                 "
                 cf blue-green-deploy compose-broker
                 cf delete -f compose-broker-old
+
+      - task: deploy-prometheus-broker
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: 465642da06051a55630d39c899697b678f66a7f7
+          inputs:
+            - name: paas-cf
+            - name: paas-cf-app-discovery
+            - name: config
+            - name: bosh-CA
+          params:
+            PROMETHEUS_BROKER_AWS_ACCESS_KEY_ID: ((prometheus_broker_aws_access_key_id))
+            PROMETHEUS_BROKER_AWS_SECRET_KEY_ID: ((prometheus_broker_aws_secret_key_id))
+            PROMETHEUS_BROKER_UAA_PASSWORD: ((prometheus_broker_uaa_password))
+            PROMETHEUS_BROKER_UAA_USERNAME: ((prometheus_broker_uaa_username))
+            ENABLE_PROMETHEUS_BROKER: ((enable_prometheus_broker))
+          run:
+            path: sh
+            args:
+              - -e
+              - -u
+              - -c
+              - |
+                ./paas-cf/concourse/scripts/import_bosh_ca.sh
+
+                . ./config/config.sh
+                if [ "${ENABLE_PROMETHEUS_BROKER}" = "true" ]; then
+                  cf login -a "${API_ENDPOINT}" -u "${CF_ADMIN}" -p "${CF_PASS}" \
+                    -o admin -s service-brokers
+
+                  cd paas-cf-app-discovery/
+
+                    ruby -ryaml -e "
+                      env = {
+                        'AWS_ACCESS_KEY_ID' => '${PROMETHEUS_BROKER_AWS_ACCESS_KEY_ID}',
+                        'AWS_SECRET_ACCESS_KEY' => '${PROMETHEUS_BROKER_AWS_SECRET_KEY_ID}',
+                        'UAA_PASSWORD' => '${PROMETHEUS_BROKER_UAA_PASSWORD}',
+                        'UAA_USERNAME' => '${PROMETHEUS_BROKER_UAA_USERNAME}',
+                      }
+                      manifest = YAML.load_file('manifest.yml')
+                      manifest['applications'].each { |app|
+                        app['env'] ||= {}
+                        app['env'].merge!(env)
+                      }
+                      File.write('manifest.yml', manifest.to_yaml)
+                    "
+
+                  cf push prometheus-service-broker
+
+                else
+                  echo "Prometheus broker disabled, skipping deployment..."
+                fi
 
       - task: deploy-simulated-load-application
         config:
@@ -2299,6 +2363,7 @@ jobs:
               - name: paas-cf
               - name: config
               - name: bosh-CA
+              - name: cf-secrets
             params:
               APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
             run:
@@ -2345,6 +2410,43 @@ jobs:
                     cf update-service-broker elasticache-broker elasticache-broker "${ELASTICACHE_BROKER_PASS}" "https://${ELASTICACHE_BROKER_SERVER}"
                   else
                     cf create-service-broker elasticache-broker elasticache-broker "${ELASTICACHE_BROKER_PASS}" "https://${ELASTICACHE_BROKER_SERVER}"
+                  fi
+
+        - task: register-prometheus-service-broker
+          config:
+            platform: linux
+            image_resource:
+              type: docker-image
+              source:
+                repository: governmentpaas/cf-cli
+                tag: 465642da06051a55630d39c899697b678f66a7f7
+            inputs:
+              - name: paas-cf
+              - name: config
+              - name: bosh-CA
+              - name: cf-secrets
+            params:
+              APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+              ENABLE_PROMETHEUS_BROKER: ((enable_prometheus_broker))
+            run:
+              path: sh
+              args:
+                - -e
+                - -u
+                - -c
+                - |
+                  ./paas-cf/concourse/scripts/import_bosh_ca.sh
+                  . ./config/config.sh
+                  echo | cf login -a "${API_ENDPOINT}" -u "${CF_ADMIN}" -p "${CF_PASS}"
+
+                  if [ "${ENABLE_PROMETHEUS_BROKER}" = "true" ]; then
+                    if cf service-brokers | grep "prometheus-service-broker\s"; then
+                      cf update-service-broker prometheus-service-broker prometheus-service-broker "${PROMETHEUS_BROKER_PASS}" "https://prometheus-service-broker.${APPS_DNS_ZONE_NAME}"
+                    else
+                      cf create-service-broker prometheus-service-broker prometheus-service-broker "${PROMETHEUS_BROKER_PASS}" "https://prometheus-service-broker.${APPS_DNS_ZONE_NAME}"
+                    fi
+                  else
+                    echo "Prometheus broker disabled, skipping enabling..."
                   fi
 
       - task: update-kibana-timezone

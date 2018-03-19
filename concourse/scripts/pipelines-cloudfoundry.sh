@@ -13,6 +13,9 @@ $("${SCRIPT_DIR}/environment.sh" "$@")
 . "${SCRIPT_DIR}/lib/compose.sh"
 
 # shellcheck disable=SC1090
+. "${SCRIPT_DIR}/lib/prometheus-broker.sh"
+
+# shellcheck disable=SC1090
 . "${SCRIPT_DIR}/lib/google-oauth.sh"
 
 download_git_id_rsa() {
@@ -60,12 +63,21 @@ prepare_environment() {
   get_git_concourse_pool_clone_full_url_ssh
   get_datadog_secrets
   get_compose_secrets
+  get_prometheus_broker_secrets
   get_google_oauth_secrets
 
   if [ "${ENABLE_DATADOG}" = "true" ] ; then
     # shellcheck disable=SC2154
     if [ -z "${datadog_api_key+x}" ] || [ -z "${datadog_app_key+x}" ] ; then
       echo "Datadog enabled but could not retrieve api or app key. Did you do run \`make dev upload-datadog-secrets\`?"
+      exit 1
+    fi
+  fi
+
+  if [ "${ENABLE_PROMETHEUS_BROKER}" = "true" ] ; then
+    # shellcheck disable=SC2154
+    if [ -z "${prometheus_broker_aws_access_key_id+x}" ] || [ -z "${prometheus_broker_aws_secret_key_id+x}" ] || [ -z "${prometheus_broker_uaa_password+x}" ]|| [ -z "${prometheus_broker_uaa_username+x}" ]; then
+      echo "Prometheus broker enabled but could not retrieve secrets. Did you do run \`make dev upload-prometheus-broker-secrets\`?"
       exit 1
     fi
   fi
@@ -116,6 +128,11 @@ compose_api_key: ${compose_api_key:-}
 compose_billing_email: ${compose_billing_email:-}
 compose_billing_password: ${compose_billing_password:-}
 enable_datadog: ${ENABLE_DATADOG}
+prometheus_broker_aws_access_key_id: ${prometheus_broker_aws_access_key_id:-}
+prometheus_broker_aws_secret_key_id: ${prometheus_broker_aws_secret_key_id:-}
+prometheus_broker_uaa_password: ${prometheus_broker_uaa_password:-}
+prometheus_broker_uaa_username: ${prometheus_broker_uaa_username:-}
+enable_prometheus_broker: ${ENABLE_PROMETHEUS_BROKER}
 concourse_atc_password: ${CONCOURSE_ATC_PASSWORD}
 oauth_client_id: ${oauth_client_id:-}
 oauth_client_secret: ${oauth_client_secret:-}

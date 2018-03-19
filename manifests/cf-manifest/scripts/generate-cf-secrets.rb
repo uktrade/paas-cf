@@ -19,6 +19,7 @@ generator = SecretGenerator.new(
   "secrets_consul_encrypt_keys" => :simple_in_array,
   "secrets_elasticache_broker_auth_token_seed" => :simple,
   "secrets_elasticache_broker_admin_password" => :simple,
+  "secrets_prometheus_broker_admin_password" => :simple,
   "secrets_grafana_admin_password" => :simple,
   "secrets_kibana_admin_password" => :simple,
   "secrets_loggregator_endpoint_shared_secret" => :simple,

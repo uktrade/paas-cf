@@ -94,6 +94,7 @@ dev: globals ## Set Environment to DEV
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-default.yml)
 	$(eval export DISABLE_HEALTHCHECK_DB=true)
 	$(eval export ENABLE_DATADOG ?= false)
+	$(eval export ENABLE_PROMETHEUS_BROKER ?=false)
 	$(eval export CONCOURSE_AUTH_DURATION=48h)
 	$(eval export DISABLE_PIPELINE_LOCKING=true)
 	$(eval export TEST_HEAVY_LOAD=true)
@@ -113,6 +114,7 @@ staging: globals ## Set Environment to Staging
 	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS=${ALERT_EMAIL_ADDRESS})
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-staging.yml)
 	$(eval export ENABLE_DATADOG=true)
+	$(eval export ENABLE_PROMETHEUS_BROKER=true)
 	$(eval export DEPLOY_ENV=staging)
 	$(eval export TEST_HEAVY_LOAD=true)
 	$(eval export COMPOSE_PASSWORD_STORE_HIGH_DIR?=${HOME}/.paas-pass-high)
@@ -132,6 +134,7 @@ prod: globals ## Set Environment to Production
 	$(eval export ENV_SPECIFIC_CF_MANIFEST=cf-prod.yml)
 	$(eval export DISABLE_CF_ACCEPTANCE_TESTS=true)
 	$(eval export ENABLE_DATADOG=true)
+	$(eval export ENABLE_PROMETHEUS_BROKER=true)
 	$(eval export DEPLOY_ENV=prod)
 	$(eval export COMPOSE_PASSWORD_STORE_HIGH_DIR?=${HOME}/.paas-pass-high)
 	@true
@@ -185,6 +188,14 @@ upload-google-oauth-secrets: check-env ## Decrypt and upload Google Admin Consol
 	$(if ${OAUTH_PASSWORD_STORE_DIR},,$(error Must pass OAUTH_PASSWORD_STORE_DIR=<path_to_password_store>))
 	$(if $(wildcard ${OAUTH_PASSWORD_STORE_DIR}),,$(error Password store ${OAUTH_PASSWORD_STORE_DIR} does not exist))
 	@scripts/upload-google-oauth-secrets.sh
+
+.PHONY: upload-prometheus-broker-secrets
+upload-prometheus-broker-secrets: check-env ## Decrypt and upload Compose credentials to S3
+	$(eval export PROMETHEUS_BROKER_PASSWORD_STORE_DIR?=${HOME}/.paas-pass)
+	$(if ${AWS_ACCOUNT},,$(error Must set environment to dev/staging/prod))
+	$(if ${PROMETHEUS_BROKER_PASSWORD_STORE_DIR},,$(error Must pass PROMETHEUS_BROKER_PASSWORD_STORE_DIR=<path_to_password_store>))
+	$(if $(wildcard ${PROMETHEUS_BROKER_PASSWORD_STORE_DIR}),,$(error Password store ${PROMETHEUS_BROKER_PASSWORD_STORE_DIR} does not exist))
+	@scripts/upload-prometheus-broker-secrets.sh
 
 .PHONY: pingdom
 pingdom: check-env ## Use custom Terraform provider to set up Pingdom check
