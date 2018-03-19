@@ -125,18 +125,36 @@ var _ = Describe("TLS gauges", func() {
 		})
 
 		Context("If certificate check returns an error", func() {
-			It("returns the error", func() {
+			It("logs the error", func() {
 				metricErr := errors.New("some error")
 				tlsChecker.DaysUntilExpiryReturnsOnCall(0, float64(0), metricErr)
 
 				gauge := TLSValidityGauge(logger, tlsChecker, "somedomain.com:443", 5*time.Second)
 				defer gauge.Close()
 
-				Eventually(func() error {
+				Eventually(func() string {
 					metric, err := gauge.ReadMetric()
 					fmt.Fprintln(GinkgoWriter, metric, err)
-					return err
-				}, 3*time.Second).Should(MatchError(metricErr))
+					Expect(err).NotTo(HaveOccurred())
+					return string(log.Contents())
+				}, 3*time.Second).Should(MatchJSON(`{"message":"cdn-tls-certificates-validity-failure","log_level":1,"timestamp":"","source":"","data":null}`))
+			})
+
+			It("returns the metric with -1 value", func() {
+				metricErr := errors.New("some error")
+				tlsChecker.DaysUntilExpiryReturnsOnCall(0, float64(0), metricErr)
+
+				gauge := TLSValidityGauge(logger, tlsChecker, "somedomain.com:443", 5*time.Second)
+				defer gauge.Close()
+
+				var metric Metric
+				Eventually(func() error {
+					var err error
+					metric, err = gauge.ReadMetric()
+					Expect(err).NotTo(HaveOccurred())
+					return metric
+				}, 3*time.Second).Should(HaveOccurred())
+				Expect(metric.Value).To(Equal(float64(-1)))
 			})
 		})
 
@@ -161,7 +179,7 @@ var _ = Describe("TLS gauges", func() {
 		})
 
 		Context("Hostname is invalid", func() {
-			It("returns an error", func() {
+			It("logs an error", func() {
 				gauge := TLSValidityGauge(logger, tlsChecker, "hostname[", 1*time.Second)
 				defer gauge.Close()
 

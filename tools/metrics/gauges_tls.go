@@ -62,7 +62,9 @@ func CDNTLSValidityGauge(logger lager.Logger, certChecker tlscheck.CertChecker, 
 					"alias_domain":      customDomain.AliasDomain,
 					"cloudfront_domain": customDomain.CloudFrontDomain,
 				})
-				return err
+				// We cap expired certificates at 0 days until expiry.
+				// -1 will be an error code.
+				daysUntilExpiry = -1
 			}
 
 			metrics = append(metrics, Metric{
