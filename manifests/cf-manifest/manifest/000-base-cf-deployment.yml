@@ -6,7 +6,7 @@ meta:
     properties:
       loggregator:
         tls:
-          ca_cert: "((loggregator_ca.certificate))"
+          ca_cert: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
           metron:
             cert: "((loggregator_tls_metron.certificate))"
             key: "((loggregator_tls_metron.private_key))"
@@ -19,7 +19,7 @@ meta:
       diego:
         cfdot:
           bbs:
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((diego_bbs_client.certificate))"
             client_key: "((diego_bbs_client.private_key))"
             use_ssl: true
@@ -29,7 +29,7 @@ meta:
     properties:
       loggregator:
         tls:
-          ca_cert: "((loggregator_ca.certificate))"
+          ca_cert: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
           statsd_injector:
             cert: "((loggregator_tls_statsdinjector.certificate))"
             key: "((loggregator_tls_statsdinjector.private_key))"
@@ -82,7 +82,7 @@ instance_groups:
         encrypt_keys: ((secrets_consul_encrypt_keys))
         agent_cert: "((consul_agent.certificate))"
         agent_key: "((consul_agent.private_key))"
-        ca_cert: "((consul_agent_ca.certificate))"
+        ca_cert: "((consul_agent_ca.certificate))((consul_agent_ca_old.certificate))"
         server_cert: "((consul_server.certificate))"
         server_key: "((consul_server.private_key))"
   - name: datadog-consul-agent-server
@@ -156,7 +156,7 @@ instance_groups:
         maxRetainedLogMessages: 100
       loggregator:
         tls:
-          ca_cert: "((loggregator_ca.certificate))"
+          ca_cert: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
           doppler:
             cert: "((loggregator_tls_doppler.certificate))"
             key: "((loggregator_tls_doppler.private_key))"
@@ -203,12 +203,12 @@ instance_groups:
           encryption_keys:
             - label: key-2017-01
               passphrase: ((secrets_bbs_encryption_key))
-          ca_cert: "((service_cf_internal_ca.certificate))"
+          ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
           server_cert: "((diego_bbs_server.certificate))"
           server_key: "((diego_bbs_server.private_key))"
           auctioneer:
             api_location: auctioneer.service.cf.internal:9016
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((diego_auctioneer_client.certificate))"
             client_key: "((diego_auctioneer_client.private_key))"
             require_tls: true
@@ -219,7 +219,7 @@ instance_groups:
             client_key: ""
             require_ssl: false
           rep:
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((diego_rep_client.certificate))"
             client_key: "((diego_rep_client.private_key))"
             require_tls: true
@@ -635,7 +635,7 @@ instance_groups:
         external_protocol: ~
         tls_port: 9023
         mutual_tls: &cloud_controller_ng_mutual_tls
-          ca_cert: "((service_cf_internal_ca.certificate))"
+          ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
           public_cert: "((cc_tls.certificate))"
           private_key: "((cc_tls.private_key))"
         security_group_definitions:
@@ -675,7 +675,7 @@ instance_groups:
             citext: true
       uaa:
         url: https://uaa.((system_domain))
-        ca_cert: "((uaa_ca.certificate))"
+        ca_cert: "((uaa_ca.certificate))((uaa_ca_old.certificate))"
         ssl:
           port: 8443
         port: 8080
@@ -706,11 +706,11 @@ instance_groups:
       capi:
         cc_uploader:
           cc:
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((cc_bridge_cc_uploader.certificate))"
             client_key: "((cc_bridge_cc_uploader.private_key))"
           mutual_tls:
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             server_cert: "((cc_bridge_cc_uploader_server.certificate))"
             server_key: "((cc_bridge_cc_uploader_server.private_key))"
   - name: java-buildpack
@@ -827,7 +827,7 @@ instance_groups:
           mutual_tls: *cloud_controller_ng_mutual_tls
         ccdb: *cloud_controller_ng_ccdb
         uaa:
-          ca_cert: "((uaa_ca.certificate))"
+          ca_cert: "((uaa_ca.certificate))((uaa_ca_old.certificate))"
           ssl:
             port: 8443
           port: 8080
@@ -907,7 +907,7 @@ instance_groups:
             secret: ((secrets_uaa_clients_gorouter_secret))
         ssl:
           port: 8443
-        ca_cert: "((uaa_ca.certificate))"
+        ca_cert: "((uaa_ca.certificate))((uaa_ca_old.certificate))"
 
   - name: metron_agent
     <<: *metron_agent_job
@@ -967,17 +967,17 @@ instance_groups:
       properties:
         diego:
           auctioneer:
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             server_cert: "((diego_auctioneer_server.certificate))"
             server_key: "((diego_auctioneer_server.private_key))"
             bbs:
               api_location: bbs.service.cf.internal:8889
-              ca_cert: "((service_cf_internal_ca.certificate))"
+              ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
               client_cert: "((diego_bbs_client.certificate))"
               client_key: "((diego_bbs_client.private_key))"
               require_ssl: true
             rep:
-              ca_cert: "((service_cf_internal_ca.certificate))"
+              ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
               client_cert: "((diego_rep_client.certificate))"
               client_key: "((diego_rep_client.private_key))"
               require_tls: true
@@ -1056,7 +1056,7 @@ instance_groups:
         ccdb: *cloud_controller_ng_ccdb
 
         uaa:
-          ca_cert: "((uaa_ca.certificate))"
+          ca_cert: "((uaa_ca.certificate))((uaa_ca_old.certificate))"
           ssl:
             port: 8443
           port: 8080
@@ -1078,12 +1078,12 @@ instance_groups:
           tps:
             listener_enabled: false
             cc:
-              ca_cert: "((service_cf_internal_ca.certificate))"
+              ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
               client_cert: "((cc_bridge_tps.certificate))"
               client_key: "((cc_bridge_tps.private_key))"
             bbs:
               api_location: bbs.service.cf.internal:8889
-              ca_cert: "((service_cf_internal_ca.certificate))"
+              ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
               client_cert: "((diego_bbs_client.certificate))"
               client_key: "((diego_bbs_client.private_key))"
               require_ssl: true
@@ -1097,7 +1097,7 @@ instance_groups:
           ssh_proxy:
             bbs:
               api_location: bbs.service.cf.internal:8889
-              ca_cert: "((service_cf_internal_ca.certificate))"
+              ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
               client_cert: "((diego_bbs_client.certificate))"
               client_key: "((diego_bbs_client.private_key))"
               require_ssl: true
@@ -1116,12 +1116,12 @@ instance_groups:
               url: https://cloud-controller-ng.service.cf.internal:9023
             tls:
               client:
-                ca: "((loggregator_ca.certificate))"
+                ca: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
                 cert: "((scheduler_client_tls.certificate))"
                 key: "((scheduler_client_tls.private_key))"
                 adapter_cn: "scalablesyslog_adapter"
               api:
-                ca: "((service_cf_internal_ca.certificate))"
+                ca: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
                 cert: "((scheduler_api_tls.certificate))"
                 key: "((scheduler_api_tls.private_key))"
                 cn: "cloud-controller-ng.service.cf.internal"
@@ -1159,21 +1159,21 @@ instance_groups:
     release: diego
     properties:
       tls:
-        ca_cert: "((service_cf_internal_ca.certificate))"
+        ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
         cert: "((diego_rep_agent_v2.certificate))"
         key: "((diego_rep_agent_v2.private_key))"
       diego:
         ssl:
           skip_cert_verify: false
         rep:
-          ca_cert: "((service_cf_internal_ca.certificate))"
+          ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
           server_cert: "((diego_rep_agent_v2.certificate))"
           server_key: "((diego_rep_agent_v2.private_key))"
           require_tls: true
           enable_legacy_api_endpoints: false
           bbs:
             api_location: bbs.service.cf.internal:8889
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((diego_bbs_client.certificate))"
             client_key: "((diego_bbs_client.private_key))"
             require_ssl: true
@@ -1206,7 +1206,7 @@ instance_groups:
           local_mode: true
           bbs:
             api_location: bbs.service.cf.internal:8889
-            ca_cert: "((service_cf_internal_ca.certificate))"
+            ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
             client_cert: "((diego_bbs_client.certificate))"
             client_key: "((diego_bbs_client.private_key))"
             require_ssl: true
@@ -1272,12 +1272,12 @@ instance_groups:
         internal_service_hostname: cloud-controller-ng.service.cf.internal
         tls_port: 9023
         mutual_tls:
-          ca_cert: "((service_cf_internal_ca.certificate))"
+          ca_cert: "((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))"
       loggregator:
         uaa:
           client_secret: "((secrets_uaa_clients_doppler_secret))"
         tls:
-          ca_cert: "((loggregator_ca.certificate))"
+          ca_cert: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
           trafficcontroller:
             cert: "((loggregator_tls_tc.certificate))"
             key: "((loggregator_tls_tc.private_key))"
@@ -1286,7 +1286,7 @@ instance_groups:
             key: "((loggregator_tls_cc_tc.private_key))"
       uaa:
         internal_url: https://uaa.service.cf.internal:8443
-        ca_cert: "((uaa_ca.certificate))"
+        ca_cert: "((uaa_ca.certificate))((uaa_ca_old.certificate))"
       doppler:
         outgoing_port: 8081
   - name: metron_agent
@@ -1296,7 +1296,7 @@ instance_groups:
     properties:
       loggregator:
         tls:
-          ca_cert: "((loggregator_ca.certificate))"
+          ca_cert: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
           reverse_log_proxy:
             cert: "((loggregator_tls_rlp.certificate))"
             key: "((loggregator_tls_rlp.private_key))"
@@ -1326,7 +1326,7 @@ instance_groups:
       scalablesyslog:
         adapter:
           tls:
-            ca: "((loggregator_ca.certificate))"
+            ca: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
             cert: "((adapter_tls.certificate))"
             key: "((adapter_tls.private_key))"
             cn: scalablesyslog_adapter
@@ -1334,10 +1334,11 @@ instance_groups:
             addr: reverse-log-proxy.service.cf.internal:8082
         adapter_rlp:
           tls:
-            ca: "((loggregator_ca.certificate))"
+            ca: "((loggregator_ca.certificate))((loggregator_ca_old.certificate))"
             cert: "((adapter_rlp_tls.certificate))"
             key: "((adapter_rlp_tls.private_key))"
             cn: reverse_log_proxy
+
 
 variables:
 - name: service_cf_internal_ca
@@ -1345,7 +1346,17 @@ variables:
   options:
     is_ca: true
     common_name: internalCA
+- name: service_cf_internal_ca_old
+  type: certificate
+  options:
+    is_ca: true
+    common_name: internalCA
 - name: consul_agent_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: consulCA
+- name: consul_agent_ca_old
   type: certificate
   options:
     is_ca: true
@@ -1428,6 +1439,11 @@ variables:
     - 127.0.0.1
     - localhost
 - name: loggregator_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: loggregatorCA
+- name: loggregator_ca_old
   type: certificate
   options:
     is_ca: true
@@ -1515,6 +1531,11 @@ variables:
   options:
     is_ca: true
     common_name: routerCA
+- name: router_ca_old
+  type: certificate
+  options:
+    is_ca: true
+    common_name: routerCA
 - name: router_ssl
   type: certificate
   options:
@@ -1524,6 +1545,11 @@ variables:
     - "((system_domain))"
     - "*.((system_domain))"
 - name: uaa_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: uaaCA
+- name: uaa_ca_old
   type: certificate
   options:
     is_ca: true
