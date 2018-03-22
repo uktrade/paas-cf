@@ -87,7 +87,7 @@ insert into pricing_plan_components (
 	(2, 'storage', '($storage_in_mb/1024) * ceil($time_in_seconds/2678401) * 0.127', 'USD'),
 
 	-- postgres small (t2.small)
-	(6, 'instance', 'ceil($time_in_seconds/3600)*0.078', 'USD'),
+	(6, 'instance', 'ceil($time_in_seconds/3600)*0.039', 'USD'),
 	(6, 'storage', '($storage_in_mb/1024) * ceil($time_in_seconds/2678401) * 0.127', 'USD'),
 
 	-- Compose Elasticsearch (tiny) 
