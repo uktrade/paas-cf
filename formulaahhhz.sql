@@ -83,7 +83,7 @@ insert into pricing_plan_components (
 	-- postgres m4.2xlarge
 	-- RDS instances are per hour billing
 	-- RDS storage is per month billing
-	(2, 'compute', 'ceil($time_in_seconds/3600) * 1.612', 'USD'),
+	(2, 'compute', 'ceil($time_in_seconds/3600) * 0.806', 'USD'),
 	(2, 'storage', '($storage_in_mb/1024) * ceil($time_in_seconds/2678401) * 0.127', 'USD'),
 
 	-- postgres small (t2.small)
