@@ -5,12 +5,6 @@ require 'amazon-pricing'
 
 broker_manifest_path = ARGV[0]
 
-# load plans from file / stdin
-# for each
-#   find assoc plan in catalog based on unique_id
-#   add to data structure the db_instance_class
-#   look up the price for the class based on whether multi_az
-
 def plans(manifest, plan, job, properties_key, service)
   manifest['instance_groups'].
     detect { |p| p['name'] == plan }.
