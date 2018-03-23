@@ -59,6 +59,7 @@ def calculate_for_db(db_name, prices, plans, manifest)
       multi_az: is_multi_az,
       instance_class: db_instance_class,
       plan_guid: plan_id,
+      allocated_storage: plan['rds_properties']['allocated_storage'],
       price_per_hour: price,
     }
   }
