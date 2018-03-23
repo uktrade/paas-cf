@@ -31,6 +31,19 @@ def paas_db_to_aws_db
   }
 end
 
+def storage_cost_in_gb_month
+  {
+    postgresql: {
+      true => 0.253,
+      false => 0.127,
+    },
+    mysql: {
+      true => 0.253,
+      false => 0.127,
+    }
+  }
+end
+
 def calculate_for_db(db_name, prices, plans, manifest)
   plans(
     manifest,
@@ -54,6 +67,7 @@ def calculate_for_db(db_name, prices, plans, manifest)
       _term = nil,
       is_multi_az,
     )
+    storage_cost = storage_cost_in_gb_month[paas_db_to_aws_db[db_name]][is_multi_az]
     {
       name: plan['name'],
       multi_az: is_multi_az,
@@ -61,6 +75,8 @@ def calculate_for_db(db_name, prices, plans, manifest)
       plan_guid: plan_id,
       allocated_storage: plan['rds_properties']['allocated_storage'],
       price_per_hour: price,
+      compute_formula: "ceil($time_in_seconds/3600) * #{price}",
+      storage_formula: "($storage_in_mb/1024) * ceil($time_in_seconds/2678401) * #{storage_cost}",
     }
   }
 end
