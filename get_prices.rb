@@ -24,13 +24,20 @@ def plans(manifest, plan, job, properties_key, service)
     fetch('plans')
 end
 
-def calculate(prices, plans, manifest)
+def paas_db_to_aws_db
+  {
+    'postgres' => :postgresql,
+    'mysql' => :mysql,
+  }
+end
+
+def calculate_for_db(db_name, prices, plans, manifest)
   plans(
     manifest,
     'rds_broker',
     'rds-broker',
     'rds-broker',
-    'postgres'
+    db_name,
   ).map { |plan|
     plan_id = plan['id']
     api_plan = plans.detect { |p| p['entity']['unique_id'] == plan_id }
@@ -42,7 +49,7 @@ def calculate(prices, plans, manifest)
       detect { |t| t.api_name == db_instance_class }
     is_multi_az = plan['rds_properties']['multi_az']
     price = rds_instance_type.price_per_hour(
-      :postgresql,
+      paas_db_to_aws_db[db_name],
       :ondemand,
       _term = nil,
       is_multi_az,
@@ -54,6 +61,13 @@ def calculate(prices, plans, manifest)
       plan_guid: plan_id,
       price_per_hour: price,
     }
+  }
+end
+
+def calculate(prices, plans, manifest)
+  {
+    postgres: calculate_for_db('postgres', prices, plans, manifest),
+    mysql: calculate_for_db('mysql', prices, plans, manifest),
   }
 end
 
