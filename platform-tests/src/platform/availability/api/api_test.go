@@ -18,8 +18,8 @@ import (
 const (
 	maxConcourseConnectionFailures = 5
 	maxWarnings                    = 5
-	numWorkers                     = 4
-	taskRatePerSecond              = 2
+	numWorkers                     = 8
+	taskRatePerSecond              = 4
 )
 
 func lg(things ...interface{}) {
