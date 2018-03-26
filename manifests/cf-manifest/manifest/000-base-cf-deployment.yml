@@ -117,6 +117,10 @@ instance_groups:
       nats:
         password: "((secrets_nats_password))"
         user: nats_user
+  - name: datadog-nats
+    release: datadog-for-cloudfoundry
+    consumes:
+      nats: {from: nats}
   - name: metron_agent
     <<: *metron_agent_job
 - name: doppler
