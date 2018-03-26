@@ -158,6 +158,17 @@ vm_types:
       size: 10240
       type: gp2
 
+- name: xlarge
+  network: cf
+  env:
+    bosh:
+      password: ((secrets_vcap_password))
+  cloud_properties:
+    instance_type: m4.xlarge
+    ephemeral_disk:
+      size: 10240
+      type: gp2
+
 - name: router
   network: router
   env:

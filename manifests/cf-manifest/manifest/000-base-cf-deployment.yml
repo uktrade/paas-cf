@@ -242,7 +242,7 @@ instance_groups:
   - z1
   - z2
   instances: 2
-  vm_type: medium
+  vm_type: large
   vm_extensions:
   - cf_rds_client_sg
   stemcell: default
@@ -757,7 +757,7 @@ instance_groups:
       cc:
         external_port: 9022
   instances: 2
-  vm_type: large
+  vm_type: xlarge
   vm_extensions:
     - 64g_ephemeral_disk
     - cf_cc_instance_profile
