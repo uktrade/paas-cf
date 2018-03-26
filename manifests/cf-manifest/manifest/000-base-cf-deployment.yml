@@ -107,8 +107,6 @@ instance_groups:
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
-  - name: datadog-consul-agent-client
-    release: datadog-for-cloudfoundry
   - name: nats
     release: nats
     provides:
