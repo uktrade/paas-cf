@@ -112,7 +112,7 @@ instance_groups:
   - name: nats
     release: nats
     provides:
-      nats: {as: nats}
+      nats: {as: nats, shared: true}
     properties:
       nats:
         password: "((secrets_nats_password))"
