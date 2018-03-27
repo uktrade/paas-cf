@@ -1,0 +1,106 @@
+jobs:
+- name: floodspinner
+  public: false
+  serial: true
+  serial_groups: ["restage"]
+  plan:
+  - get: loggregator-ci
+  - get: 20m
+    trigger: true
+  - task: run-smoke-tests
+    file: loggregator-ci/tasks/blackbox/app.yml
+    params:
+      CF_API: ((cf-api))
+      APP_DOMAIN: "https://floodspinner.((app-domain))"
+      ORG: ((org))
+      SPACE: ((space))
+      APP_NAME: "floodspinner"
+      USERNAME: ((cf-username))
+      PASSWORD: ((cf-password))
+      WAIT: 60
+      CYCLES: 10000
+      DATADOG_API_KEY: ((datadog-loggregator-api-key))
+      DELAY: "2"
+      DELAY_UNIT: "us"
+      MESSAGE: "FIFTEEN-MINUTE"
+    timeout: 20m
+  - task: run-recent-logs-smoke-tests
+    file: loggregator-ci/tasks/blackbox-recent-logs/task.yml
+    params: &basic-smoke-details
+      APP_NAME: "floodspinner"
+      CF_API: ((cf-api))
+      DATADOG_API_KEY: ((datadog-loggregator-api-key))
+      LOGGREGATOR_ADDR: "wss://doppler.((system-domain)):443"
+      ORG: ((org))
+      PASSWORD: ((cf-password))
+      SPACE: ((space))
+      USERNAME: ((cf-username))
+    timeout: 20m
+  - task: container metrics
+    file: loggregator-ci/tasks/container-metrics-smoke-test.yml
+    params: *basic-smoke-details
+    timeout: 20m
+
+- name: dripspinner
+  public: false
+  serial: true
+  serial_groups: ["restage"]
+  plan:
+  - get: loggregator-ci
+  - get: 1h
+    trigger: true
+  - task: run-smoke-tests
+    file: loggregator-ci/tasks/blackbox/app.yml
+    params:
+      CF_API: ((cf-api))
+      APP_DOMAIN: "https://dripspinner.((app-domain))"
+      ORG: ((org))
+      SPACE: ((space))
+      APP_NAME: "dripspinner"
+      USERNAME: ((cf-username))
+      PASSWORD: ((cf-password))
+      WAIT: 600
+      CYCLES: 1000
+      DATADOG_API_KEY: ((datadog-loggregator-api-key))
+      DELAY: "500"
+      DELAY_UNIT: "ms"
+      MESSAGE: "HOURLY"
+    timeout: 20m
+
+- name: flowspinner
+  public: false
+  serial: true
+  serial_groups: ["restage"]
+  plan:
+  - get: loggregator-ci
+  - get: 1h
+    trigger: true
+  - task: run-smoke-tests
+    file: loggregator-ci/tasks/blackbox/app.yml
+    params:
+      CF_API: ((cf-api))
+      APP_DOMAIN: "https://flowspinner.((app-domain))"
+      ORG: ((org))
+      SPACE: ((space))
+      APP_NAME: "flowspinner"
+      USERNAME: ((cf-username))
+      PASSWORD: ((cf-password))
+      WAIT: 60
+      CYCLES: 1000
+      DATADOG_API_KEY: ((datadog-loggregator-api-key))
+      DELAY: "1"
+      DELAY_UNIT: "ms"
+      MESSAGE: "HOURLY"
+    timeout: 20m
+
+resources:
+- name: 20m
+  type: time
+  source: {interval: 20m}
+- name: 1h
+  type: time
+  source: {interval: 1h}
+- name: loggregator-ci
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/loggregator-ci
