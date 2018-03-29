@@ -16,6 +16,10 @@ meta:
     name: cfdot
     release: diego
     properties:
+      tls:
+        ca_certificate: "((service_cf_internal_ca.certificate))"
+        certificate: "((diego_rep_client.certificate))"
+        private_key: "((diego_rep_client.private_key))"
       diego:
         cfdot:
           bbs:
@@ -194,6 +198,20 @@ instance_groups:
         client_cert: "/var/vcap/jobs/cfdot/config/certs/cfdot/client.crt"
         client_key: "/var/vcap/jobs/cfdot/config/certs/cfdot/client.key"
         ca_cert: "/var/vcap/jobs/cfdot/config/certs/cfdot/ca.crt"
+  - name: cfdot
+    release: diego
+    properties:
+      tls: &cfdot_tls_client_properties
+        ca_certificate: "((service_cf_internal_ca.certificate))"
+        certificate: "((diego_rep_client.certificate))"
+        private_key: "((diego_rep_client.private_key))"
+      diego: &cfdot_diego_client_properties
+        cfdot:
+          bbs:
+            ca_cert: "((service_cf_internal_ca.certificate))"
+            client_cert: "((diego_bbs_client.certificate))"
+            client_key: "((diego_bbs_client.private_key))"
+            use_ssl: true
   - name: bbs
     release: diego
     properties:
@@ -231,8 +249,31 @@ instance_groups:
             db_schema: bbs
             db_driver: postgres
           require_ssl: true
-  - name: cfdot
-    <<: *cfdot_job
+  - name: locket
+    release: diego
+    properties:
+      tls:
+        ca_cert: "((service_cf_internal_ca.certificate))"
+        cert: "((diego_locket_server.certificate))"
+        key: "((diego_locket_server.private_key))"
+      enable_consul_service_registration: true
+      diego:
+        locket:
+          listen_addr: 0.0.0.0:8891
+          sql:
+            ca_cert: ((aws_rds_combined_ca_bundle))
+            db_host: ((terraform_outputs_cf_db_address))
+            db_port: 5432
+            db_schema: locket
+            db_username: locket
+            db_password: ((secrets_cf_db_locket_password))
+            db_driver: postgres
+            require_ssl: true
+      loggregator:
+        use_v2_api: false
+        ca_cert: "((loggregator_ca.certificate))"
+        cert: "((loggregator_tls_metron.certificate))"
+        key: "((loggregator_tls_metron.private_key))"
   - name: metron_agent
     <<: *metron_agent_job
 - name: uaa
@@ -962,7 +1003,10 @@ instance_groups:
     - name: metron_agent
       <<: *metron_agent_job
     - name: cfdot
-      <<: *cfdot_job
+      release: diego
+      properties:
+        tls: *cfdot_tls_client_properties
+        diego: *cfdot_diego_client_properties
     - name: auctioneer
       release: diego
       properties:
@@ -1196,7 +1240,10 @@ instance_groups:
       cflinuxfs2-rootfs:
         trusted_certs: ((aws_rds_combined_ca_bundle))
   - name: cfdot
-    <<: *cfdot_job
+    release: diego
+    properties:
+      tls: *cfdot_tls_client_properties
+      diego: *cfdot_diego_client_properties
   - name: metron_agent
     <<: *metron_agent_job
   - name: route_emitter
@@ -1415,6 +1462,8 @@ variables:
     common_name: rep client
     extended_key_usage:
     - client_auth
+    alternative_names:
+    - 127.0.0.1
 - name: diego_rep_agent_v2
   type: certificate
   options:
@@ -1592,17 +1641,17 @@ releases:
   version: 1.0.16
   sha1: d8d7db55c1602a8587ed681e714a4d121a813a36
 - name: capi
-  url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.49.0
-  version: 1.49.0
-  sha1: da59f9232a828e364337b81952a5510d8f1ca3b9
+  url: https://bosh.io/d/github.com/cloudfoundry/capi-release?v=1.52.0
+  version: 1.52.0
+  sha1: e7e939e856ac512bb00ae3b844dc1b3c1d156a46
 - name: cf-syslog-drain
   url: https://bosh.io/d/github.com/cloudfoundry/cf-syslog-drain-release?v=5.1
   version: "5.1"
   sha1: ccc588acc4854d669f60ad1c826d2b366e3548c6
 - name: cflinuxfs2
-  url: https://bosh.io/d/github.com/cloudfoundry/cflinuxfs2-release?v=1.187.0
-  version: 1.187.0
-  sha1: dd38c18449d3119d42ad1ab7bba589e6da9e1a7c
+  url: https://bosh.io/d/github.com/cloudfoundry/cflinuxfs2-release?v=1.194.0
+  version: 1.194.0
+  sha1: 5113b1e7cf0fcfe38e6ab47065c2eecf9878bdb4
 - name: consul
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/consul-release?v=191
   version: "191"
@@ -1612,9 +1661,9 @@ releases:
   url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/datadog-for-cloudfoundry-0.1.23.tgz
   sha1: 09f70cbd87ec6045d44aa346e23fd6dd9bf14bfa
 - name: diego
-  url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=1.35.0
-  version: 1.35.0
-  sha1: 7525f412d6698f499124f0facee64a40a1e99ec0
+  url: https://bosh.io/d/github.com/cloudfoundry/diego-release?v=2.1.0
+  version: 2.1.0
+  sha1: 20cb4f7d197902ad0ce312324434712cddce3044
 - name: garden-runc
   url: https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.11.1
   version: 1.11.1
