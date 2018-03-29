@@ -188,6 +188,12 @@ instance_groups:
       consul_common: {from: consul_common_link}
       consul_server: nil
       consul_client: {from: consul_client_link}
+    properties:
+      consul:
+        agent:
+          services:
+            diego:
+              locket: {}
   - name: datadog-consul-agent-client
     release: datadog-for-cloudfoundry
   - name: datadog-bbs
@@ -1132,6 +1138,9 @@ instance_groups:
               client_cert: "((diego_bbs_client.certificate))"
               client_key: "((diego_bbs_client.private_key))"
               require_ssl: true
+            watcher:
+              locket:
+                api_location: "locket.service.cf.internal:8891"
             traffic_controller_url: wss://doppler.((system_domain)):443
     - name: ssh_proxy
       release: diego
@@ -1150,6 +1159,9 @@ instance_groups:
             enable_cf_auth: true
             enable_diego_auth: false
             diego_credentials: ""
+            uaa:
+              ca_cert: "((uaa_ca.certificate))"
+              port: 8443
             uaa_secret: ((secrets_uaa_clients_ssh_proxy_secret))
             uaa_token_url: https://uaa.((system_domain))/oauth/token
     - name: scheduler
@@ -1215,7 +1227,6 @@ instance_groups:
           server_cert: "((diego_rep_agent_v2.certificate))"
           server_key: "((diego_rep_agent_v2.private_key))"
           require_tls: true
-          enable_legacy_api_endpoints: false
           bbs:
             api_location: bbs.service.cf.internal:8889
             ca_cert: "((service_cf_internal_ca.certificate))"
@@ -1619,6 +1630,23 @@ variables:
     common_name: cc-uploader.service.cf.internal
     extended_key_usage:
     - server_auth
+- name: diego_locket_server
+  type: certificate
+  options:
+    ca: service_cf_internal_ca
+    common_name: locket.service.cf.internal
+    extended_key_usage:
+    - server_auth
+    alternative_names:
+    - "*.locket.service.cf.internal"
+    - locket.service.cf.internal
+- name: diego_locket_client
+  type: certificate
+  options:
+    ca: service_cf_internal_ca
+    common_name: locket client
+    extended_key_usage:
+    - client_auth
 - name: application_ca
   type: certificate
   options:
