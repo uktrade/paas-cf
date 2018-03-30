@@ -4,3 +4,6 @@ source "https://rubygems.org"
 
 gem "amazon-pricing"
 gem "pry-byebug"
+
+# Added at 2018-03-30 10:00:31 +0100 by chrisfarmiloe:
+gem "hashie", "~> 3.5"
