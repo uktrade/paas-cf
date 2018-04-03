@@ -7,7 +7,7 @@ WORKDIR=${WORKDIR:-.}
 
 datadog_opsfile=${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/noop.yml
 if [ "${ENABLE_DATADOG}" = "true" ] ; then
-  datadog_opsfile="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/090-datadog-nozzle.yml"
+  datadog_opsfile="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/090-datadog.yml"
 fi
 
 oauth_opsfile=${PAAS_CF_DIR}/manifests/cf-manifest//manifest/operations/noop.yml
@@ -35,6 +35,8 @@ bosh interpolate \
   --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/060-cdn-broker.yml" \
   --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/070-elasticache-broker.yml" \
   --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/080-logsearch.yml" \
+  --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/091-collectd.yml" \
+  --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/092-syslog-forwarder.yml" \
   --ops-file="${WORKDIR}/grafana-dashboards-opsfile/grafana-dashboards-opsfile.yml" \
   --ops-file="${WORKDIR}/vpc-peering-opsfile/vpc-peers.yml" \
   --ops-file="${datadog_opsfile}" \

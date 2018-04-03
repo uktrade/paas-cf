@@ -1123,7 +1123,9 @@ jobs:
               APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
               SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
               DEPLOY_ENV: ((deploy_env))
+              AWS_ACCOUNT: ((aws_account))
               DATADOG_API_KEY: ((datadog_api_key))
+              DATADOG_APP_KEY: ((datadog_app_key))
               OAUTH_CLIENT_ID: ((oauth_client_id))
               OAUTH_CLIENT_SECRET: ((oauth_client_secret))
             run:
@@ -1137,6 +1139,7 @@ jobs:
                   system_domain: ${SYSTEM_DNS_ZONE_NAME}
                   app_domain: ${APPS_DNS_ZONE_NAME}
                   environment: ${DEPLOY_ENV}
+                  aws_account: ${AWS_ACCOUNT}
                   datadog_api_key: ${DATADOG_API_KEY}
                   oauth_client_id: ${OAUTH_CLIENT_ID}
                   oauth_client_secret: ${OAUTH_CLIENT_SECRET}
