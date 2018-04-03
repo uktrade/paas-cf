@@ -37,6 +37,16 @@ meta:
       region: ((terraform_outputs_region))
     cdn: ~
 
+addons:
+  - name: node_exporter
+    jobs:
+      - name: node_exporter
+        release: node-exporter
+    include:
+      stemcell:
+        - os: ubuntu-trusty
+    properties: {}
+
 name: ((environment))
 update:
   canaries: 0
@@ -1693,6 +1703,10 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=56
   version: "56"
   sha1: 462383bd04d75ba5a0fd5e205853719b5b78423d
+- name: node-exporter
+  version: 3.0.1
+  url: https://github.com/bosh-prometheus/node-exporter-boshrelease/releases/download/v3.0.1/node-exporter-3.0.1.tgz
+  sha1: e2a70d0574d53a5b4f72e37a2fca8a5d39b022ac
 stemcells:
 - alias: default
   name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
