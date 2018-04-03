@@ -11,6 +11,7 @@ groups:
       - cf-terraform
       - generate-cf-config
       - cf-deploy
+      - prometheus-deploy
       - post-deploy
       - smoke-tests
       - acceptance-tests
@@ -220,6 +221,20 @@ resources:
       region_name: ((aws_region))
       versioned_file: cloud-config.yml
 
+  - name: prometheus-vars-store
+    type: s3-iam
+    source:
+      bucket: ((state_bucket))
+      region_name: ((aws_region))
+      versioned_file: prometheus-vars-store.yml
+
+  - name: prometheus-manifest
+    type: s3-iam
+    source:
+      bucket: ((state_bucket))
+      region_name: ((aws_region))
+      versioned_file: prometheus-manifest.yml
+
   - name: deployed-healthcheck
     type: s3-iam
     source:
@@ -294,6 +309,12 @@ resources:
     source:
       uri: https://github.com/alphagov/paas-billing
       tag_filter: v0.17.0
+
+  - name: prometheus-boshrelease
+    type: git
+    source:
+      uri: https://github.com/bosh-prometheus/prometheus-boshrelease
+      tag_filter: v21.1.1
 
 jobs:
   - name: pipeline-lock
@@ -426,6 +447,7 @@ jobs:
                 paas-cf/concourse/scripts/s3init.sh "((state_bucket))" id_rsa.pub paas-cf/concourse/init_files/zero_bytes
                 paas-cf/concourse/scripts/s3init.sh "((state_bucket))" healthcheck-deployed paas-cf/concourse/init_files/string-no
                 paas-cf/concourse/scripts/s3init.sh "((state_bucket))" bosh-CA.crt paas-cf/concourse/init_files/zero_bytes
+                paas-cf/concourse/scripts/s3init.sh "((state_bucket))" prometheus-vars-store.yml paas-cf/concourse/init_files/zero_bytes
 
   - name: generate-secrets
     serial_groups: [cf-deploy]
@@ -1006,6 +1028,7 @@ jobs:
           - get: bosh-tfstate
           - get: cf-tfstate
             passed: ['cf-terraform']
+          - get: prometheus-boshrelease
 
       - aggregate:
         - task: extract-terraform-outputs
@@ -1167,6 +1190,7 @@ jobs:
               - name: environment-variables
               - name: grafana-dashboards-opsfile
               - name: vpc-peering-opsfile
+              - name: prometheus-boshrelease
             outputs:
               - name: cf-manifest
               - name: cf-manifest-pre-vars
@@ -1185,10 +1209,12 @@ jobs:
                   tar -xzf ./ipsec-CA/ipsec-CA.tar.gz -C ./ipsec-CA
                   cp cf-vars-store/cf-vars-store.yml cf-vars-store-updated/
                   ./paas-cf/manifests/cf-manifest/scripts/generate-manifest.sh \
+                    -o prometheus-boshrelease/manifests/operators/cf/add-prometheus-uaa-clients.yml \
                     --var-errs \
                     --vars-store cf-vars-store-updated/cf-vars-store.yml \
                     > cf-manifest/cf-manifest.yml
                   ./paas-cf/manifests/cf-manifest/scripts/generate-manifest.sh \
+                    -o prometheus-boshrelease/manifests/operators/cf/add-prometheus-uaa-clients.yml \
                     > cf-manifest-pre-vars/cf-manifest-pre-vars.yml
 
           on_success:
@@ -1202,6 +1228,8 @@ jobs:
             - put: cf-vars-store
               params:
                 file: cf-vars-store-updated/cf-vars-store.yml
+
+
 
   - name: cf-deploy
     serial_groups: [cf-deploy]
@@ -1391,6 +1419,116 @@ jobs:
                 -X PUT \
                 -d '{"transient":{"cluster.routing.allocation.enable":"all"}}' \
                 "${TF_VAR_logsearch_elastic_master_elb_dns_name}:9200/_cluster/settings"
+
+
+  - name: prometheus-deploy
+    serial: true
+    plan:
+      - aggregate:
+          - get: pipeline-trigger
+            passed: ['cf-deploy']
+            trigger: true
+          - get: paas-cf
+            passed: ['cf-deploy']
+          - get: cf-vars-store
+            passed: ['generate-cf-config']
+          - get: cf-secrets
+            passed: ['generate-cf-config']
+          - get: bosh-secrets
+          - get: bosh-CA-crt
+          - get: prometheus-boshrelease
+          - get: prometheus-vars-store
+
+      - task: generate-prometheus-manifest
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/bosh-cli-v2
+              tag: 465642da06051a55630d39c899697b678f66a7f7
+          inputs:
+            - name: paas-cf
+            - name: cf-vars-store
+            - name: cf-secrets
+            - name: bosh-secrets
+            - name: bosh-CA-crt
+            - name: prometheus-vars-store
+            - name: prometheus-boshrelease
+          outputs:
+            - name: prometheus-manifest
+            - name: prometheus-vars-store-updated
+          params:
+            SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
+            CF_DEPLOYMENT_NAME: ((deploy_env))
+            BOSH_URL: https://((bosh_fqdn)):25555
+          run:
+            path: sh
+            args:
+              - -e
+              - -u
+              - -c
+              - |
+                bosh_password="$(cat bosh-secrets/bosh-secrets.yml | awk '/bosh_admin_password:/ {print $2}')"
+
+                cp \
+                  prometheus-vars-store/prometheus-vars-store.yml \
+                  prometheus-vars-store-updated/
+
+                bosh interpolate prometheus-boshrelease/manifests/prometheus.yml \
+                  --var-errs \
+                  --vars-store prometheus-vars-store-updated/prometheus-vars-store.yml \
+                  --vars-file=cf-vars-store/cf-vars-store.yml \
+                  -o prometheus-boshrelease/manifests/operators/monitor-bosh.yml \
+                  -v bosh_url="${BOSH_URL}" \
+                  -v bosh_username=admin \
+                  -v bosh_password="${bosh_password}" \
+                  --var-file bosh_ca_cert=bosh-CA-crt/bosh-CA.crt \
+                  -v metrics_environment="${CF_DEPLOYMENT_NAME}" \
+                  -o prometheus-boshrelease/manifests/operators/monitor-cf.yml \
+                  -v metron_deployment_name="${CF_DEPLOYMENT_NAME}" \
+                  -v system_domain="${SYSTEM_DNS_ZONE_NAME}"\
+                  -v traffic_controller_external_port=443 \
+                  -o prometheus-boshrelease/manifests/operators/enable-cf-route-registrar.yml \
+                  -v cf_deployment_name="${CF_DEPLOYMENT_NAME}" \
+                  -v skip_ssl_verify=false \
+                  -o paas-cf/manifests/prometheus-manifest/operators/iaas-specifics.yml \
+                  > prometheus-manifest/prometheus-manifest.yml
+
+        on_success:
+          aggregate:
+          - put: prometheus-vars-store
+            params:
+              file: prometheus-vars-store-updated/prometheus-vars-store.yml
+          - put: prometheus-manifest
+            params:
+              file: prometheus-manifest/prometheus-manifest.yml
+
+      - task: prometheus-deploy
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/bosh-cli-v2
+              tag: 777204b5c870fc7ebf0d2b7aa55fcccddfa29c4b
+          inputs:
+            - name: paas-cf
+            - name: prometheus-manifest
+            - name: bosh-secrets
+            - name: bosh-CA-crt
+          params:
+            BOSH_ENVIRONMENT: ((bosh_fqdn))
+            BOSH_CA_CERT: bosh-CA-crt/bosh-CA.crt
+            BOSH_DEPLOYMENT: prometheus
+          run:
+            path: sh
+            args:
+              - -e
+              - -c
+              - |
+                ./paas-cf/concourse/scripts/bosh_login.sh bosh-secrets/bosh-secrets.yml
+                bosh -n deploy prometheus-manifest/prometheus-manifest.yml
 
   - name: post-deploy
     serial: true
