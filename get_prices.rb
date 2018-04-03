@@ -51,7 +51,7 @@ def calculate_for_db(db_name, prices, plans, manifest)
     {
       name: "#{db_name} #{broker_plan['name']}",
       valid_from: '2017-01-01',
-      plan_guid: service_plan['entity']['unique_id'],
+      plan_guid: service_plan['metadata']['guid'],
       storage_in_mb: broker_plan['rds_properties']['allocated_storage'] * 1024,
       memory_in_mb: 0,
       components: [{
