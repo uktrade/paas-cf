@@ -80,7 +80,8 @@ postgres_prices = calculate_for_db('postgres', rds_price_list, service_plans, rd
 mysql_prices = calculate_for_db('mysql', rds_price_list, service_plans, rds_broker_plans)
 elasticache_prices = JSON.parse(File.read('elasticache_prices.json'))
 cdn_prices = JSON.parse(File.read('cdn_prices.json'))
+compose_prices = JSON.parse(File.read('compose_prices.json'))
 
-all_prices = app_prices + postgres_prices + mysql_prices + elasticache_prices + cdn_prices
+all_prices = app_prices + postgres_prices + mysql_prices + elasticache_prices + cdn_prices + compose_prices
 
 puts JSON.pretty_generate(all_prices)

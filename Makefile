@@ -1,5 +1,5 @@
-prices.json: 050-rds-broker.yml rds_price_list.dump app_prices.json prod-plans.json elasticache_prices.json cdn_prices.json
+prices.json: 050-rds-broker.yml prod-plans.json app_prices.json elasticache_prices.json cdn_prices.json
 	bundle exec ./get_prices.rb > $@
 
 clean:
-	rm -f 050-rds-broker.yml rds_price_list.dump rds_prices.yml
+	rm -f prices.json
