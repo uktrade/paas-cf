@@ -154,7 +154,7 @@ instance_groups:
     release: datadog-for-cloudfoundry
   - name: doppler
     release: loggregator
-    provides: {doppler: {as: doppler}}
+    provides: {doppler: {as: doppler, shared: true}}
     properties:
       doppler:
         maxRetainedLogMessages: 100
