@@ -1,5 +1,4 @@
 ---
 - type: replace
-  path: /instance_groups/name=prometheus/jobs/name=cloudfoundry_alerts/properties?
-  value:
-    cloudfoundry_alerts.app_crashed.evaluation_time: 1h
+  path: /instance_groups/name=prometheus/jobs/name=cloudfoundry_alerts/properties?/cloudfoundry_alerts/app_crashed/evaluation_time
+  value: 1h
