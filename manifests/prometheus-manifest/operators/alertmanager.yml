@@ -1,8 +1,8 @@
 ---
 - type: replace
-  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/data/retention/
-  value: 30d
+  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/data/retention
+  value: 720h
 
 - type: replace
-  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/route/repeat_interval/
+  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/route/repeat_interval
   value: 60m
