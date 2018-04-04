@@ -13,3 +13,19 @@
     - __name__
     regex: "(CATS*)"
     action: drop
+
+- type: replace
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/relabel_configs/-
+  value:
+    source_labels:
+    - __name__
+    regex: "(SMOKE*)"
+    action: drop
+
+- type: replace
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/relabel_configs/-
+  value:
+    source_labels:
+    - __name__
+    regex: "(CATS*)"
+    action: drop
