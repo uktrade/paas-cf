@@ -235,6 +235,13 @@ resources:
       region_name: ((aws_region))
       versioned_file: prometheus-manifest.yml
 
+  - name: prometheus-secrets
+    type: s3-iam
+    source:
+      bucket: ((state_bucket))
+      region_name: ((aws_region))
+      versioned_file: prometheus-secrets.yml
+
   - name: deployed-healthcheck
     type: s3-iam
     source:
@@ -1441,6 +1448,7 @@ jobs:
           - get: bosh-CA-crt
           - get: prometheus-boshrelease
           - get: prometheus-vars-store
+          - get: prometheus-secrets
 
       - task: generate-prometheus-manifest
         config:
@@ -1456,8 +1464,9 @@ jobs:
             - name: cf-secrets
             - name: bosh-secrets
             - name: bosh-CA-crt
-            - name: prometheus-vars-store
             - name: prometheus-boshrelease
+            - name: prometheus-vars-store
+            - name: prometheus-secrets
           outputs:
             - name: prometheus-manifest
             - name: prometheus-vars-store-updated
@@ -1482,6 +1491,7 @@ jobs:
                   --var-errs \
                   --vars-store prometheus-vars-store-updated/prometheus-vars-store.yml \
                   --vars-file=cf-vars-store/cf-vars-store.yml \
+                  --vars-file=prometheus-secrets/prometheus-secrets.yml \
                   -o prometheus-boshrelease/manifests/operators/monitor-bosh.yml \
                   -v bosh_url="${BOSH_URL}" \
                   -v bosh_username=admin \
@@ -1493,6 +1503,7 @@ jobs:
                   -v system_domain="${SYSTEM_DNS_ZONE_NAME}"\
                   -v traffic_controller_external_port=443 \
                   -o prometheus-boshrelease/manifests/operators/enable-cf-route-registrar.yml \
+                  -o prometheus-boshrelease/manifests/operators/alertmanager-pagerduty-receiver.yml \
                   -v cf_deployment_name="${CF_DEPLOYMENT_NAME}" \
                   -v skip_ssl_verify=false \
                   -o paas-cf/manifests/prometheus-manifest/operators/iaas-specifics.yml \
