@@ -4,5 +4,19 @@
   value: 2
 
 - type: replace
+  path: /instance_groups/name=prometheus/azs?
+  value:
+  - z1
+  - z2
+  - z3
+
+- type: replace
   path: /instance_groups/name=alertmanager/instances
   value: 3
+
+- type: replace
+  path: /instance_groups/name=alertmanager/azs?
+  value:
+  - z1
+  - z2
+  - z3
