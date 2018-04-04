@@ -1497,6 +1497,7 @@ jobs:
                   -v skip_ssl_verify=false \
                   -o paas-cf/manifests/prometheus-manifest/operators/iaas-specifics.yml \
                   -o paas-cf/manifests/prometheus-manifest/operators/cf-alerts.yml \
+                  -o paas-cf/manifests/prometheus-manifest/operators/alertmanager.yml \
                   > prometheus-manifest/prometheus-manifest.yml
 
         on_success:
