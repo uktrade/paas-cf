@@ -12,6 +12,8 @@
   value: false
 
 - type: replace
-  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/route?/match?
-  value: |
-    severity: critical
+  path: /instance_groups/name=alertmanager/jobs/name=alertmanager/properties/alertmanager?/route?/routes?/-
+  value:
+    match:
+      severity: critical
+    receiver: pagerduty

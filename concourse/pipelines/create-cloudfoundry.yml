@@ -1503,11 +1503,11 @@ jobs:
                   -v system_domain="${SYSTEM_DNS_ZONE_NAME}"\
                   -v traffic_controller_external_port=443 \
                   -o prometheus-boshrelease/manifests/operators/enable-cf-route-registrar.yml \
-                  -o prometheus-boshrelease/manifests/operators/alertmanager-pagerduty-receiver.yml \
                   -v cf_deployment_name="${CF_DEPLOYMENT_NAME}" \
                   -v skip_ssl_verify=false \
                   -o paas-cf/manifests/prometheus-manifest/operators/iaas-specifics.yml \
                   -o paas-cf/manifests/prometheus-manifest/operators/cf-alerts.yml \
+                  -o paas-cf/manifests/prometheus-manifest/operators/alertmanager-pagerduty-receiver.yml \
                   -o paas-cf/manifests/prometheus-manifest/operators/alertmanager.yml \
                   -o paas-cf/manifests/prometheus-manifest/operators/ha-setup.yml \
                   > prometheus-manifest/prometheus-manifest.yml
