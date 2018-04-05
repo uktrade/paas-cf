@@ -2,30 +2,47 @@
   path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=firehose?/relabel_configs/-
   value:
     source_labels:
-    - __name__
-    regex: "(SMOKE*)"
+    - cf_application_info
+    regex: "SMOKE*"
     action: drop
 
 - type: replace
   path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=firehose?/relabel_configs/-
   value:
     source_labels:
-    - __name__
-    regex: "(CATS*)"
+    - cf_application_info
+    regex: "CATS*"
     action: drop
 
 - type: replace
-  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/relabel_configs/-
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/metric_relabel_configs/-
   value:
     source_labels:
-    - __name__
-    regex: "(SMOKE*)"
+    - application_name
+    regex: "SMOKE*"
     action: drop
 
 - type: replace
-  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/relabel_configs/-
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/metric_relabel_configs/-
   value:
     source_labels:
-    - __name__
-    regex: "(CATS*)"
+    - application_name
+    regex: "CATS*"
     action: drop
+
+- type: replace
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/metric_relabel_configs/-
+  value:
+    source_labels:
+    - cf_application_info
+    regex: "SMOKE.+"
+    action: drop
+
+- type: replace
+  path: /instance_groups/name=prometheus/jobs/name=prometheus/properties/prometheus/scrape_configs/job_name=cf?/metric_relabel_configs/-
+  value:
+    source_labels:
+    - cf_application_info
+    regex: "CATS.+"
+    action: drop
+
