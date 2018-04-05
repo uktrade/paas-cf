@@ -3,7 +3,7 @@
   value:
     source_labels:
     - cf_application_info
-    regex: "SMOKE*"
+    regex: SMOKE*
     action: drop
 
 - type: replace
@@ -11,7 +11,7 @@
   value:
     source_labels:
     - cf_application_info
-    regex: "CATS*"
+    regex: CATS*
     action: drop
 
 - type: replace
@@ -19,7 +19,7 @@
   value:
     source_labels:
     - application_name
-    regex: "SMOKE*"
+    regex: SMOKE.+
     action: drop
 
 - type: replace
@@ -27,7 +27,7 @@
   value:
     source_labels:
     - application_name
-    regex: "CATS*"
+    regex: CATS.+
     action: drop
 
 - type: replace
@@ -35,7 +35,7 @@
   value:
     source_labels:
     - cf_application_info
-    regex: "SMOKE.+"
+    regex: SMOKE.+
     action: drop
 
 - type: replace
@@ -43,6 +43,6 @@
   value:
     source_labels:
     - cf_application_info
-    regex: "CATS.+"
+    regex: CATS.+
     action: drop
 
