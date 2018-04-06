@@ -1478,7 +1478,7 @@ jobs:
               - -u
               - -c
               - |
-                bosh_password="$(cat bosh-secrets/bosh-secrets.yml | awk '/bosh_admin_password:/ {print $2}')"
+                bosh_password="$(awk '/bosh_admin_password:/ {print $2}' < bosh-secrets/bosh-secrets.yml)"
 
                 cp \
                   prometheus-vars-store/prometheus-vars-store.yml \
