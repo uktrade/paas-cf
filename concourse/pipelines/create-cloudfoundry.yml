@@ -1433,14 +1433,14 @@ jobs:
     plan:
       - aggregate:
           - get: pipeline-trigger
-            # passed: ['cf-deploy']
-            # trigger: true
+            passed: ['cf-deploy']
+            trigger: true
           - get: paas-cf
-            # passed: ['cf-deploy']
+            passed: ['cf-deploy']
           - get: cf-vars-store
-            # passed: ['generate-cf-config']
+            passed: ['generate-cf-config']
           - get: cf-secrets
-            # passed: ['generate-cf-config']
+            passed: ['generate-cf-config']
           - get: bosh-secrets
           - get: bosh-CA-crt
           - get: prometheus-boshrelease
