@@ -1,0 +1,56 @@
+---
+
+- type: replace
+  path: /releases/-
+  value:
+    name: service-metrics
+    version: latest
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: service_metrics
+    azs: [z1, z2]
+    instances: 1
+    vm_type: small
+    stemcell: default
+    networks:
+      - name: cf
+    jobs:
+      - name: service-metrics
+        release: service-metrics
+        properties:
+          service_metrics:
+            origin: metrics-source
+            execution_interval_seconds: 5
+            metrics_command: /bin/echo
+            metrics_command_args:
+              - -n
+              - '[{"key":"service-dummy","value":99,"unit":"metric"}]'
+            monit_dependencies: []
+            tls:
+              cert: ((service-metrics.certificate))
+              key: ((service-metrics.private_key))
+              ca: ((service-metrics.ca))
+      - name: metron_agent
+        release: loggregator
+        properties:
+          loggregator:
+            tls:
+              ca_cert: "((loggregator_ca.certificate))"
+              metron:
+                cert: "((loggregator_tls_metron.certificate))"
+                key: "((loggregator_tls_metron.private_key))"
+          metron_agent:
+            deployment: ((environment))
+
+- type: replace
+  path: /variables/-
+  value:
+    name: service-metrics
+    type: certificate
+    options:
+      ca: loggregator_ca
+      common_name: service-metrics
+      extended_key_usage:
+        - client_auth
