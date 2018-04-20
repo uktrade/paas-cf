@@ -201,6 +201,7 @@ private
       'WORKDIR' => workdir,
       'CF_ENV_SPECIFIC_MANIFEST' => root.join("manifests/cf-manifest/env-specific/cf-#{environment}.yml").to_s,
       'ENABLE_DATADOG' => enable_datadog,
+      'ENABLE_IDP_UAA' => 'false',
       'DISABLE_USER_CREATION' => disable_user_creation
     }
     args = ["#{root}/manifests/cf-manifest/scripts/generate-manifest.sh"] + extra_args

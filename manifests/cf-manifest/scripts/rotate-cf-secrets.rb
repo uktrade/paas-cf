@@ -12,6 +12,7 @@ list_secrets_to_keep = %w{
   secrets_cf_db_locket_password
   secrets_cf_db_master_password
   secrets_cf_db_uaa_password
+  secrets_cf_db_idp_uaa_password
   secrets_compose_broker_admin_password
   secrets_consul_encrypt_keys
   secrets_elasticache_broker_admin_password

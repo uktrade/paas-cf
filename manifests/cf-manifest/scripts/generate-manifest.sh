@@ -10,9 +10,14 @@ if [ "${ENABLE_DATADOG}" = "true" ] ; then
   datadog_opsfile="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/090-datadog-nozzle.yml"
 fi
 
-oauth_opsfile=${PAAS_CF_DIR}/manifests/cf-manifest//manifest/operations/noop.yml
+oauth_opsfile=${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/noop.yml
 if [ "${DISABLE_USER_CREATION}" = "false" ] ; then
    oauth_opsfile="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/100-oauth.yml"
+fi
+
+idp_uaa_opsfile=${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/noop.yml
+if [ "${ENABLE_IDP_UAA}" = "true" ] ; then
+   idp_uaa_opsfile="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/500-add-uaa-idp.yml"
 fi
 
 bosh interpolate \
@@ -40,6 +45,7 @@ bosh interpolate \
   --ops-file="${WORKDIR}/vpc-peering-opsfile/vpc-peers.yml" \
   --ops-file="${datadog_opsfile}" \
   --ops-file="${oauth_opsfile}" \
+  --ops-file="${idp_uaa_opsfile}" \
   --ops-file="${PAAS_CF_DIR}/manifests/cf-manifest/manifest/operations/999-prune.yml" \
   "$@" \
   "${PAAS_CF_DIR}/manifests/cf-manifest/manifest/000-base-cf-deployment.yml"

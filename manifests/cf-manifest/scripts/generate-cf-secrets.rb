@@ -15,6 +15,7 @@ generator = SecretGenerator.new(
   "secrets_cf_db_locket_password" => :simple,
   "secrets_cf_db_master_password" => :simple,
   "secrets_cf_db_uaa_password" => :simple,
+  "secrets_cf_db_idp_uaa_password" => :simple,
   "secrets_cf_db_network_connectivity_password" => :simple,
   "secrets_cf_db_network_policy_password" => :simple,
   "secrets_compose_broker_admin_password" => :simple,

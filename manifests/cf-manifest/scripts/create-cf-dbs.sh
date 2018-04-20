@@ -9,6 +9,7 @@ bbs_pass=${TF_VAR_secrets_cf_db_bbs_password:?}
 locket_pass=${TF_VAR_secrets_cf_db_locket_password:?}
 network_connectivity_pass=${TF_VAR_secrets_cf_db_network_connectivity_password:?}
 network_policy_pass=${TF_VAR_secrets_cf_db_network_policy_password:?}
+idp_uaa_pass=${TF_VAR_secrets_cf_db_idp_uaa_password:?}
 db_address=${TF_VAR_cf_db_address:?}
 
 # See: https://github.com/koalaman/shellcheck/wiki/SC2086#exceptions
@@ -34,6 +35,9 @@ psql_adm -d postgres -c "SELECT rolname FROM pg_roles WHERE rolname = 'network_c
 psql_adm -d postgres -c "SELECT rolname FROM pg_roles WHERE rolname = 'network_policy'" \
   | grep -q 'network_policy' || psql_adm -d postgres -c "CREATE USER network_policy WITH ROLE dbadmin"
 
+psql_adm -d postgres -c "SELECT rolname FROM pg_roles WHERE rolname = 'idp_uaa'" \
+  | grep -q 'idp_uaa' || psql_adm -d postgres -c "CREATE USER idp_uaa WITH ROLE dbadmin"
+
 # Always update passwords
 psql_adm -d postgres -c "ALTER USER api WITH PASSWORD '${api_pass}'"
 psql_adm -d postgres -c "ALTER USER uaa WITH PASSWORD '${uaa_pass}'"
@@ -41,9 +45,9 @@ psql_adm -d postgres -c "ALTER USER bbs WITH PASSWORD '${bbs_pass}'"
 psql_adm -d postgres -c "ALTER USER locket WITH PASSWORD '${locket_pass}'"
 psql_adm -d postgres -c "ALTER USER network_connectivity WITH PASSWORD '${network_connectivity_pass}'"
 psql_adm -d postgres -c "ALTER USER network_policy WITH PASSWORD '${network_policy_pass}'"
+psql_adm -d postgres -c "ALTER USER idp_uaa WITH PASSWORD '${idp_uaa_pass}'"
 
-for db in api uaa bbs locket network_connectivity network_policy; do
-
+for db in api uaa bbs locket network_connectivity network_policy idp_uaa; do
   # Create database
   psql_adm -d postgres -l | grep -q " ${db} " || \
     psql_adm -d postgres -c "CREATE DATABASE ${db} OWNER ${db}"

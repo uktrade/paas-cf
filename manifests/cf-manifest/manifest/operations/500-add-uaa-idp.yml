@@ -1,0 +1,109 @@
+---
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: idp-uaa
+    azs:
+    - z1
+    - z2
+    instances: 2
+    vm_type: medium
+    vm_extensions:
+    - cf_rds_client_sg
+    stemcell: default
+    networks:
+    - name: cf
+    jobs:
+    - name: uaa
+      release: uaa
+      properties:
+        uaa:
+          sslCertificate: "((idp_uaa_ssl.certificate))"
+          sslPrivateKey: "((idp_uaa_ssl.private_key))"
+          url: https://idp.((system_domain))
+          admin:
+            client_secret: "((idp_uaa_admin_client_secret))"
+          logging_level: INFO
+          scim:
+            users: []
+          jwt:
+            policy:
+              active_key_id: key-1
+              keys:
+                key-1:
+                  signingKey: "((idp_uaa_jwt_signing_key.private_key))"
+        login:
+          saml:
+            activeKeyId: key-1
+            keys:
+              key-1:
+                key: "((idp_uaa_login_saml.private_key))"
+                certificate: "((idp_uaa_login_saml.certificate))"
+                passphrase: ""
+          smtp:
+            host: ((terraform_outputs_ses_smtp_host))
+            port: 587
+            from_address: "gov-uk-paas-support@digital.cabinet-office.gov.uk"
+            user: ((terraform_outputs_ses_smtp_aws_access_key_id))
+            password: ((terraform_outputs_ses_smtp_password))
+            auth: true
+            starttls: true
+          self_service_links_enabled: true
+          links:
+            passwd: "https://login.((system_domain))/forgot_password"
+            signup: "https://www.cloud.service.gov.uk/signup"
+            homeRedirect: "https://www.cloud.service.gov.uk/next-steps?account-updated"
+          branding:
+            company_name: "GOV.UK PaaS"
+          asset_base_url: "https://paas-uaa-assets.((terraform_outputs_cf_apps_domain))"
+        uaadb:
+          db_scheme: postgresql
+          address: ((terraform_outputs_cf_db_address))
+          port: 5432
+          roles:
+            - tag: admin
+              name: idp_uaa
+              password: ((secrets_cf_db_idp_uaa_password))
+          databases:
+            - tag: uaa
+              name: idp_uaa
+              citext: true
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_admin_client_secret
+    type: password
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_jwt_signing_key
+    type: rsa
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: uaaCA
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_ssl
+    type: certificate
+    options:
+      ca: idp_uaa_ca
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_login_saml
+    type: certificate
+    options:
+      ca: idp_uaa_ca
+      common_name: idp_uaa_login_saml

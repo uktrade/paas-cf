@@ -1136,6 +1136,7 @@ jobs:
             params:
               CF_ENV_SPECIFIC_MANIFEST: paas-cf/manifests/cf-manifest/env-specific/((cf_env_specific_manifest))
               ENABLE_DATADOG: ((enable_datadog))
+              ENABLE_IDP_UAA: ((enable_idp_uaa))
               DISABLE_USER_CREATION: ((disable_user_creation))
             run:
               path: sh
