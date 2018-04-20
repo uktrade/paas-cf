@@ -33,6 +33,14 @@
               keys:
                 key-1:
                   signingKey: "((idp_uaa_jwt_signing_key.private_key))"
+          clients:
+            idp_uaa_oidc_client:
+              override: true
+              authorized-grant-types: authorization_code,client_credentials,refresh_token
+              authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
+              scope: openid,oauth.approvals
+              secret: ((idp_uaa_oidc_client_secret))
+              redirect-uri: https://login.((system_domain))/login/callback/andras
         login:
           saml:
             activeKeyId: key-1
@@ -107,3 +115,31 @@
     options:
       ca: idp_uaa_ca
       common_name: idp_uaa_login_saml
+
+# Add upstream idp_uaa
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/login/oauth?/providers/idp-uaa
+  value:
+    type: oidc1.0
+    authUrl: https://idp.((system_domain))/oauth/authorize
+    tokenUrl: https://idp.((system_domain))/oauth/token
+    tokenKeyUrl: https://idp.((system_domain))/token_keys
+    issuer: https://idp.((system_domain))/oauth/token
+    redirectUrl: https://login.((system_domain))/uaa
+    scopes:
+      - openid
+      - email
+    linkText: Central UAA IDP
+    showLinkText: true
+    addShadowUserOnLogin: false
+    relyingPartyId: idp_uaa_oidc_client
+    relyingPartySecret: ((idp_uaa_oidc_client_secret))
+    skipSslValidation: false
+    attributeMappings:
+      user_name: email
+
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_oidc_client_secret
+    type: password
