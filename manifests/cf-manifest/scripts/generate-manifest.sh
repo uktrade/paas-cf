@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -xeu -o pipefail
 
 PAAS_CF_DIR=${PAAS_CF_DIR:-paas-cf}
 WORKDIR=${WORKDIR:-.}
