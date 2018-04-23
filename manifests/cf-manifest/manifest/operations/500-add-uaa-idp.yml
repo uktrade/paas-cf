@@ -37,7 +37,7 @@
             idp_uaa_oidc_client:
               override: true
               authorized-grant-types: authorization_code,client_credentials,refresh_token
-              authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
+              authorities: uaa.none
               scope: openid,oauth.approvals
               secret: ((idp_uaa_oidc_client_secret))
               redirect-uri: https://login.((system_domain))/login/callback/idp-uaa
