@@ -40,7 +40,7 @@
               authorities: oauth.login,scim.write,clients.read,notifications.write,critical_notifications.write,emails.write,scim.userids,password.write
               scope: openid,oauth.approvals
               secret: ((idp_uaa_oidc_client_secret))
-              redirect-uri: https://login.((system_domain))/login/callback/andras
+              redirect-uri: https://login.((system_domain))/login/callback/idp-uaa
         login:
           saml:
             activeKeyId: key-1
@@ -109,14 +109,14 @@
     name: idp_uaa_jwt_signing_key
     type: rsa
 
-#- type: replace
-  #path: /variables/-
-  #value:
-    #name: idp_uaa_ca
-    #type: certificate
-    #options:
-      #is_ca: true
-      #common_name: uaaCA
+- type: replace
+  path: /variables/-
+  value:
+    name: idp_uaa_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: uaaCA
 
 - type: replace
   path: /variables/-
