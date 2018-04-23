@@ -109,14 +109,14 @@
     name: idp_uaa_jwt_signing_key
     type: rsa
 
-- type: replace
-  path: /variables/-
-  value:
-    name: idp_uaa_ca
-    type: certificate
-    options:
-      is_ca: true
-      common_name: uaaCA
+#- type: replace
+  #path: /variables/-
+  #value:
+    #name: idp_uaa_ca
+    #type: certificate
+    #options:
+      #is_ca: true
+      #common_name: uaaCA
 
 - type: replace
   path: /variables/-
@@ -124,7 +124,7 @@
     name: idp_uaa_ssl
     type: certificate
     options:
-      ca: idp_uaa_ca
+      ca: uaa_ca
       common_name: idp.service.cf.internal
       alternative_names:
       - idp.service.cf.internal
