@@ -9,7 +9,7 @@
 - type: replace
   path: /instance_groups/-
   value:
-    name: service_metrics
+    name: service-metrics
     azs: [z1, z2]
     instances: 1
     vm_type: small
@@ -43,6 +43,12 @@
                 key: "((loggregator_tls_metron.private_key))"
           metron_agent:
             deployment: ((environment))
+      - name: consul_agent
+        release: consul
+        consumes:
+          consul_common: {from: consul_common_link}
+          consul_server: {from: consul_server_link}
+          consul_client: {from: consul_client_link}
 
 - type: replace
   path: /variables/-
