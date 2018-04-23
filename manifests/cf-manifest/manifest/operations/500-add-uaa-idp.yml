@@ -77,6 +77,25 @@
             - tag: uaa
               name: idp_uaa
               citext: true
+    - name: route_registrar
+      release: routing
+      properties:
+        route_registrar:
+          routes:
+            - name: idp_uaa
+              registration_interval: 10s
+              health_check:
+                name: cf_uaa_health_check
+                script_path: /var/vcap/jobs/uaa/bin/health_check
+                timeout: "5s"
+              port: 8081
+              tls_port: 8443
+              server_cert_domain_san: "idp.service.cf.internal"
+              tags:
+                component: idp_uaa
+              uris:
+                - "idp.((system_domain))"
+                - "idp-login.((system_domain))"
 
 - type: replace
   path: /variables/-
@@ -106,6 +125,9 @@
     type: certificate
     options:
       ca: idp_uaa_ca
+      common_name: idp.service.cf.internal
+      alternative_names:
+      - idp.service.cf.internal
 
 - type: replace
   path: /variables/-
