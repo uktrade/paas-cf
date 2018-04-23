@@ -9,6 +9,14 @@
 - type: replace
   path: /instance_groups/-
   value:
+    name: log-cache
+    networks:
+    - name: cf
+    ephemeral_disk:
+      size: 10240
+      type: gp2
+    stemcell: default
+    vm_type: small
     azs:
     - z1
     - z2
@@ -20,12 +28,6 @@
         consul_common: {from: consul_common_link}
         consul_server: {from: consul_server_link}
         consul_client: {from: consul_client_link}
-      properties:
-        consul:
-          agent:
-            services:
-              uaa: {}
-              cloud_controller_ng: {}
     - name: log-cache
       properties:
         egress_port: 8080
@@ -43,7 +45,8 @@
       properties:
         port: 8084
       release: log-cache
-    - consumes:
+    - name: log-cache-nozzle
+      consumes:
         reverse_log_proxy:
           deployment: ((environment))
           address: reverse-log-proxy.service.cf.internal
@@ -52,7 +55,6 @@
             reverse_log_proxy:
               egress:
                 port: 8082
-      name: log-cache-nozzle
       properties:
         logs_provider:
           tls:
@@ -131,14 +133,6 @@
           client_secret: ((secrets_uaa_clients_doppler_secret))
           internal_addr: https://uaa.service.cf.internal:8443
       release: log-cache
-    name: log-cache
-    networks:
-    - name: cf
-    ephemeral_disk:
-      size: 10240
-      type: gp2
-    stemcell: default
-    vm_type: small
 
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=log-cache-scheduler?
