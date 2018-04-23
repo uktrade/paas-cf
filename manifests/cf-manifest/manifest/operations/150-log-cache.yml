@@ -46,7 +46,12 @@
     - consumes:
         reverse_log_proxy:
           deployment: ((environment))
-          from: reverse_log_proxy
+          address: reverse-log-proxy.service.cf.internal
+          instances: []
+          properties:
+            reverse_log_proxy:
+              egress:
+                port: 8082
       name: log-cache-nozzle
       properties:
         logs_provider:
