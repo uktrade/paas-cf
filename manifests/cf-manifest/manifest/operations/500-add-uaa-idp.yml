@@ -150,15 +150,12 @@
     redirectUrl: https://login.((system_domain))/uaa
     scopes:
       - openid
-      - email
     linkText: Central UAA IDP
     showLinkText: true
     addShadowUserOnLogin: false
     relyingPartyId: idp_uaa_oidc_client
     relyingPartySecret: ((idp_uaa_oidc_client_secret))
     skipSslValidation: false
-    attributeMappings:
-      user_name: email
 
 - type: replace
   path: /variables/-
