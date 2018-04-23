@@ -95,7 +95,6 @@
                 component: idp_uaa
               uris:
                 - "idp.((system_domain))"
-                - "idp-login.((system_domain))"
 
 - type: replace
   path: /variables/-
