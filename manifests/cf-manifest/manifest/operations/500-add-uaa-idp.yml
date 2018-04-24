@@ -155,6 +155,8 @@
     relyingPartyId: idp_uaa_oidc_client
     relyingPartySecret: ((idp_uaa_oidc_client_secret))
     skipSslValidation: false
+    attributeMappings:
+      user_name: user_name
 
 - type: replace
   path: /variables/-
