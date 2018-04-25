@@ -1336,8 +1336,6 @@ instance_groups:
     serial: true
   networks:
   - name: cf
-  provides:
-    reverse_log_proxy: {as: reverse_log_proxy, shared: true}
   jobs:
   - name: consul_agent
     release: consul
@@ -1385,6 +1383,8 @@ instance_groups:
     <<: *metron_agent_job
   - name: reverse_log_proxy
     release: loggregator
+    provides:
+      reverse_log_proxy: {as: reverse_log_proxy, shared: true}
     properties:
       loggregator:
         tls:
