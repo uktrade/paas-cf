@@ -1,0 +1,25 @@
+---
+
+- type: replace
+  path: /instance_groups/name=consul/jobs/-
+  value:
+    name: datadog-consul-agent-client
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=consul/jobs/-
+  value:
+    name: datadog-consul-agent-server
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=consul/jobs/name=consul_agent/properties/consul/agent/log_level?
+  value: ~
+
+- type: replace
+  path: /instance_groups/name=consul/jobs/name=consul_agent/properties/consul/encrypt_keys
+  value: ((secrets_consul_encrypt_keys))
+
+- type: replace
+  path: /instance_groups/name=consul/persistent_disk_type
+  value: consul
