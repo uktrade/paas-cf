@@ -1,0 +1,20 @@
+---
+
+- type: replace
+  path: /instance_groups/name=nats/jobs/-
+  value:
+    name: datadog-consul-agent-client
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=nats/jobs/-
+  value:
+    name: datadog-nats
+    release: datadog-for-cloudfoundry
+    consumes:
+      nats:
+        from: nats
+
+- type: replace
+  path: /instance_groups/name=nats/jobs/name=nats/properties/nats/user
+  value: nats_user
