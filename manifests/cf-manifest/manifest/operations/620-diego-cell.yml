@@ -1,0 +1,139 @@
+---
+
+- type: remove
+  path: /instance_groups/name=diego-cell/vm_extensions
+
+- type: replace
+  path: /instance_groups/name=diego-cell/azs/-
+  value: z3
+
+- type: replace
+  path: /instance_groups/name=diego-cell/instances
+  value: ((cell_instances))
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: datadog-consul-agent-client
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: datadog-garden
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: datadog-ipsec
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: datadog-rep
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: datadog-route-emitter
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/-
+  value:
+    name: racoon
+    release: ipsec
+    properties:
+      racoon:
+        ports:
+        - name: cell
+          targets: ((terraform_outputs_router_subnet_cidr_blocks))
+        certificate_authority_private_key: "((ipsec_ca.private_key))"
+        certificate_authority_cert: "((ipsec_ca.certificate))"
+        level: require
+        verify_certificate: 'on'
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=cflinuxfs2-rootfs-setup/properties/cflinuxfs2-rootfs/trusted_certs
+  value: ((aws_rds_combined_ca_bundle))
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden?/log_level
+  value: error
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/debug_listen_address
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/default_container_grace_time
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/destroy_containers_on_start
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/graph_cleanup_threshold_in_mb
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/persistent_image_list
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/containers
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/ssl/skip_cert_verify
+  value: false
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/executor/memory_capacity_mb
+  value: ((cell_memory_capacity_mb))
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego/executor/instance_identity_ca_cert
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego/executor/instance_identity_key
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/bbs/api_location
+  value: bbs.service.cf.internal:8889
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/ca_cert
+  value: ((service_cf_internal_ca.certificate))
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/enable_legacy_api_endpoints
+  value: false
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/require_tls
+  value: true
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/server_cert
+  value: ((diego_rep_agent_v2.certificate))
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/server_key
+  value: ((diego_rep_agent_v2.private_key))
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/tcp
+
+- type: remove
+  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/uaa
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/diego?/route_emitter/bbs/api_location
+  value: bbs.service.cf.internal:8889
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/diego?/route_emitter/bbs/require_ssl
+  value: true
+
+- type: replace
+  path: /instance_groups/name=diego-cell/networks/0/name
+  value: cell
