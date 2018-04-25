@@ -1,0 +1,40 @@
+- type: replace
+  path: /instance_groups/name=api/jobs/-
+  value:
+    name: datadog-cc
+    properties:
+      cc:
+        external_port: 9022
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=api/jobs/-
+  value:
+    name: datadog-consul-agent-client
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /instance_groups/name=cc-worker/jobs/-
+  value:
+    name: datadog-cc-worker
+    release: datadog-for-cloudfoundry
+    properties:
+      cc:
+        jobs:
+          generic:
+            # FIXME: default, was null
+            number_of_workers: ~
+
+- type: replace
+  path: /instance_groups/name=cc-worker/jobs/-
+  value:
+    name: datadog-consul-agent-client
+    release: datadog-for-cloudfoundry
+
+- type: replace
+  path: /releases/-
+  value:
+    name: datadog-for-cloudfoundry
+    sha1: 09f70cbd87ec6045d44aa346e23fd6dd9bf14bfa
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/datadog-for-cloudfoundry-0.1.23.tgz
+    version: 0.1.23
