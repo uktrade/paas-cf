@@ -17,24 +17,26 @@ cf_deployment_manifest() {
     ops600s="$ops600s -o $i"
   done
 
+
+  # shellcheck disable=SC2086
   bosh interpolate \
+    --vars-file=../variables.yml \
     -o operations/rename-network.yml -v network_name=cf \
     -o operations/aws.yml \
     -o operations/use-s3-blobstore.yml \
     -o operations/use-external-dbs.yml \
-    -v external_database_type=postgres -v external_database_port=5432 -v external_cc_database_name=api \
-    -o operations/override-app-domains.yml -v app_domains='((terraform_outputs_cf_apps_domain))' \
-    -o operations/rename-deployment.yml -v deployment_name='((environment))' \
     -o operations/stop-skipping-tls-validation.yml \
     -o operations/enable-uniq-consul-node-name.yml \
-    "${ops500s}" \
-    "${ops600s}" \
+    ${ops500s} \
+    ${ops600s} \
     cf-deployment.yml
   )
 }
 
 orig_paas_cf_manifest() {
-  cat manifests/cf-manifest/manifest/000-base-cf-deployment.yml
+  bosh interpolate \
+    --vars-file=manifests/variables.yml \
+    manifests/cf-manifest/manifest/000-base-cf-deployment.yml
 }
 
 spruce diff <(cf_deployment_manifest) <(orig_paas_cf_manifest) | \
