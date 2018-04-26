@@ -1,5 +1,4 @@
 ---
-
 - type: remove
   path: /instance_groups/name=diego-cell/vm_extensions
 
@@ -68,14 +67,12 @@
   path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/debug_listen_address
 
 - type: remove
-  path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/default_container_grace_time
-
-- type: remove
   path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/destroy_containers_on_start
 
 - type: remove
   path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/graph_cleanup_threshold_in_mb
 
+# TODO: do we need to keep the value from upstream? Needs investigation
 - type: remove
   path: /instance_groups/name=diego-cell/jobs/name=garden/properties/garden/persistent_image_list
 
@@ -97,16 +94,8 @@
   path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego/executor/instance_identity_key
 
 - type: replace
-  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/bbs/api_location
-  value: bbs.service.cf.internal:8889
-
-- type: replace
   path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/ca_cert
   value: ((service_cf_internal_ca.certificate))
-
-- type: replace
-  path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/enable_legacy_api_endpoints
-  value: false
 
 - type: replace
   path: /instance_groups/name=diego-cell/jobs/name=rep/properties/diego?/rep/require_tls
@@ -125,14 +114,6 @@
 
 - type: remove
   path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/uaa
-
-- type: replace
-  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/diego?/route_emitter/bbs/api_location
-  value: bbs.service.cf.internal:8889
-
-- type: replace
-  path: /instance_groups/name=diego-cell/jobs/name=route_emitter/properties/diego?/route_emitter/bbs/require_ssl
-  value: true
 
 - type: replace
   path: /instance_groups/name=diego-cell/networks/0/name
