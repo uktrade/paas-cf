@@ -32,10 +32,6 @@
   value: key-2017-01
 
 - type: replace
-  path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/auctioneer/api_location?
-  value: auctioneer.service.cf.internal:9016
-
-- type: replace
   path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/auctioneer/require_tls?
   value: true
 
