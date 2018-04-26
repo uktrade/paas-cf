@@ -1,0 +1,4 @@
+---
+
+- type: remove
+  path: /releases/name=cf-smoke-tests
