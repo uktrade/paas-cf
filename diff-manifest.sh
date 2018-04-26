@@ -27,8 +27,8 @@ cf_deployment_manifest() {
     -o operations/rename-deployment.yml -v deployment_name='((environment))' \
     -o operations/stop-skipping-tls-validation.yml \
     -o operations/enable-uniq-consul-node-name.yml \
-    ${ops500s} \
-    ${ops600s} \
+    "${ops500s}" \
+    "${ops600s}" \
     cf-deployment.yml
   )
 }
