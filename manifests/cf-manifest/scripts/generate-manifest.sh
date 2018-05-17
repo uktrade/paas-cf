@@ -41,6 +41,7 @@ bosh interpolate \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-external-dbs.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/stop-skipping-tls-validation.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/enable-uniq-consul-node-name.yml" \
+  --ops-file="${CF_DEPLOYMENT_DIR}/operations/experimental/use-log-cache.yml" \
   ${opsfile_args} \
   --ops-file="${WORKDIR}/grafana-dashboards-opsfile/grafana-dashboards-opsfile.yml" \
   --ops-file="${WORKDIR}/vpc-peering-opsfile/vpc-peers.yml" \
