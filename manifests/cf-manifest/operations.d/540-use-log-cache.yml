@@ -109,15 +109,15 @@
         uaa:
           ca_cert: ((uaa_ca.certificate))
           client_id: doppler
-          client_secret: ((uaa_clients_doppler_secret))
+          client_secret: ((secrets_uaa_clients_doppler_secret))
           internal_addr: https://uaa.service.cf.internal:8443
       release: log-cache
     name: log-cache
     networks:
-    - name: default
+    - name: ((network_name))
     persistent_disk_type: 5GB
     stemcell: default
-    vm_type: minimal
+    vm_type: small
 - type: replace
   path: /instance_groups/name=scheduler/jobs/name=log-cache-scheduler?
   value:
