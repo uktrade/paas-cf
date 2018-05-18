@@ -13,6 +13,12 @@
     - z2
     instances: 1
     jobs:
+    - name: consul_agent
+      release: consul
+      consumes:
+        consul_common: {from: consul_common_link}
+        consul_server: nil
+        consul_client: {from: consul_client_link}
     - name: log-cache
       properties:
         egress_port: 8080
@@ -32,7 +38,12 @@
       release: log-cache
     - consumes:
         reverse_log_proxy:
-          from: reverse_log_proxy
+          address: reverse-log-proxy.service.cf.internal
+          instances: []
+          properties:
+            reverse_log_proxy:
+              egress:
+                port: 8082
       name: log-cache-nozzle
       properties:
         logs_provider:
