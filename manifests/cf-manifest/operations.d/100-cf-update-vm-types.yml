@@ -29,9 +29,6 @@
 - type: replace
   path: /instance_groups/name=uaa/vm_type
   value: medium
-- type: replace
-  path: /instance_groups/name=log-cache/vm_type
-  value: small
 
 # TODO: Remove the router vm_type. Not needed with extensions
 - type: replace
