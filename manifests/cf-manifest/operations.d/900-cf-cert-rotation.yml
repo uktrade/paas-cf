@@ -40,10 +40,6 @@
   value: ((uaa_ca.certificate))((uaa_ca_old.certificate))
 
 - type: replace
-  path: /instance_groups/name=consul/jobs/name=consul_agent/properties/consul/ca_cert
-  value: ((consul_agent_ca.certificate))((consul_agent_ca_old.certificate))
-
-- type: replace
   path: /instance_groups/name=diego-api/jobs/name=bbs/properties/diego/bbs/auctioneer/ca_cert
   value: ((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))
 
