@@ -36,7 +36,7 @@
 
 - type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ca_certs?
-  value: ((uaa_ca.certificate))((uaa_ca_old.certificate))
+  value: ((uaa_ca_old.certificate))((uaa_ca.certificate))
 
 - type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/drain_wait?

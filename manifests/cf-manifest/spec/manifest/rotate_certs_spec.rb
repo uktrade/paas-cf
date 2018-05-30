@@ -28,7 +28,7 @@ RSpec.describe "Certificate rotation" do
       if v =~ /\(\(([^\.]*).certificate\)\)/
         cert_name = $1
         if rotable_ca_certs.include?(cert_name)
-          unless v =~ /\(\(#{cert_name}.certificate\)\)\(\(#{cert_name}_old.certificate\)\)/
+          unless v =~ /\(\(#{cert_name}_old.certificate\)\)\(\(#{cert_name}.certificate\)\)/
             new_acum << path
           end
         end
