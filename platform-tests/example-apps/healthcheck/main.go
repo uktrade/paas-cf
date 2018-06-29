@@ -9,6 +9,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/beevik/ntp"
 )
 
 func main() {
@@ -19,6 +22,17 @@ func main() {
 	http.HandleFunc("/mongo-test", mongoHandler)
 	http.HandleFunc("/elasticsearch-test", elasticsearchHandler)
 	http.HandleFunc("/redis-test", redisHandler)
+	go func() {
+		for {
+			response, err := ntp.Query("0.pool.ntp.org")
+			if err != nil {
+				fmt.Println("Time ntp error:", err)
+			} else {
+				fmt.Println("Time offset:", response.ClockOffset, "time:", response.Time, "RRT:", response.RTT)
+			}
+			time.Sleep(1 * time.Second)
+		}
+	}()
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal(err)
