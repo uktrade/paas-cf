@@ -28,7 +28,12 @@ func main() {
 			if err != nil {
 				fmt.Println("Time ntp error:", err)
 			} else {
-				fmt.Println("Time offset:", response.ClockOffset, "time:", response.Time, "RRT:", response.RTT)
+				fmt.Println(
+					"response.offset:", response.ClockOffset,
+					"response.time:", response.Time,
+					"response.RRT:", response.RTT,
+					"time.now():", time.Now(),
+				)
 			}
 			time.Sleep(1 * time.Second)
 		}
