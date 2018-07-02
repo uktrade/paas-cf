@@ -14,6 +14,14 @@ import (
 	"github.com/beevik/ntp"
 )
 
+func absTime(d time.Duration) time.Duration {
+	if d > 0 {
+		return d
+	} else {
+		return -d
+	}
+}
+
 func main() {
 	addr := ":" + os.Getenv("PORT")
 	fmt.Println("Listening on", addr)
@@ -26,14 +34,29 @@ func main() {
 		for {
 			response, err := ntp.Query("0.pool.ntp.org")
 			if err != nil {
-				fmt.Println("Time ntp error:", err)
-			} else {
 				fmt.Println(
-					"response.offset:", response.ClockOffset,
-					"response.time:", response.Time,
-					"response.RRT:", response.RTT,
 					"time.now():", time.Now(),
+					"Time ntp error:", err,
 				)
+			} else {
+				if absTime(response.ClockOffset) > 100*time.Millisecond {
+					fmt.Println(
+						"long time offset",
+						"time.now():", time.Now(),
+						"response.time:", response.Time,
+						"response.RRT:", response.RTT,
+						"response.offset:", response.ClockOffset,
+						"response.Stratum:", response.Stratum,
+					)
+				} else {
+					fmt.Println(
+						"normal time offset",
+						"time.now():", time.Now(),
+						"response.time:", response.Time,
+						"response.RRT:", response.RTT,
+						"response.offset:", response.ClockOffset,
+					)
+				}
 			}
 			time.Sleep(1 * time.Second)
 		}

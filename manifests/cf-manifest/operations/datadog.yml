@@ -9,7 +9,7 @@
     sha1: 573bed2ab7960eb97dafff4b7c6111e7ad72b39c
 
 - type: replace
-  path: /addons/-
+  path: /instance_groups/name=api/jobs/-
   value:
     name: datadog-agent
     jobs:
