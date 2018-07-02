@@ -12,9 +12,7 @@
   path: /instance_groups/name=api/jobs/-
   value:
     name: datadog-agent
-    jobs:
-    - name: datadog-agent
-      release: datadog-agent
+    release: datadog-agent
     properties:
       enabled: true
       api_key: ((datadog_api_key))
