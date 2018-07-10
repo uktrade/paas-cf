@@ -58,6 +58,7 @@ resource "datadog_monitor" "continuous-smoketests-errors" {
 
   require_full_window = false
   notify_no_data      = true
+  no_data_timeframe   = "30"
 
   thresholds {
     critical = "3"
