@@ -54,14 +54,31 @@ resource "datadog_monitor" "continuous-smoketests-errors" {
   type  = "query alert"
   query = "${format("sum(last_15m):count_nonzero(max:concourse.build.finished{build_status:errored,deploy_env:%s,job:continuous-smoke-tests}) >= 3", var.env)}"
 
-  message = "${format("{{#is_alert}}The `continuous-smoke-tests` have been erroring for a while now. We need to investigate.{{/is_alert}} {{#is_no_data}}The continuous smoke tests have not reported any metrics for a while. Check concourse status.{{/is_no_data}} %s @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.datadog_notification_in_hours, var.aws_account)}"
+  message = "${format("{{#is_alert}}The `continuous-smoke-tests` have been erroring for a while now. We need to investigate.{{/is_alert}} %s @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.datadog_notification_in_hours, var.aws_account)}"
+
+  require_full_window = false
+  notify_no_data      = false
+
+  thresholds {
+    critical = "3"
+  }
+
+  tags = ["deployment:${var.env}", "service:${var.env}_monitors"]
+}
+
+resource "datadog_monitor" "continuous-smoketests-no-data" {
+  name  = "${format("%s concourse continuous smoketests no data", var.env)}"
+  type  = "query alert"
+  query = "${format("sum(last_15m):count_nonzero(max:concourse.build.finished{deploy_env:%s,job:continuous-smoke-tests}) = 0", var.env)}"
+
+  message = "${format("The `continuous-smoke-tests` have not been reporting data for a while now. We need to investigate. %s @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.datadog_notification_in_hours, var.aws_account)}"
 
   require_full_window = false
   notify_no_data      = true
   no_data_timeframe   = "30"
 
   thresholds {
-    critical = "3"
+    critical = "0"
   }
 
   tags = ["deployment:${var.env}", "service:${var.env}_monitors"]
