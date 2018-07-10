@@ -49,6 +49,23 @@ resource "datadog_monitor" "continuous-smoketests-failures" {
   tags = ["deployment:${var.env}", "service:${var.env}_monitors"]
 }
 
+resource "datadog_monitor" "continuous-smoketests-errors" {
+  name  = "${format("%s concourse continuous smoketests errors", var.env)}"
+  type  = "query alert"
+  query = "${format("sum(last_15m):count_nonzero(max:concourse.build.finished{build_status:errored,deploy_env:%s,job:continuous-smoke-tests}) >= 3", var.env)}"
+
+  message = "${format("{{#is_alert}}The `continuous-smoke-tests` have been erroring for a while now. We need to investigate. Notify: %s{{/is_alert}} @govpaas-alerting-%s@digital.cabinet-office.gov.uk", var.datadog_notification_in_hours, var.aws_account)}"
+
+  require_full_window = false
+  notify_no_data      = true
+
+  thresholds {
+    critical = "3"
+  }
+
+  tags = ["deployment:${var.env}", "service:${var.env}_monitors"]
+}
+
 resource "datadog_monitor" "check-certificates-failures" {
   name  = "${format("%s concourse check certificates failures", var.env)}"
   type  = "query alert"
