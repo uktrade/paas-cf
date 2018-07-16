@@ -1,0 +1,326 @@
+---
+- type: replace
+  path: /addons?/-
+  value:
+    include:
+      stemcell:
+      - os: ubuntu-trusty
+      - os: ubuntu-xenial
+    jobs:
+    - name: bosh-dns
+      properties:
+        aliases:
+          _.cell.service.cf.internal:
+          - _.diego-cell.cf.((environment)).bosh
+          - _.windows-cell.cf.((environment)).bosh
+          - _.windows2016-cell.cf.((environment)).bosh
+          - _.isolated-diego-cell.cf.((environment)).bosh
+          auctioneer.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          bbs.service.cf.internal:
+          - q-s4.diego-api.cf.((environment)).bosh
+          bits.service.cf.internal:
+          - '*.bits.cf.((environment)).bosh'
+          blobstore.service.cf.internal:
+          - '*.blobstore.cf.((environment)).bosh'
+          - '*.singleton-blobstore.cf.((environment)).bosh'
+          cc-uploader.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          cloud-controller-ng.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          consul.service.cf.internal:
+          - '*.consul.cf.((environment)).bosh'
+          credhub.service.cf.internal:
+          - '*.credhub.cf.((environment)).bosh'
+          doppler.service.cf.internal:
+          - '*.doppler.cf.((environment)).bosh'
+          file-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          gorouter.service.cf.internal:
+          - '*.router.cf.((environment)).bosh'
+          locket.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          loggregator-trafficcontroller.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          policy-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          reverse-log-proxy.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          routing-api.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          silk-controller.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          sql-db.service.cf.internal:
+          - '*.mysql.cf.((environment)).bosh'
+          - '*.postgres.cf.((environment)).bosh'
+          - '*.database.cf.((environment)).bosh'
+          ssh-proxy.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          tps.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          uaa.service.cf.internal:
+          - '*.uaa.cf.((environment)).bosh'
+        api:
+          client:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_client_tls.certificate))
+              private_key: ((dns_api_client_tls.private_key))
+          server:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_server_tls.certificate))
+              private_key: ((dns_api_server_tls.private_key))
+        cache:
+          enabled: true
+        health:
+          enabled: true
+          server:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_server_tls.certificate))
+              private_key: ((dns_healthcheck_server_tls.private_key))
+          client:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_client_tls.certificate))
+              private_key: ((dns_healthcheck_client_tls.private_key))
+      release: bosh-dns
+    name: bosh-dns
+- type: replace
+  path: /addons/-
+  value:
+    include:
+      stemcell:
+      - os: windows2012R2
+    jobs:
+    - name: bosh-dns-windows
+      properties:
+        aliases:
+          _.cell.service.cf.internal:
+          - _.diego-cell.cf.((environment)).bosh
+          - _.windows-cell.cf.((environment)).bosh
+          - _.windows2016-cell.cf.((environment)).bosh
+          - _.isolated-diego-cell.cf.((environment)).bosh
+          auctioneer.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          bbs.service.cf.internal:
+          - q-s4.diego-api.cf.((environment)).bosh
+          bits.service.cf.internal:
+          - '*.bits.cf.((environment)).bosh'
+          blobstore.service.cf.internal:
+          - '*.blobstore.cf.((environment)).bosh'
+          - '*.singleton-blobstore.cf.((environment)).bosh'
+          cc-uploader.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          cloud-controller-ng.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          consul.service.cf.internal:
+          - '*.consul.cf.((environment)).bosh'
+          credhub.service.cf.internal:
+          - '*.credhub.cf.((environment)).bosh'
+          doppler.service.cf.internal:
+          - '*.doppler.cf.((environment)).bosh'
+          file-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          gorouter.service.cf.internal:
+          - '*.router.cf.((environment)).bosh'
+          locket.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          loggregator-trafficcontroller.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          policy-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          reverse-log-proxy.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          routing-api.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          silk-controller.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          sql-db.service.cf.internal:
+          - '*.mysql.cf.((environment)).bosh'
+          - '*.postgres.cf.((environment)).bosh'
+          - '*.database.cf.((environment)).bosh'
+          ssh-proxy.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          tps.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          uaa.service.cf.internal:
+          - '*.uaa.cf.((environment)).bosh'
+        api:
+          client:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_client_tls.certificate))
+              private_key: ((dns_api_client_tls.private_key))
+          server:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_server_tls.certificate))
+              private_key: ((dns_api_server_tls.private_key))
+        cache:
+          enabled: true
+        health:
+          enabled: true
+          server:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_server_tls.certificate))
+              private_key: ((dns_healthcheck_server_tls.private_key))
+          client:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_client_tls.certificate))
+              private_key: ((dns_healthcheck_client_tls.private_key))
+      release: bosh-dns
+    name: bosh-dns-windows2012
+- type: replace
+  path: /addons/-
+  value:
+    include:
+      stemcell:
+      - os: windows2016
+    jobs:
+    - name: bosh-dns-windows
+      properties:
+        aliases:
+          _.cell.service.cf.internal:
+          - _.diego-cell.cf.((environment)).bosh
+          - _.windows-cell.cf.((environment)).bosh
+          - _.windows2016-cell.cf.((environment)).bosh
+          - _.isolated-diego-cell.cf.((environment)).bosh
+          auctioneer.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          bbs.service.cf.internal:
+          - q-s4.diego-api.cf.((environment)).bosh
+          bits.service.cf.internal:
+          - '*.bits.cf.((environment)).bosh'
+          blobstore.service.cf.internal:
+          - '*.blobstore.cf.((environment)).bosh'
+          - '*.singleton-blobstore.cf.((environment)).bosh'
+          cc-uploader.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          cloud-controller-ng.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          consul.service.cf.internal:
+          - '*.consul.cf.((environment)).bosh'
+          credhub.service.cf.internal:
+          - '*.credhub.cf.((environment)).bosh'
+          doppler.service.cf.internal:
+          - '*.doppler.cf.((environment)).bosh'
+          file-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          gorouter.service.cf.internal:
+          - '*.router.cf.((environment)).bosh'
+          locket.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          loggregator-trafficcontroller.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          policy-server.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          reverse-log-proxy.service.cf.internal:
+          - '*.log-api.cf.((environment)).bosh'
+          routing-api.service.cf.internal:
+          - '*.api.cf.((environment)).bosh'
+          silk-controller.service.cf.internal:
+          - '*.diego-api.cf.((environment)).bosh'
+          sql-db.service.cf.internal:
+          - '*.mysql.cf.((environment)).bosh'
+          - '*.postgres.cf.((environment)).bosh'
+          - '*.database.cf.((environment)).bosh'
+          ssh-proxy.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          tps.service.cf.internal:
+          - '*.scheduler.cf.((environment)).bosh'
+          uaa.service.cf.internal:
+          - '*.uaa.cf.((environment)).bosh'
+        api:
+          client:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_client_tls.certificate))
+              private_key: ((dns_api_client_tls.private_key))
+          server:
+            tls:
+              ca: ((dns_api_tls_ca.certificate))
+              certificate: ((dns_api_server_tls.certificate))
+              private_key: ((dns_api_server_tls.private_key))
+        cache:
+          enabled: true
+        health:
+          enabled: true
+          server:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_server_tls.certificate))
+              private_key: ((dns_healthcheck_server_tls.private_key))
+          client:
+            tls:
+              ca: ((dns_healthcheck_tls_ca.certificate))
+              certificate: ((dns_healthcheck_client_tls.certificate))
+              private_key: ((dns_healthcheck_client_tls.private_key))
+      release: bosh-dns
+    name: bosh-dns-windows2016
+- type: replace
+  path: /releases/-
+  value:
+    name: bosh-dns
+    sha1: bb7f1cf29c4186fdba4a049fb6feb5638227d9a4
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-release?v=1.6.0
+    version: 1.6.0
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_api_tls_ca
+    options:
+      common_name: dnsApiTlsCa
+      is_ca: true
+    type: certificate
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_api_client_tls
+    options:
+      ca: dns_api_tls_ca
+      common_name: api.bosh-dns
+      extended_key_usage:
+      - client_auth
+    type: certificate
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_api_server_tls
+    options:
+      ca: dns_api_tls_ca
+      common_name: api.bosh-dns
+      extended_key_usage:
+      - server_auth
+    type: certificate
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_healthcheck_tls_ca
+    type: certificate
+    options:
+      common_name: dnsHealthCheckTlsCa
+      is_ca: true
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_healthcheck_server_tls
+    type: certificate
+    options:
+      ca: dns_healthcheck_tls_ca
+      common_name: health.bosh-dns
+      extended_key_usage:
+      - server_auth
+- type: replace
+  path: /variables/-
+  value:
+    name: dns_healthcheck_client_tls
+    type: certificate
+    options:
+      ca: dns_healthcheck_tls_ca
+      common_name: health.bosh-dns
+      extended_key_usage:
+      - client_auth
