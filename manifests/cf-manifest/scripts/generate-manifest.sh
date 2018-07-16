@@ -40,6 +40,7 @@ bosh interpolate \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-external-blobstore.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-s3-blobstore.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-external-dbs.yml" \
+  --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-bosh-dns.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/stop-skipping-tls-validation.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/enable-uniq-consul-node-name.yml" \
   ${opsfile_args} \
