@@ -43,9 +43,12 @@ bosh interpolate \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-external-dbs.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/stop-skipping-tls-validation.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/enable-uniq-consul-node-name.yml" \
+  --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-bosh-dns-for-containers.yml" \
+  --ops-file="${CF_DEPLOYMENT_DIR}/operations/enable-service-discovery.yml" \
   ${opsfile_args} \
   --ops-file="${WORKDIR}/vpc-peering-opsfile/vpc-peers.yml" \
   --ops-file="${datadog_opsfile}" \
   --ops-file="${oauth_opsfile}" \
   "$@" \
   "${CF_DEPLOYMENT_DIR}/cf-deployment.yml"
+
