@@ -11,10 +11,8 @@
       properties:
         aliases:
           _.cell.service.cf.internal:
-          - _.diego-cell.cf.((environment)).bosh
-          - _.windows-cell.cf.((environment)).bosh
-          - _.windows2016-cell.cf.((environment)).bosh
-          - _.isolated-diego-cell.cf.((environment)).bosh
+          - _.diego-cell.cell.((environment)).bosh
+          - _.isolated-diego-cell.cell.((environment)).bosh
           auctioneer.service.cf.internal:
           - '*.scheduler.cf.((environment)).bosh'
           bbs.service.cf.internal:
@@ -37,7 +35,7 @@
           file-server.service.cf.internal:
           - '*.api.cf.((environment)).bosh'
           gorouter.service.cf.internal:
-          - '*.router.cf.((environment)).bosh'
+          - '*.router.router.((environment)).bosh'
           locket.service.cf.internal:
           - '*.diego-api.cf.((environment)).bosh'
           loggregator-trafficcontroller.service.cf.internal:
