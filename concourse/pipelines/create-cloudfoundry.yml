@@ -351,7 +351,10 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-billing
-      tag_filter: v0.37.0
+      #FIXME: replace this with `tag_filter: vx.xx.x` from
+      # https://concourse.build.ci.cloudpipeline.digital/teams/main/pipelines/paas-billing/jobs/tag-releases
+      # after the merge of https://github.com/alphagov/paas-billing/pull/45
+      branch: wip-orgs-spaces-collection
 
   - name: paas-accounts
     type: git
