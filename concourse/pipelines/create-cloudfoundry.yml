@@ -2838,7 +2838,6 @@ jobs:
             passed: ['post-deploy']
           - get: cf-vars-store
             passed: ['post-deploy']
-          - get: cf-acceptance-tests
           - get: paas-admin
             passed: ['post-deploy']
 

@@ -33,6 +33,7 @@ func main() {
 	http.HandleFunc("/print-headers", printHeaders)
 	http.HandleFunc("/body-size", bodySize)
 	http.HandleFunc("/header-size", headerSize)
+	http.HandleFunc("/big-body", bigBody)
 	http.HandleFunc("/big-header", bigHeader)
 	http.HandleFunc("/egress", egress)
 	http.HandleFunc("/slow-response", slowResponse)
@@ -71,6 +72,16 @@ func bodySize(w http.ResponseWriter, r *http.Request) {
 func headerSize(w http.ResponseWriter, r *http.Request) {
 	header := r.Header.Get("test-header")
 	w.Write([]byte(fmt.Sprintf("%d", len(header))))
+}
+
+func bigBody(w http.ResponseWriter, r *http.Request) {
+	bodySize, err := strconv.Atoi(r.URL.Query().Get("size"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Write([]byte(randStringBytes(bodySize * int(KILOBYTE))))
 }
 
 func bigHeader(w http.ResponseWriter, r *http.Request) {
