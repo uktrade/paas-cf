@@ -2,18 +2,23 @@
 
 
 [[projects]]
+  digest = "1:69d807ed8672819ca2c3d455f0b02b8594072a127217f4590c8f122c679960e2"
   name = "github.com/PuerkitoBio/goquery"
   packages = ["."]
+  pruneopts = "UT"
   revision = "e1271ee34c6a305e38566ecd27ae374944907ee9"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:2d800b1befbccbbb7ef6f3ce5beec21a48047aed0266e2fccda70bc50f32824c"
   name = "github.com/andybalholm/cascadia"
   packages = ["."]
+  pruneopts = "UT"
   revision = "349dd0209470eabd9514242c688c403c0926d266"
 
 [[projects]]
+  digest = "1:b71bfb9b71897960e0cca301e73cbbb7a349b505ba43544b21760f8b7cfa78d8"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -40,22 +45,28 @@
     "private/protocol/xml/xmlutil",
     "private/waiter",
     "service/s3",
-    "service/sts"
+    "service/sts",
   ]
+  pruneopts = "UT"
   revision = "6c577e9e7b08a6d10bad1c9703227cd0403a8dd7"
   version = "v1.4.22"
 
 [[projects]]
+  digest = "1:1afeb4b89147a1756809ca00966c6540b425fa158b16c89d966e41f68a0a5034"
   name = "github.com/bmizerany/pat"
   packages = ["."]
+  pruneopts = "UT"
   revision = "c068ca2f0aacee5ac3681d68e4d0a003b7d1fd2c"
 
 [[projects]]
+  digest = "1:90b968eac96201fa665660e17db8c19f7c5560299c9f1dee1f1742d663fe5ad5"
   name = "github.com/cloudfoundry-community/go-cfclient"
   packages = ["."]
+  pruneopts = "UT"
   revision = "dbe382d68b57a2345f60b71935eb6e8cfa7e5895"
 
 [[projects]]
+  digest = "1:e45a9020631679b8da9501caa87c08d429cb13329a2640c89339d5515fdde060"
   name = "github.com/cloudfoundry-incubator/cf-test-helpers"
   packages = [
     "cf",
@@ -68,69 +79,89 @@
     "internal",
     "silentcommandstarter",
     "workflowhelpers",
-    "workflowhelpers/internal"
+    "workflowhelpers/internal",
   ]
+  pruneopts = "UT"
   revision = "dc453294914947b630c176d5a38923854d62bf83"
 
 [[projects]]
+  digest = "1:28c8da34b529691ca33b1dd18bba29ed2fb9f738e8bed7f086672df57ff91268"
   name = "github.com/cloudfoundry/cf-acceptance-tests"
   packages = [
     "helpers/config",
-    "helpers/validationerrors"
+    "helpers/validationerrors",
   ]
+  pruneopts = "UT"
   revision = "d2cb3b538b87c96266e030004c43a59ea3b96a5a"
 
 [[projects]]
+  digest = "1:b89dde64c895863ed3dfced8cfce9a66bb6088f1aa5cf4562a3b69b7e5a3e3f1"
   name = "github.com/concourse/atc"
   packages = [
     ".",
-    "event"
+    "event",
   ]
+  pruneopts = "UT"
   revision = "406261dbd7681e0ed1c8de6366994a4e935e0b55"
 
 [[projects]]
+  digest = "1:98bb4e8381609531db12dfded821a7b7776a13d94324316f673375957e6ff66f"
   name = "github.com/concourse/go-concourse"
   packages = [
     "concourse",
     "concourse/eventstream",
-    "concourse/internal"
+    "concourse/internal",
   ]
+  pruneopts = "UT"
   revision = "b260442fef033f8d10163306d5387fdef5547fd2"
 
 [[projects]]
+  digest = "1:a45a0da7e6debef32e16b9ffcf2593e980fbe8d2ee26942a806c32ffdcd45d69"
   name = "github.com/go-ini/ini"
   packages = ["."]
+  pruneopts = "UT"
   revision = "5b3e00af70a9484542169a976dcab8d03e601a17"
   version = "v1.30.0"
 
 [[projects]]
+  digest = "1:043b515f91437b5fa747a5c8350915a79bd998ae36ef2a95df753f3b239f0375"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "UT"
   revision = "3852dcfda249c2097355a6aabb199a28d97b30df"
 
 [[projects]]
   branch = "master"
+  digest = "1:07671f8997086ed115824d1974507d2b147d1e0463675ea5dbf3be89b1c2c563"
   name = "github.com/hashicorp/errwrap"
   packages = ["."]
+  pruneopts = "UT"
   revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
 
 [[projects]]
+  digest = "1:d34360ed65beae7aba66ea116f31e1e3aaae9dc18ff2300a14dfd14a906d8622"
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
+  pruneopts = "UT"
   revision = "8c5f0ad9360406a3807ce7de6bc73269a91a6e51"
 
 [[projects]]
+  digest = "1:b87714e57a511d88f307aba7d5b63522da12bed0a050889c81272fc50f71100e"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
+  pruneopts = "UT"
   revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
   version = "0.2.2"
 
 [[projects]]
+  digest = "1:922a47edb4c9b30c8d1e55ececa4fc35c791cccfac6b810c5155fc3a65751597"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
+  pruneopts = "UT"
   revision = "281073eb9eb092240d33ef253c404f1cca550309"
 
 [[projects]]
+  digest = "1:f4cbb10407f60c0263738e7b219b80ba99516aa9da187f44680d5b29360b3c9f"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -150,12 +181,14 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types"
+    "types",
   ]
+  pruneopts = "UT"
   revision = "9eda700730cba42af70d53180f9dcce9266bc2bc"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:d8fc675257c2872fd3257f91f3157df4cf0b7b75f71457554efa4741b4f1b6ef"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -172,47 +205,61 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types"
+    "types",
   ]
+  pruneopts = "UT"
   revision = "c893efa28eb45626cdaa76c9f653b62488858837"
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:e8fcad58263a7511225a674d9c23b9c55aa2f8616e2dab59f184a516f55c6566"
   name = "github.com/peterhellberg/link"
   packages = ["."]
+  pruneopts = "UT"
   revision = "d1cebc7ea14a5fc0de7cb4a45acae773161642c6"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = "UT"
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:383e656d30a7bd2c663514940748c189307134c65ec8c7b2070ed01abb93e73d"
   name = "github.com/streadway/quantile"
   packages = ["."]
+  pruneopts = "UT"
   revision = "b0c588724d25ae13f5afb3d90efec0edc636432b"
 
 [[projects]]
+  digest = "1:fb98adcc593cddf3f937901eb95a5e98d751818b044632ac577c704c06c60caa"
   name = "github.com/tedsuo/rata"
   packages = ["."]
+  pruneopts = "UT"
   revision = "b15ebd8bd97ae9202eb00c076d59b2f2824bce37"
 
 [[projects]]
+  digest = "1:c03a197b97eae238b5295cfb2f33bb410be0d97ede25a41b910f3666e70f1cbc"
   name = "github.com/tsenart/vegeta"
   packages = ["lib"]
+  pruneopts = "UT"
   revision = "9f28db162ce19bb52817af4fd9b5801b1f2772c5"
   version = "v6.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:25253213243fe3cf02abf5820334bc5ba13a6a743480f1c5f80c2611d6ece9df"
   name = "github.com/vito/go-sse"
   packages = ["sse"]
+  pruneopts = "UT"
   revision = "fd69d275caac5d78d793e77ddbe9bd2001d9b88d"
 
 [[projects]]
+  digest = "1:51734535f82adfe212f771765b7d94d85d9bfcde609fd80d927e9f4a3f03b380"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -221,28 +268,34 @@
     "html/atom",
     "html/charset",
     "http2",
-    "http2/hpack"
+    "http2/hpack",
   ]
+  pruneopts = "UT"
   revision = "af4fee9d05b66edc24197d189e6118f8ebce8c2b"
 
 [[projects]]
   branch = "master"
+  digest = "1:c1bf34af9dfc4a00fdd56562568965ab31e11af4c0674ec3c293268d34dad6ea"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "clientcredentials",
-    "internal"
+    "internal",
   ]
+  pruneopts = "UT"
   revision = "d89af98d7c6bba047c5a2622f36bc14b8766df85"
 
 [[projects]]
   branch = "master"
+  digest = "1:fc6e04d1d2e3d018bb091dd898eff38850cc15eadde575be88a17246d2d9fb68"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "UT"
   revision = "9aade4d3a3b7e6d876cd3823ad20ec45fc035402"
 
 [[projects]]
   branch = "master"
+  digest = "1:597246632ba720e065496dc99e52630635e675d105ea0839dbfd565702a48233"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -261,11 +314,13 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = "UT"
   revision = "bd91bbf73e9a4a801adbfb97133c992678533126"
 
 [[projects]]
+  digest = "1:9cf45e754ab2dff5f53a553e6948b994ff738e4d1092ca608dcada945d8be0ef"
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -274,19 +329,42 @@
     "internal/log",
     "internal/remote_api",
     "internal/urlfetch",
-    "urlfetch"
+    "urlfetch",
   ]
+  pruneopts = "UT"
   revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:858458e1fcdb1cb44ded97c2ae2b610ee9336fdb0a8347ea1ad835e6a1db6c76"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "UT"
   revision = "a83829b6f1293c91addabc89d0571c246397bbf4"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6ca308f4ce5d3c4a42f5bd42809dbf0bce52fee8a6a8867c1adaf03458bd7143"
+  input-imports = [
+    "github.com/PuerkitoBio/goquery",
+    "github.com/aws/aws-sdk-go/aws",
+    "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/s3",
+    "github.com/cloudfoundry-community/go-cfclient",
+    "github.com/cloudfoundry-incubator/cf-test-helpers/cf",
+    "github.com/cloudfoundry-incubator/cf-test-helpers/config",
+    "github.com/cloudfoundry-incubator/cf-test-helpers/generator",
+    "github.com/cloudfoundry-incubator/cf-test-helpers/helpers",
+    "github.com/cloudfoundry-incubator/cf-test-helpers/workflowhelpers",
+    "github.com/cloudfoundry/cf-acceptance-tests/helpers/config",
+    "github.com/concourse/atc",
+    "github.com/concourse/go-concourse/concourse",
+    "github.com/onsi/ginkgo",
+    "github.com/onsi/gomega",
+    "github.com/onsi/gomega/gbytes",
+    "github.com/onsi/gomega/gexec",
+    "github.com/onsi/gomega/ghttp",
+    "github.com/tsenart/vegeta/lib",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
