@@ -96,6 +96,7 @@ module ManifestHelpers
     attr_accessor :cloud_config_with_defaults
     attr_accessor :terraform_fixture
     attr_accessor :cf_secrets_file
+    attr_accessor :prometheus_secrets_file
     attr_accessor :vars_store
   end
 
@@ -165,6 +166,16 @@ module ManifestHelpers
     )
   end
 
+  def manifest_for_prometheus
+    render_manifest_with_vars_store(
+      environment: "dev",
+      bosh_url: "http://test.example.com",
+      bosh_password: "123456",
+      system_dns_zone_name: "testing.example.com",
+      cf_deployment_name: "testing",
+    )
+  end
+
   def cf_deployment_manifest
     Cache.instance.cf_deployment_manifest ||= YAML.load_file(root.join('manifests/cf-deployment/cf-deployment.yml'))
   end
@@ -181,6 +192,11 @@ module ManifestHelpers
   def cf_secrets_file
     Cache.instance.cf_secrets_file ||= generate_cf_secrets
     Cache.instance.cf_secrets_file.path
+  end
+
+  def prometheus_secrets_file
+    Cache.instance.prometheus_secrets_file ||= generate_prometheus_secrets
+    Cache.instance.prometheus_secrets_file.path
   end
 
   def property_tree(tree)
@@ -295,6 +311,32 @@ private
     }
   end
 
+  def render_prometheus_manifest(
+    environment:,
+    extra_args:,
+    env_specific_manifest: "default"
+  )
+    generate_prometheus_secrets
+    copy_monitor_cf
+    copy_cf_route_registrar
+    copy_monitor_bosh
+
+    env = {
+    environment: environment,
+      'PAAS_CF_DIR' => root.to_s,
+      'WORKDIR' => workdir,
+      'BOSH_URL' => bosh_url,
+      'bosh_password' => bosh_password,
+      'SYSTEM_DNS_ZONE_NAME' => system_dns_zone_name,
+      'CF_DEPLOYMENT_NAME' => cf_deployment_name,
+    }
+    args = ["#{root}/manifests/cf-manifest/scripts/generate-prometheus-manifest.sh"] + extra_args
+    output, error, status = Open3.capture3(env, args.join(' '))
+    expect(status).to be_success, "generate-prometheus-manifest.sh exited #{status.exitstatus}, stderr:\n#{error}"
+
+    deep_freeze(PropertyTree.load_yaml(output))
+  end
+
   def copy_logit_fixtures
     dir = workdir + '/logit-secrets'
     FileUtils.mkdir(dir) unless Dir.exist?(dir)
@@ -336,6 +378,33 @@ private
     )
   end
 
+  def copy_monitor_cf
+    dir = workdir + '/prometheus-boshrelease/manifests/operators'
+    FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+    FileUtils.cp(
+      root.join("manifests/shared/spec/fixtures/monitor-cf.yml"),
+      "#{dir}/monitor-cf.yml",
+    )
+  end
+
+  def copy_cf_route_registrar
+    dir = workdir + '/prometheus-boshrelease/manifests/operators'
+    FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+    FileUtils.cp(
+      root.join("manifests/shared/spec/fixtures/enable-cf-route-registrar.yml"),
+      "#{dir}/enable-cf-route-registrar.yml",
+    )
+  end
+
+  def copy_monitor_bosh
+    dir = workdir + '/prometheus-boshrelease/manifests/operators'
+    FileUtils.mkdir_p(dir) unless Dir.exist?(dir)
+    FileUtils.cp(
+      root.join("manifests/shared/spec/fixtures/monitor-bosh.yml"),
+      "#{dir}/monitor-bosh.yml",
+    )
+  end
+
   def load_terraform_fixture
     data = YAML.load_file(root.join("manifests/shared/spec/fixtures/terraform/cf.yml"))
     deep_freeze(data)
@@ -348,6 +417,20 @@ private
     output, error, status = Open3.capture3(File.expand_path("../../../scripts/generate-cf-secrets.rb", __FILE__))
     unless status.success?
       raise "Error generating cf-secrets, exit: #{status.exitstatus}, output:\n#{output}\n#{error}"
+    end
+    file.write(output)
+    file.flush
+    file.rewind
+    file
+  end
+
+  def generate_prometheus_secrets
+    dir = workdir + '/prometheus-secrets'
+    FileUtils.mkdir(dir) unless Dir.exist?(dir)
+    file = File::open("#{dir}/prometheus-vars-store.yml", 'w')
+    output, error, status = Open3.capture3(File.expand_path("../../../scripts/generate-prometheus-secrets.rb", __FILE__))
+    unless status.success?
+      raise "Error generating prometheus-secrets, exit: #{status.exitstatus}, output:\n#{output}\n#{error}"
     end
     file.write(output)
     file.flush
