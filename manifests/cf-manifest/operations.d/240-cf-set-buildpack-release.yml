@@ -20,9 +20,15 @@
   path: /releases/name=go-buildpack
   value:
     name: go-buildpack
-    url: https://bosh.io/d/github.com/cloudfoundry/go-buildpack-release?v=1.8.26
-    version: 1.8.26
-    sha1: 2a11862007592ba34e768e7b9544a9698de59a17
+    url: https://bosh.io/d/github.com/cloudfoundry/go-buildpack-release?v=1.8.25
+    version: 1.8.25
+    sha1: 086c1a8eb48c5ce23dbbb45b6284a354d6617d92
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/install_buildpacks/name=go_buildpack
+  value:
+    name: go_buildpack
+    package: go-buildpack
 
 - type: replace
   path: /releases/name=java-buildpack
