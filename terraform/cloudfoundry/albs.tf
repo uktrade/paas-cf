@@ -63,6 +63,11 @@ resource "aws_lb_listener" "cf_router_apps_listener_443" {
   }
 }
 
+resource "aws_lb_listener_certificate" "cf_router_system" {
+  listener_arn    = "${aws_lb_listener.cf_router_apps_listener_443.arn}"
+  certificate_arn = "${data.aws_acm_certificate.system.arn}"
+}
+
 resource "aws_lb_listener" "cf_router_listener_80" {
   load_balancer_arn = "${aws_lb.cf_router_alb.arn}"
   port              = "80"
