@@ -74,6 +74,10 @@ output "cf_ssh_proxy_elb_name" {
   value = "${aws_elb.ssh_proxy.name}"
 }
 
+output "cf_router_lb_target_group_name" {
+  value = "${aws_lb_target_group.cf_router.name}"
+}
+
 output "aws_backing_service_cidr_all" {
   value = "${var.aws_backing_service_cidr_all}"
 }

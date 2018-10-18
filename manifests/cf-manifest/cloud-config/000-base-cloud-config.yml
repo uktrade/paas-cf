@@ -209,6 +209,8 @@ vm_types:
     elbs:
     - ((terraform_outputs_cf_router_elb_name))
     - ((terraform_outputs_cf_router_system_domain_elb_name))
+    lb_target_groups:
+    - ((terraform_outputs_cf_router_lb_target_group_name))
 
 - name: cell
   network: cell
