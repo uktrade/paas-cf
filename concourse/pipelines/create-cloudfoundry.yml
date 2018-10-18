@@ -928,7 +928,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/terraform
-              tag: f810666094e6c65eeb183f9833b231aa24df6811
+              tag: upgrade-terraform-160625947-manually-built
           inputs:
             - name: terraform-variables
             - name: paas-cf
@@ -2333,7 +2333,7 @@ jobs:
             type: docker-image
             source:
               repository: governmentpaas/terraform
-              tag: f810666094e6c65eeb183f9833b231aa24df6811
+              tag: upgrade-terraform-160625947-manually-built
           inputs:
             - name: datadog-tfstate
             - name: paas-cf
