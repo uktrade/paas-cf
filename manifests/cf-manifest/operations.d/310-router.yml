@@ -40,12 +40,9 @@
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/drain_wait?
   value: 120
 
-- type: remove
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_pem
-
 - type: replace
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/enable_ssl
-  value: false
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_port?
+  value: 8443
 
 - type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/status/user

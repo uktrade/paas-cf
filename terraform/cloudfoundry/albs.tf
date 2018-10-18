@@ -17,14 +17,8 @@ resource "aws_lb" "cf_router_alb" {
 
 resource "aws_lb_target_group" "cf_router" {
   name     = "${var.env}-cf-router-target-group"
-  # FIXME: do SSL to gorouter. To do that we need to setup the
-  # Go Router to enable the HTTPS endpoint, but also change the tls_port
-  # to avoid conflicts with haproxy.
-  # tls_port cannot be changed until the latest version of routing_release
-  #port     = "8443"
-  #protocol = "HTTPS"
-  port     = "80"
-  protocol = "HTTP"
+  port     = "8443"
+  protocol = "HTTPS"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
