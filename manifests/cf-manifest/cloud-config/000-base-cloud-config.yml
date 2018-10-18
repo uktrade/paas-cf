@@ -259,6 +259,8 @@ vm_extensions:
   cloud_properties:
     elbs:
     - ((terraform_outputs_cf_doppler_elb_name))
+    lb_target_groups:
+    - ((terraform_outputs_cf_doppler_lb_target_group_name))
 
 - name: ssh_proxy_elb
   cloud_properties:

@@ -39,6 +39,24 @@ resource "aws_lb_target_group" "cf_router" {
   }
 }
 
+resource "aws_lb_target_group" "cf_doppler" {
+  name     = "${var.env}-cf-doppler-target-group"
+  port     = "8081"
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    protocol            = "HTTP"
+    port                = "8081"
+    path                = "/"
+    matcher             = "404" # FIXME
+    interval            = "${var.health_check_interval}"
+    timeout             = "${var.health_check_timeout}"
+    healthy_threshold   = "${var.health_check_healthy}"
+    unhealthy_threshold = "${var.health_check_unhealthy}"
+  }
+}
+
 resource "aws_lb_ssl_negotiation_policy" "cf_router_alb" {
   name          = "paas-${var.default_elb_security_policy}"
   load_balancer = "${aws_lb.cf_router_alb.name}"
@@ -60,6 +78,21 @@ resource "aws_lb_listener" "cf_router_apps_listener_443" {
   default_action {
     type             = "forward"
     target_group_arn = "${aws_lb_target_group.cf_router.arn}"
+  }
+}
+
+resource "aws_lb_listener_rule" "cf_doppler" {
+  listener_arn = "${aws_lb_listener.cf_router_apps_listener_443.arn}"
+  priority     = 99
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.cf_doppler.arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["doppler.${var.system_dns_zone_name}"]
   }
 }
 

@@ -78,6 +78,10 @@ output "cf_router_lb_target_group_name" {
   value = "${aws_lb_target_group.cf_router.name}"
 }
 
+output "cf_doppler_lb_target_group_name" {
+  value = "${aws_lb_target_group.cf_doppler.name}"
+}
+
 output "aws_backing_service_cidr_all" {
   value = "${var.aws_backing_service_cidr_all}"
 }
