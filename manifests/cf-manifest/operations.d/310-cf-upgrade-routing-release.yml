@@ -1,0 +1,10 @@
+---
+
+- type: replace
+  path: /releases/name=routing
+  value:
+    name: "routing"
+    version: "0.182.0+dev.4"
+    url: "https://github.com/alphagov/routing-release/releases/download/hsts/routing-hsts.tgz"
+    sha1: "4c7aca5d9a118eddbfe5f9c4fb0374c84ee03b2c"
+
