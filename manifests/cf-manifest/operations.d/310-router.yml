@@ -45,6 +45,10 @@
   value: 8443
 
 - type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/strict_transport_security_header?
+  value: max-age=31536000; includeSubDomains; preload
+
+- type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/status/user
   value: router_user
 
