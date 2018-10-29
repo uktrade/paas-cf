@@ -1011,6 +1011,8 @@ jobs:
           - get: cf-tfstate
             passed: ['cf-terraform']
           - get: logit-secrets
+          - get: bosh-CA-crt
+          - get: bosh-secrets
 
       - aggregate:
         - task: extract-terraform-outputs
@@ -1166,6 +1168,47 @@ jobs:
             - put: cf-vars-store
               params:
                 file: cf-vars-store-updated/cf-vars-store.yml
+
+        - task: import-cf-vars-store-to-credhub
+          config:
+            platform: linux
+            image_resource:
+              type: docker-image
+              source:
+                repository: keymon/credhub-with-ruby
+            inputs:
+              - name: cf-manifest-pre-vars
+              - name: cf-vars-store-updated
+              - name: paas-cf
+              - name: bosh-secrets
+              - name: bosh-CA-crt
+            params:
+              SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
+              CREDHUB_CA_CERT: bosh-CA-crt/bosh-CA.crt
+              CREDHUB_SERVER: https://bosh.((system_dns_zone_name)):8844/api
+              CREDHUB_CLIENT: credhub-admin
+              BOSH_DEPLOYMENT: ((deploy_env))
+            run:
+              path: sh
+              args:
+                - -e
+                - -u
+                - -c
+                - |
+                  VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+
+                  CREDHUB_SECRET="$($VAL_FROM_YAML secrets.bosh_credhub_admin_client_password bosh-secrets/bosh-secrets.yml)"
+                  export CREDHUB_SECRET
+
+                  credhub login
+
+                  ./paas-cf/concourse/scripts/vars-store-to-credhub.rb \
+                    cf-manifest-pre-vars/cf-manifest-pre-vars.yml \
+                    cf-vars-store-updated/cf-vars-store.yml \
+                    "/${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}" \
+                      > import-credhub.yml
+
+                  credhub import -f import-credhub.yml > /dev/null
 
   - name: cf-deploy
     serial_groups: [cf-deploy]
