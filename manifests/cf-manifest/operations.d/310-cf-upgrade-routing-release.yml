@@ -1,0 +1,10 @@
+---
+
+- type: replace
+  path: /releases/name=routing
+  value:
+    name: "routing"
+    version: "0.182.0+dev.6"
+    url: "https://github.com/alphagov/paas-routing-release/releases/download/hsts/routing-release-http-rewrite.tgz"
+    sha1: "c36112871863b1f8fc8a6bacac29507ceb4fd873"
+

@@ -48,6 +48,16 @@
   value: false
 
 - type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/http_rewrite?
+  value:
+    responses:
+      add_headers_if_not_present:
+      - name: "Strict-Transport-Security"
+        value: "max-age=31536000; includeSubDomains; preload"
+      remove_headers:
+      - name: "X-Vcap-Request-Id"
+
+- type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/status/user
   value: router_user
 
