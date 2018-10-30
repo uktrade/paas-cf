@@ -621,7 +621,8 @@ jobs:
                   exit 0
                 fi
 
-                CF_PASS=$(awk '/cf_admin_password/ {print $2}' cf-vars-store/cf-vars-store.yml | tr -d '"')
+                CF_PASS=((cf_admin_password))
+                echo "FIXME: ${CF_PASS}"
                 API_ENDPOINT="https://api.${SYSTEM_DNS_ZONE_NAME}"
                 PIPELINE_TRIGGER_VERSION=$(cat pipeline-trigger/number)
 
