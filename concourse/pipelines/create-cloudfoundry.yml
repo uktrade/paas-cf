@@ -1230,7 +1230,8 @@ jobs:
                 - -e
                 - -u
                 - -c
-                - -o pipefail
+                - -o
+                - pipefail
                 - |
                   VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
 
@@ -1251,7 +1252,7 @@ jobs:
                       /${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}/secrets_paas_accounts_admin_password \
                       /${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}/uaa_admin_client_secret \
                       /${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}/uaa_clients_paas_admin_secret \
-                  > import.yml 
+                  > import.yml
 
                   credhub import -f import.yml
                   rm import.yml
