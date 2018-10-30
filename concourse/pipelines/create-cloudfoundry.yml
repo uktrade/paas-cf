@@ -1245,7 +1245,10 @@ jobs:
                   credhub export -p "/${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}" | \
                     ./paas-cf/concourse/scripts/filter-rename-credhub-export.rb \
                       "/${BOSH_DEPLOYMENT}/${BOSH_DEPLOYMENT}/:/concourse/main/" \
-                      /hector/hector/cf_admin_password
+                      /hector/hector/cf_admin_password > import.yml
+
+                  credhub import -f import.yml
+                  rm import.yml
 
   - name: cf-deploy
     serial_groups: [cf-deploy]
