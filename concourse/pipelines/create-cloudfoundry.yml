@@ -607,6 +607,7 @@ jobs:
           params:
             SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
             CF_ADMIN: admin
+            CF_PASS: ((cf_admin_password))
           image_resource: *cf-cli-image-resource
           run:
             path: sh
@@ -614,15 +615,17 @@ jobs:
               - -e
               - -u
               - -c
+              - -x
               - |
+                echo "FIXME: ${CF_PASS}"
+                echo "CF_PASS: ((cf_admin_password))"
+
                 HEALTHCHECK_DEPLOYED=$(cat deployed-healthcheck/healthcheck-deployed)
                 if [ "${HEALTHCHECK_DEPLOYED}" = "no" ]; then
                   echo "Skipping wait-for-app-availability-tests because the healthcheck is not deployed"
                   exit 0
                 fi
 
-                CF_PASS=((cf_admin_password))
-                echo "FIXME: ${CF_PASS}"
                 API_ENDPOINT="https://api.${SYSTEM_DNS_ZONE_NAME}"
                 PIPELINE_TRIGGER_VERSION=$(cat pipeline-trigger/number)
 
