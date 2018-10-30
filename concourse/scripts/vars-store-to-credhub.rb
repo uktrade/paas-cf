@@ -22,9 +22,18 @@ prefix = ARGV[2]
 result = {
   'credentials' => manifest['variables'].reduce([]) { |accum, c|
     if existing_secrets[c['name']]
-      c['value'] = existing_secrets[c['name']]
-      c['name'] = prefix + '/' + c['name']
-      accum << c
+      new_entry = {
+        'name' => prefix + '/' + c['name'],
+        'type' => c['type'],
+        'value'=> existing_secrets[c['name']],
+      }
+      if c['options'] and c['options']['ca']
+        new_entry['value'].delete('ca')
+        new_entry['value']['ca_name'] = prefix + '/' + c['options']['ca']
+      end
+      new_entry['value'].delete('public_key_fingerprint')
+      new_entry['value'].delete('password_hash')
+      accum << new_entry
     end
     accum
   }
