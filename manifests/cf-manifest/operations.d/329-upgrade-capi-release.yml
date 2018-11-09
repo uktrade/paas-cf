@@ -1,0 +1,10 @@
+---
+
+- type: replace
+  path: /releases/name=capi
+  value:
+    name: capi
+    url: https://github.com/keymon/capi-release/releases/download/1.71.0/capi-release-with-sleep.tgz
+    version: 1.71.0+dev.1
+    sha1: 461d9dd202ca474a606edd866f7483909411b4a3
+
