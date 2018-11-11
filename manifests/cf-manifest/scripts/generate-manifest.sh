@@ -47,6 +47,7 @@ bosh interpolate \
   --vars-file="${PAAS_CF_DIR}/manifests/variables.yml" \
   --vars-file="${CF_ENV_SPECIFIC_MANIFEST}" \
   --vars-file="${WORKDIR}/environment-variables.yml" \
+  --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-compiled-releases.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/rename-network-and-deployment.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/aws.yml" \
   --ops-file="${CF_DEPLOYMENT_DIR}/operations/use-external-blobstore.yml" \
