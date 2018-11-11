@@ -1,9 +1,0 @@
----
-
-- type: replace
-  path: /releases/name=capi
-  value:
-    name: "capi"
-    version: "1.71.0+dev.2"
-    url: "https://github.com/keymon/capi-release/releases/download/1.71.0/capi-release.tgz"
-    sha1: "e89785b89b29cb0195bdc0ecc9fe21f4227305dc"
