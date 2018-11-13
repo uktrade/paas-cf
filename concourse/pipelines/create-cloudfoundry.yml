@@ -15,7 +15,7 @@ meta:
       type: docker-image
       source:
         repository: governmentpaas/cf-acceptance-tests
-        tag: 51c4648c56a18e28a295e73963b65fdbfe76e52f
+        tag: 987345becb5d67347cf32deae0d0e0d143a0e652
     cf-cli: &cf-cli-image-resource
       type: docker-image
       source:
