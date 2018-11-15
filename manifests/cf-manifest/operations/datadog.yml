@@ -4,9 +4,9 @@
   path: /releases/-
   value:
     name: datadog-agent
-    version: 0.1.5
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/datadog-agent-0.1.5.tgz
-    sha1: 573bed2ab7960eb97dafff4b7c6111e7ad72b39c
+    version: 0.0.1542245592
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/datadog-agent-0.0.1542245592.tgz
+    sha1: e56c209bc2d325f7969c5b27963d7f004d5b5672
 
 - type: replace
   path: /addons/-
