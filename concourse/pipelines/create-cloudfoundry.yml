@@ -2738,6 +2738,44 @@ jobs:
               paas-cf/concourse/scripts/tag_release.sh \
                 "${OUTPUT_TAG_PREFIX}" "${aws_account}" "${deploy_env}" "${INPUT_TAG_PREFIX}"
 
+      - task: repoint-and-retriger-branch
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: governmentpaas/self-update-pipelines
+              tag: 0eff5b6a9c092f865a2b19cc4e75a3b539b82fa2
+          inputs:
+            - name: paas-cf
+          params:
+            DEPLOY_ENV: ((deploy_env))
+            BRANCH: ((branch_name))
+            MAKEFILE_ENV_TARGET: ((makefile_env_target))
+            AWS_DEFAULT_REGION: ((aws_region))
+            SELF_UPDATE_PIPELINE: ((self_update_pipeline))
+            PIPELINES_TO_UPDATE: ((pipeline_name))
+            BOSH_AZ: ((bosh_az))
+            SKIP_AWS_CREDENTIAL_VALIDATION: true
+            ENABLE_DATADOG: ((enable_datadog))
+            NEW_ACCOUNT_EMAIL_ADDRESS: ((NEW_ACCOUNT_EMAIL_ADDRESS))
+            SLIM_DEV_DEPLOYMENT: ((slim_dev_deployment))
+          run:
+            path: bash
+            args:
+            - -e
+            - -u
+            - -c
+            - |
+              if [ "$BRANCH" == "hector-wip" ]; then
+                export BRANCH=hector-wip-2
+              else
+                export BRANCH=hector-wip
+              fi
+
+              make -C ./paas-cf "${MAKEFILE_ENV_TARGET}" pipelines
+              make -C ./paas-cf "${MAKEFILE_ENV_TARGET}" trigger-deploy
+
   - name: pipeline-unlock
     serial: true
     plan:
