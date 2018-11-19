@@ -50,7 +50,6 @@ groups:
       - cf-deploy
       - prometheus-deploy
       - smoke-tests
-      - performance-tests
       - tag-release
       - pipeline-unlock
   - name: operator
@@ -67,7 +66,6 @@ groups:
       - app-availability-tests
       - api-availability-tests
       - smoke-tests
-      - performance-tests
   - name: health
     jobs:
       - continuous-smoke-tests
@@ -191,30 +189,6 @@ resources:
             ]
         }
 
-  - name: datadog-tfstate
-    type: s3-iam
-    source:
-      bucket: ((state_bucket))
-      versioned_file: datadog.tfstate
-      region_name: ((aws_region))
-      initial_version: "-"
-      initial_content_text: |
-        {
-            "version": 3,
-            "terraform_version": "0.11.1",
-            "serial": 0,
-            "modules": [
-                {
-                    "path": [
-                        "root"
-                    ],
-                    "outputs": {},
-                    "resources": {},
-                    "depends_on": []
-                }
-            ]
-        }
-
   - name: cf-secrets
     type: s3-iam
     source:
@@ -270,12 +244,6 @@ resources:
       initial_version: "-"
       initial_content_text: "no"
 
-  - name: cf-acceptance-tests
-    type: git
-    source:
-      uri: https://github.com/cloudfoundry/cf-acceptance-tests
-      branch: cf6.0
-
   - name: cf-smoke-tests-release
     type: git
     source:
@@ -324,30 +292,6 @@ resources:
     type: time
     source:
       interval: 720h
-
-  - name: paas-aiven-broker
-    type: git
-    source:
-      uri: https://github.com/alphagov/paas-aiven-broker
-      tag_filter: v0.10.0
-
-  - name: paas-billing
-    type: git
-    source:
-      uri: https://github.com/alphagov/paas-billing
-      tag_filter: v0.44.0
-
-  - name: paas-accounts
-    type: git
-    source:
-      uri: https://github.com/alphagov/paas-accounts
-      tag_filter: v0.1.0
-
-  - name: paas-admin
-    type: git
-    source:
-      uri: https://github.com/alphagov/paas-admin
-      tag_filter: v0.48.0
 
   - name: prometheus-vars-store
     type: s3-iam
@@ -1099,6 +1043,8 @@ jobs:
             trigger: true
           - get: paas-cf
             passed: ['generate-cf-config']
+          - get: cf-vars-store
+            passed: ['generate-cf-config']
           - get: cloud-config
             passed: ['generate-cf-config']
           - get: cf-manifest
@@ -1116,6 +1062,7 @@ jobs:
               - name: paas-cf
               - name: cf-manifest
               - name: bosh-CA-crt
+              - name: cf-vars-store
             params:
               BOSH_ENVIRONMENT: ((bosh_fqdn))
               BOSH_CA_CERT: bosh-CA-crt/bosh-CA.crt
@@ -1347,10 +1294,10 @@ jobs:
     plan:
       - aggregate:
           - get: pipeline-trigger
-            passed: ['performance-tests']
+            passed: ['cf-deploy','app-availability-tests','api-availability-tests']
             trigger: true
           - get: paas-cf
-            passed: ['performance-tests']
+            passed: ['cf-deploy','app-availability-tests','api-availability-tests']
           - get: git-keys
 
       - put: release-version
