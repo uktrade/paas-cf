@@ -1,8 +1,26 @@
 ---
-region: eu-west-1
-metrics:
- - aws_namespace: AWS/EC2
-   aws_metric_name: CPUCreditBalance
-   aws_dimensions: [InstanceId]
-   aws_statistics: [Average]
+tasks:
+- name: ec2_cloudwatch
+  metrics:
+  - aws_namespace: AWS/EC2
+    aws_metric_name: CPUCreditBalance
+    aws_dimensions: [InstanceId]
+    aws_dimensions_select:
+      InstanceId: [$_target]
+    aws_statistics: [Average]
+
+- name: rds_cloudwatch_not_broker
+  metrics:
+  - aws_namespace: AWS/RDS
+    aws_metric_name: FreeStorageSpace
+    aws_dimensions: [DBInstanceIdentifier]
+    aws_dimensions_select_regex:
+      DBInstanceIdentifier: "^hector-.*"
+    aws_statistics: [Average]
+  - aws_namespace: AWS/RDS
+    aws_metric_name: CPUCreditUsage
+    aws_dimensions: [DBInstanceIdentifier]
+    aws_dimensions_select_regex:
+      DBInstanceIdentifier: "^hector-.*"
+    aws_statistics: [Average]
 
