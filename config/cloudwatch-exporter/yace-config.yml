@@ -1,0 +1,47 @@
+---
+discovery:
+  exportedTagsOnMetrics:
+    ec2:
+      - Name
+      - deployment
+      - director
+      - id
+      - index
+      - instance_group
+      - job
+    rds:
+      - deploy_env
+  jobs:
+  - type: "ec2"
+    region: eu-west-1
+    searchTags:
+      - Key: deployment
+        Value: ^(hector)$
+    metrics:
+      - name: CPUCreditBalance
+        statistics:
+        - Average
+        period: 60
+        length: 600
+      - name: CPUUtilization
+        statistics:
+        - Average
+        period: 60
+        length: 600
+  - type: "rds"
+    region: eu-west-1
+    searchTags:
+      - Key: deploy_env
+        Value: hector
+    metrics:
+      - name: FreeStorageSpace
+        statistics:
+        - Average
+        period: 60
+        length: 600
+      - name: CPUCreditUsage
+        statistics:
+        - Average
+        period: 60
+        length: 600
+

@@ -1,0 +1,8 @@
+---
+region: eu-west-1
+metrics:
+ - aws_namespace: AWS/EC2
+   aws_metric_name: CPUCreditBalance
+   aws_dimensions: [InstanceId]
+   aws_statistics: [Average]
+
