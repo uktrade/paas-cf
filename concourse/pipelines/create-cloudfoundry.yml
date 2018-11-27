@@ -348,7 +348,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-accounts
-      tag_filter: v0.1.0
+      branch: make-api-put-idempotent
 
   - name: paas-admin
     type: git
