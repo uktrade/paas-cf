@@ -40,6 +40,11 @@ resource "aws_lb_ssl_negotiation_policy" "cf_router_system_domain" {
     name  = "Reference-Security-Policy"
     value = "${var.default_elb_security_policy}"
   }
+
+  attribute {
+    name  = "Reference-Security-Policy"
+    value = true
+  }
 }
 
 resource "aws_proxy_protocol_policy" "cf_router_system_domain_haproxy" {
