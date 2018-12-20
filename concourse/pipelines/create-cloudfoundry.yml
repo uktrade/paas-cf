@@ -3338,9 +3338,7 @@ jobs:
         - get: paas-cf
           passed: ['pipeline-lock']
         - get: cf-manifest
-          passed: ['post-deploy']
         - get: cf-vars-store
-          passed: ['post-deploy']
 
       - task: assert-should-run
         config:
