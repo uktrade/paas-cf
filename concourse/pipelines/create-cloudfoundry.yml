@@ -3149,6 +3149,7 @@ jobs:
 
   - name: rotate-cf-admin-password
     serial: true
+    serial_groups: [smoke-tests]
     plan:
     - aggregate:
       - get: paas-cf
@@ -3212,6 +3213,7 @@ jobs:
 
   - name: rotate-cloudfoundry-credentials
     serial: true
+    serial_groups: [smoke-tests]
     plan:
     - aggregate:
       - get: paas-cf
@@ -3555,9 +3557,7 @@ jobs:
         - get: paas-cf
           passed: ['pipeline-lock']
         - get: cf-manifest
-          passed: ['post-deploy']
         - get: cf-vars-store
-          passed: ['post-deploy']
 
       - task: assert-should-run
         config:
