@@ -71,6 +71,7 @@ groups:
       - bump-patch-version
       - pipeline-check-lock
       - pipeline-release-lock
+      - cleanup-deleted-cf-users
   - name: tests
     jobs:
       - app-availability-tests
@@ -3149,6 +3150,7 @@ jobs:
 
   - name: rotate-cf-admin-password
     serial: true
+    serial_groups: [smoke-tests]
     plan:
     - aggregate:
       - get: paas-cf
@@ -3212,6 +3214,7 @@ jobs:
 
   - name: rotate-cloudfoundry-credentials
     serial: true
+    serial_groups: [smoke-tests]
     plan:
     - aggregate:
       - get: paas-cf
@@ -3555,9 +3558,7 @@ jobs:
         - get: paas-cf
           passed: ['pipeline-lock']
         - get: cf-manifest
-          passed: ['post-deploy']
         - get: cf-vars-store
-          passed: ['post-deploy']
 
       - task: assert-should-run
         config:
@@ -3657,3 +3658,57 @@ jobs:
                 EOF
 
                 ./paas-cf/concourse/scripts/check-certificates.rb 30 < ipsec_cert.yml
+
+  - name: cleanup-deleted-cf-users
+    serial: true
+    plan:
+      - aggregate:
+        - get: paas-cf
+        - get: cf-vars-store
+
+      - task: retrieve-config
+        config:
+          platform: linux
+          inputs:
+            - name: paas-cf
+            - name: cf-vars-store
+          outputs:
+            - name: config
+          params:
+            SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
+          image_resource: *ruby-slim-image-resource
+          run:
+            path: sh
+            args:
+              - -e
+              - -c
+              - |
+                VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+
+                cat << EOT > config/config.sh
+                export CF_ADMIN=admin
+                export CF_PASS=$($VAL_FROM_YAML cf_admin_password cf-vars-store/cf-vars-store.yml)
+                export API_ENDPOINT="https://api.${SYSTEM_DNS_ZONE_NAME}"
+                EOT
+
+      - task: cleanup-deleted-cf-users
+        config:
+          platform: linux
+          image_resource: *cf-cli-image-resource
+          inputs:
+            - name: paas-cf
+            - name: config
+          params:
+            DEPLOY_ENV: ((deploy_env))
+            AWS_ACCOUNT: ((aws_account))
+            DISABLE_PIPELINE_LOCKING: ((disable_pipeline_locking))
+          run:
+            path: sh
+            args:
+            - -e
+            - -c
+            - |
+              . ./config/config.sh
+              echo | cf login -a "${API_ENDPOINT}" -u "${CF_ADMIN}" -p "${CF_PASS}"
+
+              ./paas-cf/scripts/cleanup-deleted-cf-users.sh --delete
