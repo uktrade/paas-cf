@@ -143,3 +143,24 @@ resource "aws_security_group" "service_brokers" {
     create_before_destroy = true
   }
 }
+
+resource "aws_security_group" "ci-cd_broker" {
+  name_prefix = "${var.env}-ci-cd-"
+  description = "Group for ci-cd brokers"
+  vpc_id      = "${var.vpc_id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "${var.env}-ci-cd-brokers"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}

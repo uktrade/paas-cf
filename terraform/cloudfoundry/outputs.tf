@@ -192,3 +192,13 @@ output "yace_aws_secret_access_key" {
   sensitive = true
   value     = "${aws_iam_access_key.yace.secret}"
 }
+
+output "cicd_aws_access_key_id" {
+  sensitive = true
+  value     = "${aws_iam_access_key.ci-cd_broker.id}"
+}
+
+output "cicd_aws_secret_access_key" {
+  sensitive = true
+  value     = "${aws_iam_access_key.ci-cd_broker.secret}"
+}
