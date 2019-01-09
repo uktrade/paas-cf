@@ -1,0 +1,13 @@
+---
+
+- type: replace
+  path: /vm_extensions/-
+  value:
+    name: ci_cd_broker
+    cloud_properties:
+      iam_instance_profile: ci-cd-broker
+      security_groups:
+      - ((terraform_outputs_ci_cd_broker_security_group))
+      - ((terraform_outputs_default_security_group))
+      elbs:
+      - ((terraform_outputs_ci_cd_broker_elb_name))

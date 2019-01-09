@@ -1,25 +1,10 @@
-resource "aws_iam_user" "ci-cd_broker" {
-  name = "ci-cd-broker-${var.env}"
-
-  force_destroy = true
-}
-
-resource "aws_iam_user_group_membership" "ci-cd_broker" {
-  user   = "${aws_iam_user.ci-cd_broker.name}"
-  groups = ["ci-cd-broker"]
-}
-
-resource "aws_iam_access_key" "ci-cd_broker" {
-  user = "${aws_iam_user.ci-cd_broker.name}"
-}
-
-resource "aws_elb" "ci-cd_broker" {
+resource "aws_elb" "ci_cd_broker" {
   name                      = "${var.env}-ci-cd-broker"
   subnets                   = ["${split(",", var.infra_subnet_ids)}"]
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
   internal                  = true
-  security_groups           = ["${aws_security_group.ci-cd_broker.id}"]
+  security_groups           = ["${aws_security_group.ci_cd_broker.id}"]
 
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"
@@ -44,9 +29,9 @@ resource "aws_elb" "ci-cd_broker" {
   }
 }
 
-resource "aws_lb_ssl_negotiation_policy" "ci-cd_broker" {
+resource "aws_lb_ssl_negotiation_policy" "ci_cd_broker" {
   name          = "paas-${var.default_elb_security_policy}"
-  load_balancer = "${aws_elb.ci-cd_broker.id}"
+  load_balancer = "${aws_elb.ci_cd_broker.id}"
   lb_port       = 443
 
   attribute {

@@ -144,7 +144,7 @@ resource "aws_security_group" "service_brokers" {
   }
 }
 
-resource "aws_security_group" "ci-cd_broker" {
+resource "aws_security_group" "ci_cd_broker" {
   name_prefix = "${var.env}-ci-cd-"
   description = "Group for ci-cd brokers"
   vpc_id      = "${var.vpc_id}"

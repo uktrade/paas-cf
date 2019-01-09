@@ -79,6 +79,10 @@ output "aws_backing_service_cidr_all" {
   value = "${var.aws_backing_service_cidr_all}"
 }
 
+output "ci_cd_broker_security_group" {
+  value = "${aws_security_group.ci_cd_broker.name}"
+}
+
 output "rds_broker_db_clients_security_group" {
   value = "${aws_security_group.rds_broker_db_clients.name}"
 }
@@ -105,6 +109,10 @@ output "rds_broker_postgres10_db_parameter_group" {
 
 output "rds_broker_mysql57_db_parameter_group" {
   value = "${aws_db_parameter_group.rds_broker_mysql57.id}"
+}
+
+output "ci_cd_broker_elb_name" {
+  value = "${aws_elb.ci_cd_broker.name}"
 }
 
 output "rds_broker_elb_name" {
@@ -191,14 +199,4 @@ output "yace_aws_access_key_id" {
 output "yace_aws_secret_access_key" {
   sensitive = true
   value     = "${aws_iam_access_key.yace.secret}"
-}
-
-output "cicd_aws_access_key_id" {
-  sensitive = true
-  value     = "${aws_iam_access_key.ci-cd_broker.id}"
-}
-
-output "cicd_aws_secret_access_key" {
-  sensitive = true
-  value     = "${aws_iam_access_key.ci-cd_broker.secret}"
 }
