@@ -1,0 +1,30 @@
+---
+- type: replace
+  path: /releases/-
+  value:
+    name: drone-agent-broker
+    version: 0.1.2
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.2.tgz
+    sha1: 4c278e014389d96e31c7b4ad850fc0cbb6b86eac
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: drone_agent_broker
+    azs: [z1]
+    instances: 1
+    vm_type: small
+    vm_extensions:
+      - ci_cd_broker
+    stemcell: default
+    networks:
+      - name: cf
+
+- type: replace
+  path: /instance_groups/name=drone_agent_broker/jobs?/-
+  value:
+    name: drone-agent-broker
+    release: drone-agent-broker
+    properties:
+      drone-agent-broker: {}
+
