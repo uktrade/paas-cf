@@ -115,6 +115,10 @@ output "ci_cd_broker_elb_name" {
   value = "${aws_elb.ci_cd_broker.name}"
 }
 
+output "ci_cd_broker_subnet" {
+  value = "${element(concat(aws_subnet.cell.*.id, list("")), 0)}"
+}
+
 output "rds_broker_elb_name" {
   value = "${aws_elb.rds_broker.name}"
 }
