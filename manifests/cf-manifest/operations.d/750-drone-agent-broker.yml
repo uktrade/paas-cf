@@ -3,9 +3,9 @@
   path: /releases/-
   value:
     name: drone-agent-broker
-    version: 0.1.11
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.11.tgz
-    sha1: 0c5f3a1b5b7af3ced716ff5bfe51f82dbbf6d473
+    version: 0.1.12
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.12.tgz
+    sha1: a295f3191141befa6105418163ce5aeaac19445d
 
 - type: replace
   path: /instance_groups/-
@@ -26,4 +26,34 @@
     name: drone-agent-broker
     release: drone-agent-broker
     properties:
-      drone-agent-broker: {}
+      drone-agent-broker:
+        port: 80
+        basic_auth_username: drone-agent-broker
+        basic_auth_password: ((secrets_drone_agent_broker_admin_password))
+        log_level: INFO
+        aws_region: "((terraform_outputs_region))"
+        security_group_id: "((terraform_outputs_ci_cd_broker_security_group))"
+        catalog:
+          services:
+          - id: 69841bf0-d820-4d36-bf2a-b9da1772969c
+            name: drone-agent
+            description: https://drone.io build agent
+            bindable: true
+            plan_updateable: true
+            requires: []
+            metadata: {}
+            plans:
+            - id: 094349f7-9c04-4bc2-b6ce-0f8b33959935
+              name: t2.nano
+              description: A single agent running on a t2.nano EC2 instance
+              metadata: {}
+            - id: 2c623736-facf-4dae-8a5d-1034395d32a1
+              name: t2.small
+              description: A single agent running on a t2.small EC2 instance
+              metadata: {}
+
+- type: replace
+  path: /variables/-
+  value:
+    name: secrets_drone_agent_broker_admin_password
+    type: password
