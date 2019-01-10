@@ -3,9 +3,9 @@
   path: /releases/-
   value:
     name: drone-agent-broker
-    version: 0.1.9
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.9.tgz
-    sha1: 1ebc9791209396da1906f2df6126d2c2fe1849be
+    version: 0.1.11
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.11.tgz
+    sha1: 0c5f3a1b5b7af3ced716ff5bfe51f82dbbf6d473
 
 - type: replace
   path: /instance_groups/-
