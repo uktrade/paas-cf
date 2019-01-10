@@ -80,7 +80,7 @@ output "aws_backing_service_cidr_all" {
 }
 
 output "ci_cd_broker_security_group" {
-  value = "${aws_security_group.ci_cd_broker.arn}"
+  value = "${aws_security_group.ci_cd_broker.id}"
 }
 
 output "rds_broker_db_clients_security_group" {
