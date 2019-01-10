@@ -3,9 +3,9 @@
   path: /releases/-
   value:
     name: drone-agent-broker
-    version: 0.1.18
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.18.tgz
-    sha1: 21cfc524357366609d3b597b66ba22e05450a7d5
+    version: 0.1.19
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/drone-agent-broker-0.1.19.tgz
+    sha1: e058ee56c9af6ae5275aaea69f48232e17ae964d
 
 - type: replace
   path: /instance_groups/-
@@ -34,7 +34,8 @@
         aws_region: "((terraform_outputs_region))"
         security_group_id: "((terraform_outputs_ci_cd_broker_security_group))"
         subnet_id: "((terraform_outputs_ci_cd_broker_subnet))"
-        agent_ami: "ami-0016c65679adc75f5"
+        agent_ami_name: "CoreOS-stable-1967.3.0-hvm"
+        agent_ami_owner: "595879546273"
         catalog:
           services:
           - id: 69841bf0-d820-4d36-bf2a-b9da1772969c
