@@ -54,6 +54,14 @@ resource "aws_route53_record" "apps_apex" {
   }
 }
 
+resource "aws_route53_record" "ci_cd_broker" {
+  zone_id = "${var.system_dns_zone_id}"
+  name    = "ci-cd-broker.${var.system_dns_zone_name}."
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${aws_elb.ci_cd_broker.dns_name}"]
+}
+
 resource "aws_route53_record" "rds_broker" {
   zone_id = "${var.system_dns_zone_id}"
   name    = "rds-broker.${var.system_dns_zone_name}."
