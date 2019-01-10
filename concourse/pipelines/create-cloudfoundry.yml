@@ -1483,6 +1483,8 @@ jobs:
               export DOPPLER_ENDPOINT=$($VAL_FROM_YAML instance_groups.scheduler.jobs.tps.properties.capi.tps.traffic_controller_url cf-manifest/cf-manifest.yml)
               export RDS_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_rds_broker_elb_dns_name cf-terraform-outputs.yml)
               export RDS_BROKER_PASS=$($VAL_FROM_YAML secrets_rds_broker_admin_password cf-vars-store/cf-vars-store.yml)
+              export DRONE_AGENT_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_ci_cd_agent_broker_elb_dns_name cf-terraform-outputs.yml)
+              export DRONE_AGENT_BROKER_PASS=$($VAL_FROM_YAML secrets_drone_agent_broker_admin_password cf-vars-store/cf-vars-store.yml)
               export CDN_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_cdn_broker_elb_dns_name cf-terraform-outputs.yml)
               export CDN_BROKER_PASS=$($VAL_FROM_YAML secrets_cdn_broker_admin_password cf-vars-store/cf-vars-store.yml)
               export AIVEN_BROKER_PASS=$($VAL_FROM_YAML secrets_aiven_broker_admin_password cf-vars-store/cf-vars-store.yml)
@@ -1759,6 +1761,32 @@ jobs:
                 xlarge-ha-unencrypted-9.5
                 xlarge-unencrypted-9.5
                 EOF
+
+
+      - task: register-drone-agent-broker
+        config:
+          platform: linux
+          image_resource: *cf-cli-image-resource
+          inputs:
+            - name: paas-cf
+            - name: config
+          run:
+            path: sh
+            args:
+              - -e
+              - -u
+              - -c
+              - |
+                . ./config/config.sh
+                cf api "${API_ENDPOINT}"
+                cf auth "${CF_ADMIN}" "${CF_PASS}"
+
+                if cf service-brokers | grep 'drone-agent-broker\s'; then
+                  cf update-service-broker drone-agent-broker drone-agent-broker "${DRONE_AGENT_BROKER_PASS}" "https://${DRONE_AGENT_BROKER_SERVER}"
+                else
+                  cf create-service-broker drone-agent-broker drone-agent-broker "${DRONE_AGENT_BROKER_PASS}" "https://${DRONE_AGENT_BROKER_SERVER}"
+                fi
+                cf enable-service-access drone-agent
 
 
       - task: register-cdn-broker

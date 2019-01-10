@@ -155,6 +155,10 @@ output "cdn_broker_elb_dns_name" {
   value = "${aws_route53_record.cdn_broker.fqdn}"
 }
 
+output "ci_cd_agent_broker_elb_dns_name" {
+  value = "${aws_route53_record.ci_cd_broker.fqdn}"
+}
+
 output "cloud_controller_security_group" {
   value = "${aws_security_group.cloud_controller.name}"
 }
