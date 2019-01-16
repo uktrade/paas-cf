@@ -338,7 +338,7 @@ resources:
     type: git
     source:
       uri: https://github.com/alphagov/paas-admin
-      tag_filter: v0.49.0
+      branch_filter: wip-fix-spaces-assigned
 
   - name: prometheus-vars-store
     type: s3-iam
