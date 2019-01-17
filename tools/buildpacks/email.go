@@ -5,41 +5,36 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-func stringifyDependencies(input []Dependency) (result []string) {
-	for _, dependency := range input {
-		result = append(result, fmt.Sprintf("%s %s", dependency.Name, dependency.Version))
+func toSet(input []string) map[string]bool {
+	set := map[string]bool{}
+	for _, item := range input {
+		set[item] = true
 	}
-	return result
-}
-
-func keys(input map[string]bool) (result []string) {
-	for key := range input {
-		result = append(result, key)
-	}
-	return result
-}
-
-func toSet(dependencies []string) map[string]bool {
-	dependencySet := map[string]bool{}
-	for _, dependency := range dependencies {
-		dependencySet[dependency] = true
-	}
-	return dependencySet
+	return set
 }
 
 func difference(as, bs []string) (differences []string) {
-	uniqueAs := keys(toSet(as))
+	asSet := toSet(as)
 	bsSet := toSet(bs)
-	for _, x := range uniqueAs {
-		if _, ok := bsSet[x]; !ok {
-			differences = append(differences, x)
+	for aKey := range asSet {
+		if _, ok := bsSet[aKey]; !ok {
+			differences = append(differences, aKey)
 		}
 	}
 	return differences
+}
+
+func dependencyVersionsByName(dependencies []Dependency) (dependencyVersionsByName map[string][]string) {
+	dependencyVersionsByName = map[string][]string{}
+	for _, dependency := range dependencies {
+		dependencyVersionsByName[dependency.Name] = append(dependencyVersionsByName[dependency.Name], dependency.Version)
+	}
+	return dependencyVersionsByName
 }
 
 func main() {
@@ -75,22 +70,44 @@ func main() {
 	for idx, newBuildpack := range newBuildpacks.Buildpacks {
 		oldBuildpack := oldBuildpacks.Buildpacks[idx]
 
-		oldDependencies := stringifyDependencies(oldBuildpack.Dependencies)
-		newDependencies := stringifyDependencies(newBuildpack.Dependencies)
-		removals := difference(oldDependencies, newDependencies)
-		additions := difference(newDependencies, oldDependencies)
+		oldDependenciesByName := dependencyVersionsByName(oldBuildpack.Dependencies)
+		newDependenciesByName := dependencyVersionsByName(newBuildpack.Dependencies)
 
+		additionsByName := map[string][]string{}
+		removalsByName := map[string][]string{}
+		for name, versions := range oldDependenciesByName {
+			removalsByName[name] = difference(versions, newDependenciesByName[name])
+		}
+		for name, versions := range newDependenciesByName {
+			additionsByName[name] = difference(versions, oldDependenciesByName[name])
+		}
+
+		// TODO build a struct and yaml marshal it instead of printing
 		fmt.Printf("%s (%s):\n", newBuildpack.Name, newBuildpack.Stack)
-		fmt.Print("Removed: ")
-		for _, removal := range removals {
-			fmt.Printf("%s, ", removal)
+		fmt.Printf("  old: %s\n", oldBuildpack.Version)
+		fmt.Printf("  new: %s\n", newBuildpack.Version)
+		if len(additionsByName)+len(removalsByName) == 0 {
+			fmt.Printf(
+				"  # TODO - check these manually - https://github.com/cloudfoundry/%s/releases/\n",
+				newBuildpack.RepoName,
+			)
+			fmt.Println("  added_dependencies: {}")
+			fmt.Println("  removed_dependencies: {}")
+			fmt.Println()
+		} else {
+			fmt.Printf("  added_dependencies:\n")
+			for name, additions := range additionsByName {
+				if len(additions) != 0 {
+					fmt.Printf("    %s: %s\n", name, strings.Join(additions, ", "))
+				}
+			}
+			fmt.Printf("  removed_dependencies:\n")
+			for name, removals := range removalsByName {
+				if len(removals) != 0 {
+					fmt.Printf("    %s: %s\n", name, strings.Join(removals, ", "))
+				}
+			}
+			fmt.Println()
 		}
-		fmt.Println()
-		fmt.Print("Added: ")
-		for _, addition := range additions {
-			fmt.Printf("%s, ", addition)
-		}
-		fmt.Println()
-		fmt.Println()
 	}
 }
