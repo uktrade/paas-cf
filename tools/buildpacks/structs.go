@@ -35,8 +35,3 @@ type Changes struct {
 	Removals  []Dependency
 	Additions []Dependency
 }
-
-type Difference struct {
-	Present bool
-	Dep     string
-}
