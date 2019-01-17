@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/go-github/v21/github"
 	"golang.org/x/oauth2"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type Buildpack struct {
@@ -54,7 +54,8 @@ func readManifest(githubClient *github.Client, buildpack Buildpack, ctx context.
 		&github.RepositoryContentGetOptions{},
 	)
 	if err != nil {
-		log.Fatalf("could not get contents for manifest for %s, %v", buildpack.RepoName, err)
+		// log.Fatalf("could not get contents for manifest for %s, %v", buildpack.RepoName, err)
+		return manifest
 	}
 	fileBytes, err := fileContent.GetContent()
 	if err != nil {
@@ -87,6 +88,7 @@ func main() {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: githubToken})
 	tc := oauth2.NewClient(ctx, ts)
 	githubClient := github.NewClient(tc)
+	buildpackConfig := Buildpacks{}
 	for _, buildpack := range result.Buildpacks {
 		release, _, err := githubClient.Repositories.GetLatestRelease(ctx, "cloudfoundry", buildpack.RepoName)
 		if err != nil {
@@ -152,10 +154,12 @@ func main() {
 			Version:      *release.TagName,
 			Dependencies: manifest.Dependencies,
 		}
-		newYaml, err := yaml.Marshal(newBuildpack)
-		if err != nil {
-			log.Fatalf("could not marshal buildpack into yaml, %v", err)
-		}
-		fmt.Println(string(newYaml))
+
+		buildpackConfig.Buildpacks = append(buildpackConfig.Buildpacks, newBuildpack)
 	}
+	newYaml, err := yaml.Marshal(buildpackConfig)
+	if err != nil {
+		log.Fatalf("could not marshal buildpackConfig into yaml, %v", err)
+	}
+	fmt.Println(string(newYaml))
 }
