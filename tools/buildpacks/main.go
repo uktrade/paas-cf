@@ -14,6 +14,12 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+type AssetDetails struct {
+	Url      string
+	Filename string
+	Sha      string
+}
+
 func readManifest(githubClient *github.Client, buildpack Buildpack, ctx context.Context) (manifest Manifest) {
 	fileContent, _, _, err := githubClient.Repositories.GetContents(
 		ctx,
@@ -35,6 +41,38 @@ func readManifest(githubClient *github.Client, buildpack Buildpack, ctx context.
 		log.Fatalf("could not unmarshal manifest as YAML, %v", err)
 	}
 	return manifest
+}
+
+func downloadSha(url, repoName string) (shasum string) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("could not download shasum for %s, %v", repoName, err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("could not read response for shasum for %s, %v", repoName, err)
+	}
+	return strings.Split(string(body), " ")[0]
+}
+
+func getAssetDetails(assets []github.ReleaseAsset, repoName, nameFilter string) (assetDetails AssetDetails, ok bool) {
+	ok = false
+	for _, asset := range assets {
+		assetName := *asset.Name
+		if nameFilter != "" && !strings.Contains(assetName, nameFilter) {
+			continue
+		}
+		if strings.HasSuffix(assetName, ".zip") {
+			assetDetails.Url = *asset.BrowserDownloadURL
+			assetDetails.Filename = assetName
+			ok = true
+		}
+		if strings.HasSuffix(assetName, "SHA256SUM.txt") {
+			assetDetails.Sha = downloadSha(*asset.BrowserDownloadURL, repoName)
+		}
+	}
+	return assetDetails, ok
 }
 
 func main() {
@@ -64,51 +102,11 @@ func main() {
 			log.Fatalf("could not get latest release for %s, %v", buildpack.RepoName, err)
 		}
 
-		var newBuildpackUrl string
-		var newBuildpackFilename string
-		var newBuildpackShasum string
-		for _, asset := range release.Assets {
-			assetName := *asset.Name
-			if !strings.Contains(*asset.Name, buildpack.Stack) {
-				continue
-			}
-			if strings.HasSuffix(assetName, ".zip") {
-				newBuildpackUrl = *asset.BrowserDownloadURL
-				newBuildpackFilename = assetName
-			}
-			if strings.HasSuffix(assetName, "SHA256SUM.txt") {
-				resp, err := http.Get(*asset.BrowserDownloadURL)
-				if err != nil {
-					log.Fatalf("could not download shasum for %s, %v", buildpack.RepoName, err)
-				}
-				defer resp.Body.Close()
-				body, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					log.Fatalf("could not read response for shasum for %s, %v", buildpack.RepoName, err)
-				}
-				newBuildpackShasum = strings.Split(string(body), " ")[0]
-			}
-		}
-
-		if newBuildpackUrl == "" {
-			for _, asset := range release.Assets {
-				assetName := *asset.Name
-				if strings.HasSuffix(assetName, ".zip") {
-					newBuildpackUrl = *asset.BrowserDownloadURL
-					newBuildpackFilename = assetName
-				}
-				if strings.HasSuffix(assetName, "SHA256SUM.txt") {
-					resp, err := http.Get(*asset.BrowserDownloadURL)
-					if err != nil {
-						log.Fatalf("could not download shasum for %s, %v", buildpack.RepoName, err)
-					}
-					defer resp.Body.Close()
-					body, err := ioutil.ReadAll(resp.Body)
-					if err != nil {
-						log.Fatalf("could not read response for shasum for %s, %v", buildpack.RepoName, err)
-					}
-					newBuildpackShasum = strings.Split(string(body), " ")[0]
-				}
+		assetDetails, ok := getAssetDetails(release.Assets, buildpack.RepoName, buildpack.Stack)
+		if !ok {
+			assetDetails, ok = getAssetDetails(release.Assets, buildpack.RepoName, "")
+			if !ok {
+				log.Fatalf("could not find assets for release %s", *release.URL)
 			}
 		}
 
@@ -117,18 +115,18 @@ func main() {
 			Name:         buildpack.Name,
 			RepoName:     buildpack.RepoName,
 			Stack:        buildpack.Stack,
-			Filename:     newBuildpackFilename,
-			Sha:          newBuildpackShasum,
-			Url:          newBuildpackUrl,
+			Filename:     assetDetails.Filename,
+			Sha:          assetDetails.Sha,
+			Url:          assetDetails.Url,
 			Version:      *release.TagName,
 			Dependencies: manifest.Dependencies,
 		}
 
 		buildpackConfig.Buildpacks = append(buildpackConfig.Buildpacks, newBuildpack)
 	}
-	newYaml, err := yaml.Marshal(buildpackConfig)
+	newBuildpacksYaml, err := yaml.Marshal(buildpackConfig)
 	if err != nil {
 		log.Fatalf("could not marshal buildpackConfig into yaml, %v", err)
 	}
-	fmt.Println(string(newYaml))
+	fmt.Println(string(newBuildpacksYaml))
 }
