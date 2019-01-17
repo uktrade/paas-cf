@@ -290,3 +290,12 @@ logit-filters:
 		-w /mnt \
 		jruby:9.1-alpine ./scripts/generate_logit_filters.sh $(LOGSEARCH_BOSHRELEASE_TAG) $(LOGSEARCH_FOR_CLOUDFOUNDRY_TAG)
 	@echo "updated $(CURDIR)/config/logit/output/generated_logit_filters.conf"
+
+.PHONY: update_buildpacks
+update_buildpacks:
+	@scripts/update_buildpacks.sh
+
+.PHONY: create_buildpacks_email
+create_buildpacks_email:
+	@scripts/create_buildpacks_email.sh
+

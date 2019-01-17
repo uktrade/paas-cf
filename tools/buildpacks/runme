@@ -1,1 +1,0 @@
-go run email.go structs.go -new ../../config/buildpacks.yml -old <(git show 7b45bc6ef33adf2a37f2ce9dd7730dd9bf453942:../../config/buildpacks.yml)
