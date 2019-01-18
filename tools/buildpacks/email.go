@@ -76,11 +76,11 @@ func main() {
 
 	if *oldFilePath == "" {
 		flag.Usage()
-		log.Fatal("oldfile must be set")
+		log.Fatal("old must be set")
 	}
 	if *newFilePath == "" {
 		flag.Usage()
-		log.Fatal("newfile must be set")
+		log.Fatal("new must be set")
 	}
 	if *markdownOutputPath == "" {
 		flag.Usage()
