@@ -43,6 +43,7 @@ func dependencyVersionsByName(dependencies []Dependency) (dependencyVersionsByNa
 }
 
 func releasesSinceLastRelease(ctx context.Context, githubClient *github.Client, repoName string, lastRelease string) (releaseVersions []string) {
+
 	releases, _, err := githubClient.Repositories.ListReleases(
 		ctx,
 		"cloudfoundry",
@@ -55,8 +56,8 @@ func releasesSinceLastRelease(ctx context.Context, githubClient *github.Client, 
 	}
 
 	for _, release := range releases {
-		releaseVersions = append(releaseVersions, release.GetName())
-		if *release.Name == lastRelease {
+		releaseVersions = append(releaseVersions, release.GetTagName())
+		if release.GetTagName() == lastRelease {
 			break
 		}
 	}
