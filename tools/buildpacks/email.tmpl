@@ -1,6 +1,6 @@
 Hi,
 
-We will be upgrading most of the platform's buildpacks on or after #DATE#.
+We will be upgrading most of the platform's buildpacks on or after {{ .ReleaseDate }}.
 
 We’re letting you know about the planned buildpack updates so you can make any necessary changes to your application before the upgrade takes place. Please make sure that the versions of the languages you’ve pinned are compatible with the versions available in the planned releases.
 
@@ -11,7 +11,6 @@ Regards,
 The GOV.UK PaaS team
 
 # Planned Releases:
-
 {{ range $index := .Data }}
 {{ $buildpack := .Buildpack }}
 ## {{ .Buildpack.Name }}: {{ .Buildpack.Version}}

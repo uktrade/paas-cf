@@ -31,7 +31,8 @@ type Manifest struct {
 	Dependencies    []Dependency     `yaml:"dependencies"`
 }
 type EmailDatas struct {
-	Data []EmailData
+	ReleaseDate string
+	Data        []EmailData
 }
 type EmailData struct {
 	Buildpack           Buildpack

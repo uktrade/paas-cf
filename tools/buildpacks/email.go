@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"text/template"
+	"time"
 
 	"github.com/google/go-github/v21/github"
 	"golang.org/x/oauth2"
@@ -67,8 +68,9 @@ func releasesSinceLastRelease(ctx context.Context, githubClient *github.Client, 
 
 func main() {
 	var (
-		oldFilePath = flag.String("old", "", "Old file")
-		newFilePath = flag.String("new", "", "New file")
+		oldFilePath        = flag.String("old", "", "Old file")
+		newFilePath        = flag.String("new", "", "New file")
+		markdownOutputPath = flag.String("markdownout", "", "Path to output markdown file to")
 	)
 	flag.Parse()
 
@@ -79,6 +81,10 @@ func main() {
 	if *newFilePath == "" {
 		flag.Usage()
 		log.Fatal("newfile must be set")
+	}
+	if *markdownOutputPath == "" {
+		flag.Usage()
+		log.Fatal("markdownout must be set")
 	}
 
 	oldFileData, err := ioutil.ReadFile(*oldFilePath)
@@ -103,7 +109,10 @@ func main() {
 	newBuildpacks := Buildpacks{}
 	err = yaml.Unmarshal(newFileData, &newBuildpacks)
 
-	emailData := EmailDatas{Data: []EmailData{}}
+	emailData := EmailDatas{
+		Data:        []EmailData{},
+		ReleaseDate: time.Now().AddDate(0, 0, 7).Format("2006-01-02"),
+	}
 	doneBuildpacks := map[string]bool{}
 	for idx, newBuildpack := range newBuildpacks.Buildpacks {
 		if doneBuildpacks[newBuildpack.Name] {
@@ -159,6 +168,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Markdown template could not be executed %v", err)
 	}
-	ioutil.WriteFile("release.md", markdownText.Bytes(), 0644)
+	ioutil.WriteFile(*markdownOutputPath, markdownText.Bytes(), 0644)
 	fmt.Print(string(emailText.Bytes()))
 }
