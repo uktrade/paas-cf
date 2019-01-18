@@ -2,12 +2,16 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"text/template"
 
+	"github.com/google/go-github/v21/github"
+	"golang.org/x/oauth2"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -38,6 +42,28 @@ func dependencyVersionsByName(dependencies []Dependency) (dependencyVersionsByNa
 	return dependencyVersionsByName
 }
 
+func releasesSinceLastRelease(ctx context.Context, githubClient *github.Client, repoName string, lastRelease string) (releaseVersions []string) {
+	releases, _, err := githubClient.Repositories.ListReleases(
+		ctx,
+		"cloudfoundry",
+		repoName,
+		&github.ListOptions{
+			PerPage: 100,
+		})
+	if err != nil {
+		log.Fatalf("Failed to get repository %s from github %v", repoName, err)
+	}
+
+	for _, release := range releases {
+		releaseVersions = append(releaseVersions, release.GetName())
+		if *release.Name == lastRelease {
+			break
+		}
+	}
+
+	return releaseVersions
+}
+
 func main() {
 	var (
 		oldFilePath = flag.String("old", "", "Old file")
@@ -62,6 +88,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("newFileData cannot be read from %s: %v", *newFilePath, err)
 	}
+	ctx := context.Background()
+	githubToken, ok := os.LookupEnv("GITHUB_API_TOKEN")
+	if !ok {
+		log.Fatalf("environment variable GITHUB_API_TOKEN must be set")
+	}
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: githubToken})
+	tc := oauth2.NewClient(ctx, ts)
+	githubClient := github.NewClient(tc)
 	oldBuildpacks := Buildpacks{}
 	err = yaml.Unmarshal(oldFileData, &oldBuildpacks)
 
@@ -76,9 +110,11 @@ func main() {
 		}
 		oldBuildpack := oldBuildpacks.Buildpacks[idx]
 
+		releaseNoteVersions := releasesSinceLastRelease(ctx, githubClient, newBuildpack.RepoName, oldBuildpack.Version)
 		buildpackEmailData := EmailData{
-			Buildpack: newBuildpack,
-			Changes:   make(map[string]Changes),
+			Buildpack:           newBuildpack,
+			ReleaseNoteVersions: releaseNoteVersions,
+			Changes:             make(map[string]Changes),
 		}
 
 		oldDependenciesByName := dependencyVersionsByName(oldBuildpack.Dependencies)

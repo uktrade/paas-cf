@@ -34,8 +34,9 @@ type EmailDatas struct {
 	Data []EmailData
 }
 type EmailData struct {
-	Buildpack Buildpack
-	Changes   map[string]Changes
+	Buildpack           Buildpack
+	ReleaseNoteVersions []string
+	Changes             map[string]Changes
 }
 
 type Changes struct {
