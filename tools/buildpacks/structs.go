@@ -30,8 +30,15 @@ type Manifest struct {
 	DefaultVersions []DefaultVersion `yaml:"default_versions"`
 	Dependencies    []Dependency     `yaml:"dependencies"`
 }
+type EmailDatas struct {
+	Data []EmailData
+}
+type EmailData struct {
+	Buildpack Buildpack
+	Changes   map[string]Changes
+}
 
 type Changes struct {
-	Removals  []Dependency
-	Additions []Dependency
+	Additions []string
+	Removals  []string
 }

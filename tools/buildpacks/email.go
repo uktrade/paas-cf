@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strings"
+	"text/template"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -67,47 +68,60 @@ func main() {
 	newBuildpacks := Buildpacks{}
 	err = yaml.Unmarshal(newFileData, &newBuildpacks)
 
+	emailData := EmailDatas{Data: []EmailData{}}
+	doneBuildpacks := map[string]bool{}
 	for idx, newBuildpack := range newBuildpacks.Buildpacks {
+		if doneBuildpacks[newBuildpack.Name] {
+			continue
+		}
 		oldBuildpack := oldBuildpacks.Buildpacks[idx]
+
+		buildpackEmailData := EmailData{
+			Buildpack: newBuildpack,
+			Changes:   make(map[string]Changes),
+		}
 
 		oldDependenciesByName := dependencyVersionsByName(oldBuildpack.Dependencies)
 		newDependenciesByName := dependencyVersionsByName(newBuildpack.Dependencies)
-
 		additionsByName := map[string][]string{}
 		removalsByName := map[string][]string{}
 		for name, versions := range oldDependenciesByName {
-			removalsByName[name] = difference(versions, newDependenciesByName[name])
+			var tmpChanges = buildpackEmailData.Changes[name]
+			removals := difference(versions, newDependenciesByName[name])
+			removalsByName[name] = removals
+			tmpChanges.Removals = removals
+			if len(removals) > 0 {
+				buildpackEmailData.Changes[name] = tmpChanges
+			}
 		}
 		for name, versions := range newDependenciesByName {
-			additionsByName[name] = difference(versions, oldDependenciesByName[name])
-		}
-
-		// TODO build a struct and yaml marshal it instead of printing
-		fmt.Printf("%s (%s):\n", newBuildpack.Name, newBuildpack.Stack)
-		fmt.Printf("  old: %s\n", oldBuildpack.Version)
-		fmt.Printf("  new: %s\n", newBuildpack.Version)
-		if len(additionsByName)+len(removalsByName) == 0 {
-			fmt.Printf(
-				"  # TODO - check these manually - https://github.com/cloudfoundry/%s/releases/\n",
-				newBuildpack.RepoName,
-			)
-			fmt.Println("  added_dependencies: {}")
-			fmt.Println("  removed_dependencies: {}")
-			fmt.Println()
-		} else {
-			fmt.Printf("  added_dependencies:\n")
-			for name, additions := range additionsByName {
-				if len(additions) != 0 {
-					fmt.Printf("    %s: %s\n", name, strings.Join(additions, ", "))
-				}
+			var tmpChanges = buildpackEmailData.Changes[name]
+			additions := difference(versions, oldDependenciesByName[name])
+			additionsByName[name] = additions
+			tmpChanges.Additions = additions
+			if len(additions) > 0 {
+				buildpackEmailData.Changes[name] = tmpChanges
 			}
-			fmt.Printf("  removed_dependencies:\n")
-			for name, removals := range removalsByName {
-				if len(removals) != 0 {
-					fmt.Printf("    %s: %s\n", name, strings.Join(removals, ", "))
-				}
-			}
-			fmt.Println()
 		}
+		emailData.Data = append(emailData.Data, buildpackEmailData)
+		doneBuildpacks[newBuildpack.Name] = true
 	}
+	// asYAML, _ := yaml.Marshal(emailData)
+	// fmt.Print(string(asYAML))
+	tmpl, err := template.ParseFiles("email.tmpl", "markdown.tmpl")
+	if err != nil {
+		log.Fatalf("Email template could not be loaded %v", err)
+	}
+	var emailText bytes.Buffer
+	err = tmpl.ExecuteTemplate(&emailText, "email.tmpl", emailData)
+	if err != nil {
+		log.Fatalf("Email template could not be executed %v", err)
+	}
+	var markdownText bytes.Buffer
+	err = tmpl.ExecuteTemplate(&markdownText, "markdown.tmpl", emailData)
+	if err != nil {
+		log.Fatalf("Markdown template could not be executed %v", err)
+	}
+	ioutil.WriteFile("release.md", markdownText.Bytes(), 0644)
+	fmt.Print(string(emailText.Bytes()))
 }
