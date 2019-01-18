@@ -279,7 +279,7 @@ buildpacks:
   repo_name: java-buildpack
   stack: cflinuxfs2
   version: v4.17.1
-  sha: ""
+  sha: eea6cc811cae94d0f4a5a8ac9825e8d70435878b6374ac03d778fb05329a24e6
   filename: java-buildpack-v4.17.1.zip
   url: https://github.com/cloudfoundry/java-buildpack/releases/download/v4.17.1/java-buildpack-v4.17.1.zip
   dependencies: []
@@ -1016,7 +1016,7 @@ buildpacks:
   repo_name: java-buildpack
   stack: cflinuxfs3
   version: v4.17.1
-  sha: ""
+  sha: eea6cc811cae94d0f4a5a8ac9825e8d70435878b6374ac03d778fb05329a24e6
   filename: java-buildpack-v4.17.1.zip
   url: https://github.com/cloudfoundry/java-buildpack/releases/download/v4.17.1/java-buildpack-v4.17.1.zip
   dependencies: []
@@ -1473,4 +1473,3 @@ buildpacks:
     version: 1.15.8
     cf_stacks:
     - cflinuxfs3
-

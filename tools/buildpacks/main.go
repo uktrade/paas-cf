@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,6 +21,53 @@ type AssetDetails struct {
 	Url      string
 	Filename string
 	Sha      string
+}
+
+func downloadFile(filepath string, url string) error {
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getAssetSha(assetDetails AssetDetails) (sha string) {
+	tmpDir, err := ioutil.TempDir("/tmp", "create_buildpacks")
+	if err != nil {
+		log.Fatalf("Temporary download dir could not be created %v", err)
+	}
+	downloadFileName := fmt.Sprintf("%s/%s", tmpDir, assetDetails.Filename)
+	err = downloadFile(downloadFileName, assetDetails.Url)
+	if err != nil {
+		log.Fatalf("File %s could not be downloaded to %s %v", assetDetails.Url, downloadFileName, err)
+	}
+	f, err := os.Open(downloadFileName)
+	if err != nil {
+		log.Fatalf("File %s could not be opened %v", downloadFile, err)
+	}
+	defer f.Close()
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, f); err != nil {
+		log.Fatalf("Calculating SHA256SUM of %s failed %v", downloadFileName, err)
+	}
+	return hex.EncodeToString(hasher.Sum(nil))
 }
 
 func readManifest(githubClient *github.Client, buildpack Buildpack, ctx context.Context) (manifest Manifest) {
@@ -81,7 +131,6 @@ func main() {
 		log.Fatalf("couldn't read all of stdin, %v", err)
 	}
 	var result *Buildpacks
-
 	err = yaml.Unmarshal(stdin, &result)
 	if err != nil {
 		log.Fatalf("could not unmarshal YAML: %v", err)
@@ -97,6 +146,7 @@ func main() {
 	githubClient := github.NewClient(tc)
 	buildpackConfig := Buildpacks{}
 	for _, buildpack := range result.Buildpacks {
+		log.Printf("Processing %s (%s)\n", buildpack.Name, buildpack.Stack)
 		release, _, err := githubClient.Repositories.GetLatestRelease(ctx, "cloudfoundry", buildpack.RepoName)
 		if err != nil {
 			log.Fatalf("could not get latest release for %s, %v", buildpack.RepoName, err)
@@ -111,6 +161,11 @@ func main() {
 		}
 
 		manifest := readManifest(githubClient, buildpack, ctx)
+		if assetDetails.Sha == "" {
+			log.Printf("SHA for %s %s could not be read. Downloading %s to determine correct SHA for buildpack config.\n", buildpack.Name, *release.TagName, assetDetails.Url)
+			assetDetails.Sha = getAssetSha(assetDetails)
+
+		}
 		newBuildpack := Buildpack{
 			Name:         buildpack.Name,
 			RepoName:     buildpack.RepoName,
@@ -128,5 +183,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not marshal buildpackConfig into yaml, %v", err)
 	}
-	fmt.Println(string(newBuildpacksYaml))
+	fmt.Print(string(newBuildpacksYaml))
 }
