@@ -378,7 +378,7 @@ buildpacks:
     - cflinuxfs2
     - cflinuxfs3
   - name: appdynamics
-    version: 4.5.5.2452
+    version: 4.5.6.2534
     cf_stacks:
     - cflinuxfs2
     - cflinuxfs3
@@ -417,14 +417,14 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 5.6.38
-    cf_stacks:
-    - cflinuxfs2
-  - name: php
     version: 5.6.39
     cf_stacks:
     - cflinuxfs2
   - name: php
+    version: 5.6.40
+    cf_stacks:
+    - cflinuxfs2
+  - name: php
     version: 7.0.32
     cf_stacks:
     - cflinuxfs2
@@ -441,14 +441,6 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 7.1.24
-    cf_stacks:
-    - cflinuxfs2
-  - name: php
-    version: 7.1.24
-    cf_stacks:
-    - cflinuxfs3
-  - name: php
     version: 7.1.25
     cf_stacks:
     - cflinuxfs2
@@ -457,11 +449,11 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 7.2.12
+    version: 7.1.26
     cf_stacks:
     - cflinuxfs2
   - name: php
-    version: 7.2.12
+    version: 7.1.26
     cf_stacks:
     - cflinuxfs3
   - name: php
@@ -470,6 +462,14 @@ buildpacks:
     - cflinuxfs2
   - name: php
     version: 7.2.13
+    cf_stacks:
+    - cflinuxfs3
+  - name: php
+    version: 7.2.14
+    cf_stacks:
+    - cflinuxfs2
+  - name: php
+    version: 7.2.14
     cf_stacks:
     - cflinuxfs3
 - name: python_buildpack
@@ -1115,7 +1115,7 @@ buildpacks:
     - cflinuxfs2
     - cflinuxfs3
   - name: appdynamics
-    version: 4.5.5.2452
+    version: 4.5.6.2534
     cf_stacks:
     - cflinuxfs2
     - cflinuxfs3
@@ -1154,14 +1154,14 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 5.6.38
-    cf_stacks:
-    - cflinuxfs2
-  - name: php
     version: 5.6.39
     cf_stacks:
     - cflinuxfs2
   - name: php
+    version: 5.6.40
+    cf_stacks:
+    - cflinuxfs2
+  - name: php
     version: 7.0.32
     cf_stacks:
     - cflinuxfs2
@@ -1178,14 +1178,6 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 7.1.24
-    cf_stacks:
-    - cflinuxfs2
-  - name: php
-    version: 7.1.24
-    cf_stacks:
-    - cflinuxfs3
-  - name: php
     version: 7.1.25
     cf_stacks:
     - cflinuxfs2
@@ -1194,11 +1186,11 @@ buildpacks:
     cf_stacks:
     - cflinuxfs3
   - name: php
-    version: 7.2.12
+    version: 7.1.26
     cf_stacks:
     - cflinuxfs2
   - name: php
-    version: 7.2.12
+    version: 7.1.26
     cf_stacks:
     - cflinuxfs3
   - name: php
@@ -1207,6 +1199,14 @@ buildpacks:
     - cflinuxfs2
   - name: php
     version: 7.2.13
+    cf_stacks:
+    - cflinuxfs3
+  - name: php
+    version: 7.2.14
+    cf_stacks:
+    - cflinuxfs2
+  - name: php
+    version: 7.2.14
     cf_stacks:
     - cflinuxfs3
 - name: python_buildpack
