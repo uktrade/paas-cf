@@ -68,6 +68,8 @@ func getAssetSha(assetDetails AssetDetails) (sha string) {
 	if err != nil {
 		log.Fatalf("Temporary download dir could not be created %v", err)
 	}
+	defer os.RemoveAll(tmpDir)
+
 	downloadFileName := fmt.Sprintf("%s/%s", tmpDir, assetDetails.Filename)
 	err = downloadFile(downloadFileName, assetDetails.Url)
 	if err != nil {
@@ -85,13 +87,15 @@ func getAssetSha(assetDetails AssetDetails) (sha string) {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func readManifest(githubClient *github.Client, buildpack Buildpack, ctx context.Context) (manifest Manifest) {
+func readManifest(ctx context.Context, githubClient *github.Client, buildpack Buildpack) (manifest Manifest) {
 	fileContent, _, _, err := githubClient.Repositories.GetContents(
 		ctx,
 		"cloudfoundry",
 		buildpack.RepoName,
 		"manifest.yml",
-		&github.RepositoryContentGetOptions{},
+		&github.RepositoryContentGetOptions{
+			Ref: buildpack.Version,
+		},
 	)
 	if err != nil {
 		// log.Fatalf("could not get contents for manifest for %s, %v", buildpack.RepoName, err)
@@ -141,24 +145,23 @@ func getAssetDetails(assets []github.ReleaseAsset, repoName, nameFilter string) 
 }
 
 func main() {
-	stdin, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		log.Fatalf("couldn't read all of stdin, %v", err)
-	}
 	var result *Buildpacks
-	err = yaml.Unmarshal(stdin, &result)
+	err := yaml.NewDecoder(os.Stdin).Decode(&result)
 	if err != nil {
-		log.Fatalf("could not unmarshal YAML: %v", err)
+		log.Fatalf("could not unmarshal YAML from stdin: %v", err)
 	}
 
 	ctx := context.Background()
+	var githubClient *github.Client
 	githubToken, ok := os.LookupEnv("GITHUB_API_TOKEN")
 	if !ok {
-		log.Fatalf("environment variable GITHUB_API_TOKEN must be set")
+		log.Printf("environment variable GITHUB_API_TOKEN not set. If GitHub communication errors are seen, you may need to export a token with 'public_repo' access")
+		githubClient = github.NewClient(nil)
+	} else {
+		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: githubToken})
+		tc := oauth2.NewClient(ctx, ts)
+		githubClient = github.NewClient(tc)
 	}
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: githubToken})
-	tc := oauth2.NewClient(ctx, ts)
-	githubClient := github.NewClient(tc)
 	buildpackConfig := Buildpacks{}
 	for _, buildpack := range result.Buildpacks {
 		log.Printf("Processing %s (%s)\n", buildpack.Name, buildpack.Stack)
@@ -175,7 +178,7 @@ func main() {
 			}
 		}
 
-		manifest := readManifest(githubClient, buildpack, ctx)
+		manifest := readManifest(ctx, githubClient, buildpack)
 		if assetDetails.Sha == "" {
 			log.Printf("SHA for %s %s could not be read. Downloading %s to determine correct SHA for buildpack config.\n", buildpack.Name, *release.TagName, assetDetails.Url)
 			assetDetails.Sha = getAssetSha(assetDetails)
