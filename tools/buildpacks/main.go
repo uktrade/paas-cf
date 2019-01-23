@@ -33,20 +33,20 @@ type Manifest struct {
 	Dependencies    []Dependency     `yaml:"dependencies"`
 }
 
-func downloadFile(filepath string, url string) error {
-
-	// Create the file
-	out, err := os.Create(filepath)
+// Adapted from ioutil.WriteFile
+func copyToFile(filepath string, source io.Reader) error {
+	f, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
-	defer func() {
-		cerr := out.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
+	_, err = io.Copy(f, source)
+	if err1 := f.Close(); err == nil {
+		err = err1
+	}
+	return err
+}
 
+func downloadFile(filepath string, url string) error {
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
@@ -55,7 +55,7 @@ func downloadFile(filepath string, url string) error {
 	defer resp.Body.Close()
 
 	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
+	err = copyToFile(filepath, resp.Body)
 	if err != nil {
 		return err
 	}
