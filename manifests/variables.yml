@@ -1,4 +1,5 @@
 ---
+# The instance type comes with a 150Gb NVMe SSD storage
 cell_instance_type: r5d.xlarge
 
 # Advertised memory capacity of the cells.

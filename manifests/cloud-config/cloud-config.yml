@@ -222,6 +222,7 @@ vm_types:
   cloud_properties:
     instance_type: ((cell_instance_type))
     ephemeral_disk:
+      # The r5d.xlarge instance type comes with a 150Gb NVMe SSD storage
       use_instance_storage: true
     security_groups:
     - ((terraform_outputs_rds_broker_db_clients_security_group))
