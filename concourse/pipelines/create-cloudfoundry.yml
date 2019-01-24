@@ -3479,7 +3479,6 @@ jobs:
             SYSTEM_DOMAIN: ((system_dns_zone_name))
 
         - task: smoke-tests-run
-          attempts: 3
           file: paas-cf/concourse/tasks/smoke-tests-run.yml
           params:
             AWS_DEFAULT_REGION: ((aws_region))
