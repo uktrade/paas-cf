@@ -222,8 +222,7 @@ vm_types:
   cloud_properties:
     instance_type: ((cell_instance_type))
     ephemeral_disk:
-      size: 204800
-      type: gp2
+      use_instance_storage: true
     security_groups:
     - ((terraform_outputs_rds_broker_db_clients_security_group))
     - ((terraform_outputs_elasticache_broker_clients_security_group))
