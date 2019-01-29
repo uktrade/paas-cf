@@ -3480,6 +3480,7 @@ jobs:
 
         - task: smoke-tests-run
           file: paas-cf/concourse/tasks/smoke-tests-run.yml
+          timeout: 145s
           params:
             AWS_DEFAULT_REGION: ((aws_region))
             DEPLOY_ENV: ((deploy_env))
