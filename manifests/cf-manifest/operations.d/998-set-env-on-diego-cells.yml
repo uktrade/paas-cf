@@ -1,0 +1,5 @@
+---
+
+- type: replace
+  path: /instance_groups/name=diego-cell/env?/bosh/password
+  value: ((secrets_vcap_password))
