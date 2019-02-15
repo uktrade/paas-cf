@@ -11,7 +11,7 @@ compilation:
   vm_type: compilation
   az: z1
   network: cf
-  reuse_compilation_vms: true
+  reuse_compilation_vms: false
   workers: 6
 
 disk_types:
