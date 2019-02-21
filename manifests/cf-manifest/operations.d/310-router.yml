@@ -20,6 +20,7 @@
         additional_frontend_config: |
           capture response header strict-transport-security len 128
           http-response add-header Strict-Transport-Security max-age=31536000;\ includeSubDomains;\ preload unless { capture.res.hdr(0) -m found }
+          http-response set-header X-Robots-Tag noindex,\ nofollow,\ noarchive,\ nosnippet,\ noimageindex,\ notranslate if { capture.req.hdr(0) -m end .((app_domain)) }
         enable_healthcheck_frontend: true
         ssl_pem: "((router_ssl.certificate))((router_ssl.private_key))"
         enable_http_redirect_frontend: true
