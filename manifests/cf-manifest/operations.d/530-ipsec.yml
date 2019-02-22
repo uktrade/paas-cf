@@ -32,7 +32,7 @@
       racoon:
         ports:
         - name: cell
-          targets: ((terraform_outputs_router_subnet_cidr_blocks))
+          targets: ((terraform_outputs_router_subnet_cidr_blocks))((terraform_outputs_cell_subnet_cidr_blocks))
         certificate_authority_private_key: "((ipsec_ca.private_key))"
         certificate_authority_cert: "((ipsec_ca.certificate))"
         level: require
