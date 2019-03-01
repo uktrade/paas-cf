@@ -1,0 +1,56 @@
+---
+platform: linux
+inputs:
+  - name: paas-cf
+  - name: cf-vars-store
+    optional: true
+  - name: cf-manifest
+    optional: true
+  - name: cf-tfstate
+    optional: true
+  - name: logit-secrets
+    optional: true
+outputs:
+  - name: config
+params:
+  SYSTEM_DNS_ZONE_NAME:
+image_resource:
+  type: docker-image
+  source:
+    repository: ruby
+    tag: 2.5-slim
+run:
+  path: sh
+  args:
+    - -e
+    - -c
+    - |
+      VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
+
+      ./paas-cf/concourse/scripts/extract_terraform_state_to_yaml.rb \
+        < cf-tfstate/cf.tfstate \
+        > cf-terraform-outputs.yml \
+      || true # Allow "optional: true", above, to be used
+
+      cat << EOT > config/config.sh
+      export CF_ADMIN=admin
+      export CF_PASS=$($VAL_FROM_YAML cf_admin_password cf-vars-store/cf-vars-store.yml)
+      export API_ENDPOINT="https://api.${SYSTEM_DNS_ZONE_NAME}"
+      export UAA_ENDPOINT=$($VAL_FROM_YAML instance_groups.api.jobs.cloud_controller_ng.properties.uaa.url cf-manifest/cf-manifest.yml)
+      export DOPPLER_ENDPOINT=$($VAL_FROM_YAML instance_groups.scheduler.jobs.tps.properties.capi.tps.traffic_controller_url cf-manifest/cf-manifest.yml)
+      export RDS_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_rds_broker_elb_dns_name cf-terraform-outputs.yml)
+      export RDS_BROKER_PASS=$($VAL_FROM_YAML secrets_rds_broker_admin_password cf-vars-store/cf-vars-store.yml)
+      export CDN_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_cdn_broker_elb_dns_name cf-terraform-outputs.yml)
+      export CDN_BROKER_PASS=$($VAL_FROM_YAML secrets_cdn_broker_admin_password cf-vars-store/cf-vars-store.yml)
+      export AIVEN_BROKER_PASS=$($VAL_FROM_YAML secrets_aiven_broker_admin_password cf-vars-store/cf-vars-store.yml)
+      export BROKER_IP_WHITELIST=$($VAL_FROM_YAML terraform_outputs_nat_public_ips_csv cf-terraform-outputs.yml)
+      export ELASTICACHE_BROKER_PASS=$($VAL_FROM_YAML secrets_elasticache_broker_admin_password cf-vars-store/cf-vars-store.yml)
+      export ELASTICACHE_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_elasticache_broker_elb_dns_name cf-terraform-outputs.yml)
+      export S3_BROKER_PASS=$($VAL_FROM_YAML secrets_s3_broker_admin_password cf-vars-store/cf-vars-store.yml)
+      export S3_BROKER_SERVER=$($VAL_FROM_YAML terraform_outputs_s3_broker_elb_dns_name cf-terraform-outputs.yml)
+      export METRICS_AWS_ACCESS_KEY_ID=$($VAL_FROM_YAML terraform_outputs_metrics_exporter_aws_access_key_id cf-terraform-outputs.yml)
+      export METRICS_AWS_SECRET_ACCESS_KEY=$($VAL_FROM_YAML terraform_outputs_metrics_exporter_aws_secret_access_key cf-terraform-outputs.yml)
+      export LOGIT_ADDRESS=syslog-tls://$($VAL_FROM_YAML meta.logit.syslog_address logit-secrets/logit-secrets.yml):$($VAL_FROM_YAML meta.logit.syslog_port logit-secrets/logit-secrets.yml)
+      EOT
+
+      ls -l config/*
