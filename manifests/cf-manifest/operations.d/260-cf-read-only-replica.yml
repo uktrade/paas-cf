@@ -1,0 +1,31 @@
+- instances: 1
+  name: api_reporting_z1
+  properties:
+    cc:
+      base_url: https://api-reporting.system.mycf.io
+      consul:
+        agent:
+          services:
+            cloud_controller_ng: {}
+      run_prestart_migrations: false   #disables db migration at startup
+      srv_api_uri: https://api-reporting.system.mycf.io
+    ccdb:
+      address: ccdb-readreplica-mycf-pr.fk2uf73fjgy.us-east-1.rds.amazonaws.com
+    route_registrar:
+      routes:
+        - name: api
+          port: 9022
+          registration_interval: 20s
+          tags:
+            component: CloudController
+          uris:
+            - api-reporting.system.mycf.io
+  templates:
+    - name: consul_agent
+      release: cf
+    - name: cloud_controller_ng
+      release: cf
+    - name: metron_agent
+      release: cf
+    - name: route_registrar
+      release: cf

@@ -62,6 +62,31 @@ resource "aws_db_instance" "cf" {
   }
 }
 
+resource "aws_db_instance" "cf-ror" {
+  identifier           = "${var.env}-cf-ror"
+  allocated_storage    = 10
+  engine               = "postgres"
+  engine_version       = "9.5"
+  instance_class       = "db.m4.large"
+  parameter_group_name = "${aws_db_parameter_group.cf_pg_9_5.id}"
+
+  storage_type               = "gp2"
+  backup_window              = "02:00-03:00"
+  maintenance_window         = "${var.cf_db_maintenance_window}"
+  multi_az                   = "${var.cf_db_multi_az}"
+  backup_retention_period    = "0"
+  final_snapshot_identifier  = "${var.env}-cf-ror-rds-final-snapshot"
+  skip_final_snapshot        = "${var.cf_db_skip_final_snapshot}"
+  vpc_security_group_ids     = ["${aws_security_group.cf_rds.id}"]
+  auto_minor_version_upgrade = true
+  replicate_source_db        = "${aws_db_instance.cf.identifier}"
+
+  tags {
+    Name       = "${var.env}-cf-ror"
+    deploy_env = "${var.env}"
+  }
+}
+
 resource "aws_security_group" "cf_rds_client" {
   name        = "${var.env}-cf-rds-client"
   description = "Security group of the CF RDS clients"
