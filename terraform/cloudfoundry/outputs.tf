@@ -54,7 +54,7 @@ output "cf_db_address" {
   value = "${aws_db_instance.cf.address}"
 }
 
-output "cf-ror_db_address" {
+output "cf_ror_db_address" {
   value = "${aws_db_instance.cf-ror.address}"
 }
 
