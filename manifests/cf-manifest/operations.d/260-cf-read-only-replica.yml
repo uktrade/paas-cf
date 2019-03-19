@@ -1,8 +1,7 @@
 - type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/-
+  path: /instance_groups/name=api/jobs/name=api_read_only_replica?/
   value:
     instances: 1
-    name: api_read_only_replica
     properties:
       cc:
         base_url: https://api-ror.tnw.dev.cloudpipeline.digital
