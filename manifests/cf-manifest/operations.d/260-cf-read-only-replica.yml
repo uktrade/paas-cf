@@ -8,7 +8,7 @@
         run_prestart_migrations: false   #disables db migration at startup
         srv_api_uri: https://api-ror.tnw.dev.cloudpipeline.digital
       ccdb:
-        address: ((terraform_outputs_cf-ror_db_address))
+        address: ((terraform_outputs_cf_ror_db_address))
       route_registrar:
         routes:
           - name: api
