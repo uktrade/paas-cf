@@ -290,10 +290,10 @@
   path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=policy-server
 - type: replace
   path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/server_cert_domain_san
-  value: "api_ror.((system_domain))"
+  value: "api-ror.((system_domain))"
 - type: replace
   path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/uris
-  value: ["api_ror.((system_domain))"]
+  value: ["api-ror.((system_domain))"]
 
 - type: replace
   path: /variables/-
