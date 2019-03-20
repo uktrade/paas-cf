@@ -278,6 +278,14 @@
   value: ["api-ror.((system_domain))"]
 
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/provides?
+  value:
+    cloud_controller: nil
+    cloud_controller_https_endpoint: nil
+    cloud_controller_internal: nil
+    cloud_controller_db: nil
+
+- type: replace
   path: /variables/-
   value:
     name: cc_ror_public_tls
