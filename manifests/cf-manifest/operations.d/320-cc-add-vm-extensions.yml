@@ -5,6 +5,12 @@
   - 64g_ephemeral_disk # TODO: it is 50GB_ephemeral_disk in cf_deployment
   - cf_cc_instance_profile
   - cf_cc_security_groups
+- type: replace
+  path: /instance_groups/name=api_ror/vm_extensions?
+  value:
+    - 64g_ephemeral_disk # TODO: it is 50GB_ephemeral_disk in cf_deployment
+    - cf_cc_instance_profile
+    - cf_cc_security_groups
 
 - type: replace
   path: /instance_groups/name=cc-worker/vm_extensions?
