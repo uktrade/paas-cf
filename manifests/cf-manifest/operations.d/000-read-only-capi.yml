@@ -264,8 +264,10 @@
                 server_key: "((cc_bridge_cc_uploader_server.private_key))"
 
 - type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/jobs/local/number_of_workers?
-  value: 0  # This stops workers starting - they throw errors because DB is r/o
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/jobs?
+  value:
+    local:
+      number_of_workers: 0 # This stops CC workers starting - they throw errors because DB is r/o
 
 - type: replace
   path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/run_prestart_migrations?
