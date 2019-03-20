@@ -289,6 +289,12 @@
         - "api-ror.((system_domain))"
         - cloud-controller-ng-ror.service.cf.internal
 
+# 001-rename-network-and-deployment-UPSTREAM
+- type: replace
+  path: /instance_groups/name=api_ror/networks/name=default/name
+  value: ((network_name))
+
+
 # 002-aws-UPSTREAM
 
 - type: replace
