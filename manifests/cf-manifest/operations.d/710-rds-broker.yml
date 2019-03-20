@@ -76,7 +76,7 @@
        destination: ((terraform_outputs_aws_backing_service_cidr_all))
        ports: '3306'
 
- - type: replace
+- type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/default_running_security_groups/-
   value: rds_broker_instances
 
