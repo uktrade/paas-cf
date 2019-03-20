@@ -1,0 +1,234 @@
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: api-ror
+    azs: [z1, z3]
+    env:
+      bosh:
+        password: "((secrets.vcap_password))"
+    instances: 1
+    jobs:
+      - consumes:
+          database: nil
+        name: cloud_controller_ng
+        properties:
+          app_domains:
+            - "((system_domain))"
+          app_ssh:
+            host_key_fingerprint: "((diego_ssh_proxy_host_key.public_key_fingerprint))"
+          cc:
+            broker_client_max_async_poll_duration_minutes: 11520
+            buildpacks:
+              buildpack_directory_key: "((buildpack_directory_key))"
+              fog_connection:
+                provider: AWS
+                region: "((terraform_outputs_region))"
+                use_iam_profile: true
+            bulk_api_password: "((cc_bulk_api_password))"
+            database_encryption:
+              current_key_label: "((cc_db_encryption_key_id))"
+              keys:
+                ((cc_db_encryption_key_id)): "((cc_db_encryption_key))"
+                ((cc_db_encryption_key_id_old)): "((cc_db_encryption_key_old))"
+            db_encryption_key: "((cc_db_encryption_key))"
+            default_quota_definition: default
+            default_running_security_groups:
+              - public_networks
+              - dns
+              - rds_broker_instances
+              - elasticache_broker_instances
+            default_staging_security_groups:
+              - public_networks
+              - dns
+              - rds_broker_instances
+              - elasticache_broker_instances
+            droplets:
+              droplet_directory_key: "((droplet_directory_key))"
+              fog_connection:
+                provider: AWS
+                region: "((terraform_outputs_region))"
+                use_iam_profile: true
+            internal_api_password: "((cc_internal_api_password))"
+            jobs:
+              local:
+                number_of_workers: 0 # This stops workers starting - they throw errors because DB is r/o
+            mutual_tls:
+              ca_cert: "((service_cf_internal_ca.certificate))"
+              public_cert: "((cc_tls.certificate))"
+              private_key: "((cc_tls.private_key))"
+            packages:
+              app_package_directory_key: "((app_package_directory_key))"
+              fog_connection:
+                provider: AWS
+                region: "((terraform_outputs_region))"
+                use_iam_profile: true
+            public_tls:
+              ca_cert: "((service_cf_internal_ca.certificate))"
+              certificate: "((cc_ror_public_tls.certificate))"
+              private_key: "((cc_ror_public_tls.private_key))"
+            quota_definitions:
+              2xlarge:
+                memory_limit: 409600
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 160
+              default:
+                memory_limit: 5120
+                non_basic_services_allowed: false
+                total_routes: 1000
+                total_services: 10
+              gds-non-chargeable:
+                memory_limit: 5120
+                non_basic_services_allowed: false
+                total_routes: 1000
+                total_services: 10
+              large:
+                memory_limit: 102400
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 40
+              medium:
+                memory_limit: 61440
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 20
+              small:
+                memory_limit: 10240
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 10
+              test_apps:
+                memory_limit: 2048
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 10
+              xlarge:
+                memory_limit: 204800
+                non_basic_services_allowed: true
+                total_routes: 1000
+                total_services: 80
+            resource_pool:
+              fog_connection:
+                provider: AWS
+                region: "((terraform_outputs_region))"
+                use_iam_profile: true
+              resource_directory_key: "((resource_directory_key))"
+            run_prestart_migrations: false #important - omitting this stops cc from starting as the database is RO
+            security_group_definitions:
+              - name: public_networks
+                rules:
+                  - destination: 0.0.0.0-9.255.255.255
+                    protocol: all
+                  - destination: 11.0.0.0-169.253.255.255
+                    protocol: all
+                  - destination: 169.255.0.0-172.15.255.255
+                    protocol: all
+                  - destination: 172.32.0.0-192.167.255.255
+                    protocol: all
+                  - destination: 192.169.0.0-255.255.255.255
+                    protocol: all
+              - name: dns
+                rules:
+                  - destination: 0.0.0.0/0
+                    ports: "53"
+                    protocol: tcp
+                  - destination: 0.0.0.0/0
+                    ports: "53"
+                    protocol: udp
+              - name: rds_broker_instances
+                rules:
+                  - destination: 10.0.52.0/22
+                    ports: "5432"
+                    protocol: tcp
+                  - destination: 10.0.52.0/22
+                    ports: "3306"
+                    protocol: tcp
+              - name: elasticache_broker_instances
+                rules:
+                  - destination: 10.0.52.0/22
+                    ports: "6379"
+                    protocol: tcp
+            srv_api_uri: https://api-ror.tnw.dev.cloudpipeline.digital
+            stacks:
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 14.04)
+                name: cflinuxfs2
+              - description: Cloud Foundry Linux-based filesystem (Ubuntu 18.04)
+                name: cflinuxfs3
+            staging_upload_password: 97dbwijv0pvmbkhksztl
+            staging_upload_user: staging_user
+          ccdb:
+            address: "((terraform_outputs_cf_ror_db_address))"
+            databases:
+              - citext: true
+                name: api
+                tag: cc
+            db_scheme: postgres
+            port: 5432
+            roles:
+              - name: "((external_cc_database_username))"
+                password: "((external_cc_database_password))"
+                tag: admin
+          doppler:
+            port: 443
+          router:
+            route_services_secret: "((router_route_services_secret))"
+          ssl: {}
+          support_address: https://docs.cloud.service.gov.uk
+          system_domain: "((system_domain))"
+          system_domain_organization: admin
+          uaa:
+            ca_cert: "((uaa_ca.certificate))"
+            clients:
+              cc_routing:
+                secret: "((uaa_clients_cc-routing_secret))"
+              cloud_controller_username_lookup:
+                secret: "((uaa_clients_cloud_controller_username_lookup_secret))"
+              cc-service-dashboards:
+                secret: "((uaa_clients_cc-service-dashboards_secret))"
+              cc_service_key_client:
+                secret: "((uaa_clients_cc_service_key_client_secret))"
+            url: https://uaa.((system_domain))
+        provides:
+          cloud_controller: nil
+          cloud_controller_https_endpoint: nil
+          cloud_controller_internal: nil
+          cloud_controller_db: nil
+        release: capi
+      - name: route_registrar
+        properties:
+          route_registrar:
+            routes:
+              - health_check:
+                  name: api-health-check
+                  script_path: /var/vcap/jobs/cloud_controller_ng/bin/cloud_controller_ng_health_check
+                  timeout: 6s
+                name: api
+                port: 9022
+                registration_interval: 10s
+                server_cert_domain_san: "api-ror.((system_domain))"
+                tags:
+                  component: CloudController
+                tls_port: 9024
+                uris:
+                  - "api-ror.((system_domain))"
+        release: routing
+    networks:
+      - name: cf
+    stemcell: default
+    vm_extensions:
+      - 64g_ephemeral_disk
+      - cf_cc_instance_profile
+      - cf_cc_security_groups
+    vm_type: large
+
+- type: replace
+  path: /variables/-
+  value:
+    name: cc_ror_public_tls
+    type: certificate
+    options:
+      ca: service_cf_internal_ca
+      common_name: "api-ror.((system_domain))"
+      alternative_names:
+        - "api-ror.((system_domain))"
+        - cloud-controller-ng-ror.service.cf.internal
