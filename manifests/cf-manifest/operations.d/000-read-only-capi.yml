@@ -380,27 +380,6 @@
   path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool/fog_connection
   value: *blobstore-properties
 
-# 005-use-external-dbs-UPSTREAM
-
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/db_scheme
-  value: &external_cc_ror_database_scheme "((external_database_type))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/port
-  value: &external_cc_ror_database_port "((external_database_port))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/databases/tag=cc/name
-  value: &external_cc_ror_database_name "((external_cc_database_name))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/address?
-  value: &external_cc_ror_database_address "((external_cc_database_address))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/roles/name=cloud_controller/password
-  value: &external_cc_ror_database_password "((external_cc_database_password))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/roles/name=cloud_controller/name
-  value: &external_cc_ror_database_username "((external_cc_database_username))"
-
 #006-stop-skipping-tls-validation-UPSTREAM
 
 - type: remove
