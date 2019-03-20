@@ -17,6 +17,24 @@
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/system_domain
   value: ((terraform_outputs_cf_root_domain))
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks/fog_connection/region
+  value: ((terraform_outputs_region))
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets/fog_connection/region
+  value: ((terraform_outputs_region))
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages/fog_connection/region
+  value: ((terraform_outputs_region))
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool/fog_connection/region
+  value: ((terraform_outputs_region))
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/address
+  value: ((terraform_outputs_cf_ror_db_address))
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/system_domain
+  value: ((terraform_outputs_cf_root_domain))
+- type: replace
   path: /instance_groups/name=api/jobs/name=policy-server/properties/database/host
   value: ((terraform_outputs_cf_db_address))
 - type: replace

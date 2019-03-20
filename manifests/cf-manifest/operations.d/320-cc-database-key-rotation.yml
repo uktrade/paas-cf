@@ -12,6 +12,14 @@
       ((cc_db_encryption_key_id_old)): "((cc_db_encryption_key_old))"
 
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/database_encryption?
+  value: &cc-database-encryption
+    current_key_label: "((cc_db_encryption_key_id))"
+    keys:
+      ((cc_db_encryption_key_id)): "((cc_db_encryption_key))"
+      ((cc_db_encryption_key_id_old)): "((cc_db_encryption_key_old))"
+
+- type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/cc/database_encryption?
   value: *cc-database-encryption
 

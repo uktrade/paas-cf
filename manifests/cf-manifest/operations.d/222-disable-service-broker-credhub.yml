@@ -9,6 +9,9 @@
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/credhub_api
 
 - type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/credhub_api
+
+- type: remove
   path: /variables/name=credhub_encryption_password
 - type: remove
   path: /variables/name=credhub_admin_client_secret

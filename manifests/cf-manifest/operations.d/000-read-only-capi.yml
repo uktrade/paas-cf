@@ -1,0 +1,415 @@
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: api_ror
+    azs:
+      - z1
+      - z2
+    instances: 2
+    vm_type: small
+    vm_extensions:
+      - 50GB_ephemeral_disk
+    stemcell: default
+    networks:
+      - name: default
+    jobs:
+      - name: cloud_controller_ng
+        release: capi
+        provides:
+          cloud_controller: {as: cloud_controller, shared: true}
+        properties:
+          router:
+            route_services_secret: "((router_route_services_secret))"
+          system_domain: "((system_domain))"
+          app_domains:
+            - "((system_domain))"
+          app_ssh:
+            host_key_fingerprint: "((diego_ssh_proxy_host_key.public_key_fingerprint))"
+          routing_api: &routing_api
+            enabled: true
+          credhub_api:
+            ca_cert: ((credhub_ca.certificate))
+          ssl:
+            skip_cert_verify: true
+          uaa:
+            ca_cert: "((uaa_ca.certificate))"
+            clients:
+              cc_routing:
+                secret: "((uaa_clients_cc-routing_secret))"
+              cloud_controller_username_lookup:
+                secret: "((uaa_clients_cloud_controller_username_lookup_secret))"
+              cc-service-dashboards:
+                secret: "((uaa_clients_cc-service-dashboards_secret))"
+              cc_service_key_client:
+                secret: "((uaa_clients_cc_service_key_client_secret))"
+            url: https://uaa.((system_domain))
+          cc:
+            stacks:
+              - name: cflinuxfs2
+                description: Cloud Foundry Linux-based filesystem (Ubuntu 14.04)
+              - name: cflinuxfs3
+                description: Cloud Foundry Linux-based filesystem (Ubuntu 18.04)
+            default_running_security_groups:
+              - public_networks
+              - dns
+            default_staging_security_groups:
+              - public_networks
+              - dns
+            security_group_definitions:
+              - name: public_networks
+                rules:
+                  - destination: 0.0.0.0-9.255.255.255
+                    protocol: all
+                  - destination: 11.0.0.0-169.253.255.255
+                    protocol: all
+                  - destination: 169.255.0.0-172.15.255.255
+                    protocol: all
+                  - destination: 172.32.0.0-192.167.255.255
+                    protocol: all
+                  - destination: 192.169.0.0-255.255.255.255
+                    protocol: all
+              - name: dns
+                rules:
+                  - destination: 0.0.0.0/0
+                    ports: '53'
+                    protocol: tcp
+                  - destination: 0.0.0.0/0
+                    ports: '53'
+                    protocol: udp
+            install_buildpacks:
+              ## Order is important here
+              - name: staticfile_buildpack
+                package: staticfile-buildpack-cflinuxfs2
+              - name: java_buildpack
+                package: java-buildpack-cflinuxfs2
+              - name: ruby_buildpack
+                package: ruby-buildpack-cflinuxfs2
+              - name: dotnet_core_buildpack
+                package: dotnet-core-buildpack-cflinuxfs2
+              - name: nodejs_buildpack
+                package: nodejs-buildpack-cflinuxfs2
+              - name: go_buildpack
+                package: go-buildpack-cflinuxfs2
+              - name: python_buildpack
+                package: python-buildpack-cflinuxfs2
+              - name: php_buildpack
+                package: php-buildpack-cflinuxfs2
+              - name: binary_buildpack
+                package: binary-buildpack-cflinuxfs2
+              - name: staticfile_buildpack
+                package: staticfile-buildpack-cflinuxfs3
+              - name: java_buildpack
+                package: java-buildpack-cflinuxfs3
+              - name: ruby_buildpack
+                package: ruby-buildpack-cflinuxfs3
+              - name: dotnet_core_buildpack
+                package: dotnet-core-buildpack-cflinuxfs3
+              - name: nodejs_buildpack
+                package: nodejs-buildpack-cflinuxfs3
+              - name: go_buildpack
+                package: go-buildpack-cflinuxfs3
+              - name: python_buildpack
+                package: python-buildpack-cflinuxfs3
+              - name: php_buildpack
+                package: php-buildpack-cflinuxfs3
+              - name: binary_buildpack
+                package: binary-buildpack-cflinuxfs3
+            db_encryption_key: "((cc_db_encryption_key))"
+            database_encryption: &cc-database-encryption
+              current_key_label: "encryption_key_0"
+              keys:
+                encryption_key_0: "((cc_db_encryption_key))"
+            bulk_api_password: "((cc_bulk_api_password))"
+            internal_api_password: "((cc_internal_api_password))"
+            staging_upload_user: staging_user
+            staging_upload_password: "((cc_staging_upload_password))"
+            buildpacks: &blobstore-properties
+              blobstore_type: webdav
+              webdav_config:
+                ca_cert: "((service_cf_internal_ca.certificate))"
+                blobstore_timeout: 5
+                password: "((blobstore_admin_users_password))"
+                private_endpoint: https://blobstore.service.cf.internal:4443
+                public_endpoint: https://blobstore.((system_domain))
+                username: blobstore-user
+            resource_pool: *blobstore-properties
+            packages: *blobstore-properties
+            droplets: *blobstore-properties
+            mutual_tls: &cc_mutual_tls
+              ca_cert: "((service_cf_internal_ca.certificate))"
+              public_cert: "((cc_tls.certificate))"
+              private_key: "((cc_tls.private_key))"
+            public_tls:
+              ca_cert: "((service_cf_internal_ca.certificate))"
+              certificate: "((cc_public_tls.certificate))"
+              private_key: "((cc_public_tls.private_key))"
+          ccdb: &ccdb
+            databases:
+              - name: cloud_controller
+                tag: cc
+            db_scheme: mysql
+            port: 3306
+            roles:
+              - name: cloud_controller
+                password: "((cc_database_password))"
+                tag: admin
+      - name: binary-buildpack
+        release: binary-buildpack
+      - name: dotnet-core-buildpack
+        release: dotnet-core-buildpack
+      - name: go-buildpack
+        release: go-buildpack
+      - name: java-buildpack
+        release: java-buildpack
+      - name: nodejs-buildpack
+        release: nodejs-buildpack
+      - name: php-buildpack
+        release: php-buildpack
+      - name: python-buildpack
+        release: python-buildpack
+      - name: ruby-buildpack
+        release: ruby-buildpack
+      - name: staticfile-buildpack
+        release: staticfile-buildpack
+      - name: route_registrar
+        release: routing
+        properties:
+          route_registrar:
+            routes:
+              - name: api
+                registration_interval: 10s
+                port: 9022
+                tls_port: 9024
+                server_cert_domain_san: "api.((system_domain))"
+                tags:
+                  component: CloudController
+                uris:
+                  - api.((system_domain))
+                health_check:
+                  name: api-health-check
+                  script_path: "/var/vcap/jobs/cloud_controller_ng/bin/cloud_controller_ng_health_check"
+                  timeout: 6s
+              - name: policy-server
+                port: 4002
+                registration_interval: 20s
+                uris:
+                  - api.((system_domain))/networking
+      - name: statsd_injector
+        release: statsd-injector
+        properties: *statsd_injector_properties
+      - name: file_server
+        release: diego
+        properties:
+          bpm:
+            enabled: true
+          enable_consul_service_registration: false
+          logging:
+            format:
+              timestamp: "rfc3339"
+          loggregator: *diego_loggregator_client_properties
+      - name: routing-api
+        release: routing
+        properties:
+          routing_api:
+            skip_consul_lock: true
+            system_domain: "((system_domain))"
+            router_groups:
+              - name: default-tcp
+                type: tcp
+                reservable_ports: 1024-1123
+            sqldb:
+              host: sql-db.service.cf.internal
+              type: mysql
+              port: 3306
+              schema: routing-api
+              username: routing-api
+              password: "((routing_api_database_password))"
+            locket:
+              api_location: "locket.service.cf.internal:8891"
+              ca_cert: "((service_cf_internal_ca.certificate))"
+              client_cert: "((diego_locket_client.certificate))"
+              client_key: "((diego_locket_client.private_key))"
+          uaa:
+            ca_cert: "((uaa_ca.certificate))"
+            tls_port: 8443
+      - name: policy-server
+        release: cf-networking
+        properties:
+          uaa_client_secret: ((uaa_clients_network_policy_secret))
+          uaa_ca: ((uaa_ca.certificate))
+          enable_space_developer_self_service: true
+          database:
+            type: mysql
+            username: network_policy
+            password: ((network_policy_database_password))
+            host: sql-db.service.cf.internal
+            port: 3306
+            name: network_policy
+      - name: policy-server-internal
+        release: cf-networking
+        properties:
+          ca_cert: ((network_policy_ca.certificate))
+          server_cert: ((network_policy_server.certificate))
+          server_key: ((network_policy_server.private_key))
+      - name: cc_uploader
+        release: capi
+        properties:
+          capi:
+            cc_uploader:
+              cc:
+                ca_cert: "((service_cf_internal_ca.certificate))"
+                client_cert: "((cc_bridge_cc_uploader.certificate))"
+                client_key: "((cc_bridge_cc_uploader.private_key))"
+              mutual_tls:
+                ca_cert: "((service_cf_internal_ca.certificate))"
+                server_cert: "((cc_bridge_cc_uploader_server.certificate))"
+                server_key: "((cc_bridge_cc_uploader_server.private_key))"
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/jobs/local/number_of_workers?
+  value: 0  # This stops workers starting - they throw errors because DB is r/o
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/run_prestart_migrations?
+    value: false # This stops the pre-start job from running migrations which will prevent CC from starting.
+
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=statsd_injector
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=file_server
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=policy-server
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=policy-server-internal
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cc_uploader
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=routing-api
+
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=policy-server
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/server_cert_domain_san
+  value: "api_ror.((system_domain))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/uris
+  value: ["api_ror.((system_domain))"]
+
+- type: replace
+  path: /variables/-
+  value:
+    name: cc_ror_public_tls
+    type: certificate
+    options:
+      ca: service_cf_internal_ca
+      common_name: "api-ror.((system_domain))"
+      alternative_names:
+        - "api-ror.((system_domain))"
+        - cloud-controller-ng-ror.service.cf.internal
+
+# 002-aws-UPSTREAM
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/doppler?/port
+  value: 4443
+
+# 003-use-external-blobstore-UPSTREAM
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool
+
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks?/fog_connection
+  value: &blobstore-properties ((fog_connection))
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets?/fog_connection
+  value: *blobstore-properties
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages?/fog_connection
+  value: *blobstore-properties
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool?/fog_connection
+  value: *blobstore-properties
+
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks/buildpack_directory_key?
+  value: ((buildpack_directory_key))
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets/droplet_directory_key?
+  value: ((droplet_directory_key))
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages/app_package_directory_key?
+  value: ((app_package_directory_key))
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool/resource_directory_key?
+  value: ((resource_directory_key))
+
+#004-use-s3-blobstore-UPSTREAM.yml
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks/fog_connection
+  error: "Please apply 'use-external-blobstore.yml' before applying 'use-s3-blobstore.yml'."
+  value: &blobstore-properties
+    provider: AWS
+    aws_access_key_id: ((blobstore_access_key_id))
+    aws_secret_access_key: ((blobstore_secret_access_key))
+    region: ((aws_region))
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets/fog_connection
+  value: *blobstore-properties
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages/fog_connection
+  value: *blobstore-properties
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool/fog_connection
+  value: *blobstore-properties
+
+# 005-use-external-dbs-UPSTREAM
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/db_scheme
+  value: &external_cc_ror_database_scheme "((external_database_type))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/port
+  value: &external_cc_ror_database_port "((external_database_port))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/databases/tag=cc/name
+  value: &external_cc_ror_database_name "((external_cc_database_name))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/address?
+  value: &external_cc_ror_database_address "((external_cc_database_address))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/roles/name=cloud_controller/password
+  value: &external_cc_ror_database_password "((external_cc_database_password))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb/roles/name=cloud_controller/name
+  value: &external_cc_ror_database_username "((external_cc_database_username))"
+
+#006-stop-skipping-tls-validation-UPSTREAM
+
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ssl/skip_cert_verify
+
+# 007-enable-service-discovery-UPSTREAM
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/app_domains/-
+  value:
+    name: apps.internal
+    internal: true

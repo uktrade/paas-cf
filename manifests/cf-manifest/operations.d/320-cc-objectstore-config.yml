@@ -3,6 +3,9 @@
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/buildpacks/buildpack_directory_key?
   value: ((environment))-cf-buildpacks
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/buildpacks/buildpack_directory_key?
+  value: ((environment))-cf-buildpacks
+- type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/cc/buildpacks/buildpack_directory_key?
   value: ((environment))-cf-buildpacks
 - type: replace
@@ -11,6 +14,9 @@
 
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/droplets/droplet_directory_key?
+  value: ((environment))-cf-droplets
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/droplets/droplet_directory_key?
   value: ((environment))-cf-droplets
 - type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/cc/droplets/droplet_directory_key?
@@ -23,6 +29,9 @@
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/packages/app_package_directory_key?
   value: ((environment))-cf-packages
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/packages/app_package_directory_key?
+  value: ((environment))-cf-packages
+- type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/cc/packages/app_package_directory_key?
   value: ((environment))-cf-packages
 - type: replace
@@ -31,6 +40,9 @@
 
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/resource_pool/resource_directory_key?
+  value: ((environment))-cf-resources
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/resource_pool/resource_directory_key?
   value: ((environment))-cf-resources
 - type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/cc/resource_pool/resource_directory_key?

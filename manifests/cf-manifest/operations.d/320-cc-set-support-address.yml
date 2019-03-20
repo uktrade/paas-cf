@@ -2,3 +2,7 @@
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/support_address?
   value: https://docs.cloud.service.gov.uk
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/support_address?
+  value: https://docs.cloud.service.gov.uk

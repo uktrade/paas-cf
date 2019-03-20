@@ -13,6 +13,20 @@
         name: api
         citext: true
 - type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb
+  value: &cloud_controller_ng_ccdb
+    db_scheme: postgres
+    address: ((terraform_outputs_cf_ror_db_address))
+    port: 5432
+    roles:
+      - tag: admin
+        name: api
+        password: ((external_cc_database_password))
+    databases:
+      - tag: cc
+        name: api
+        citext: true
+- type: replace
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/ccdb
   value: *cloud_controller_ng_ccdb
 

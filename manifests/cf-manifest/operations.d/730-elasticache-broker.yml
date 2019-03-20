@@ -128,6 +128,23 @@
   value: elasticache_broker_instances
 
 - type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/security_group_definitions/-
+  value:
+    name: elasticache_broker_instances
+    rules:
+      - protocol: tcp
+        destination: ((terraform_outputs_aws_backing_service_cidr_all))
+        ports: '6379'
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/default_running_security_groups/-
+  value: elasticache_broker_instances
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/default_staging_security_groups/-
+  value: elasticache_broker_instances
+
+- type: replace
   path: /variables/-
   value:
     name: secrets_elasticache_broker_admin_password

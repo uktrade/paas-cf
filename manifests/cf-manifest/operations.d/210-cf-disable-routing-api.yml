@@ -7,6 +7,8 @@
 - type: remove
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/routing_api
 - type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/routing_api
+- type: remove
   path: /instance_groups/name=cc-worker/jobs/name=cloud_controller_worker/properties/routing_api
 - type: remove
   path: /instance_groups/name=scheduler/jobs/name=cloud_controller_clock/properties/routing_api

@@ -65,7 +65,27 @@
         keep_snapshots_for_days: 35
 
 - type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/security_group_definitions/-
+           path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/security_group_definitions/-
+           value:
+             name: rds_broker_instances
+             rules:
+               - protocol: tcp
+                 destination: ((terraform_outputs_aws_backing_service_cidr_all))
+                 ports: '5432'
+               - protocol: tcp
+                 destination: ((terraform_outputs_aws_backing_service_cidr_all))
+                 ports: '3306'
+
+             - type: replace
+               path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/default_running_security_groups/-
+               value: rds_broker_instances
+
+             - type: replace
+               path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/default_staging_security_groups/-
+               value: rds_broker_instances
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/security_group_definitions/-
   value:
     name: rds_broker_instances
     rules:
@@ -77,11 +97,11 @@
         ports: '3306'
 
 - type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/default_running_security_groups/-
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/default_running_security_groups/-
   value: rds_broker_instances
 
 - type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/cc/default_staging_security_groups/-
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/default_staging_security_groups/-
   value: rds_broker_instances
 
 - type: replace
