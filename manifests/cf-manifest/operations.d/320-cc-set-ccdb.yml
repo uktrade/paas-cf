@@ -13,7 +13,7 @@
         name: api
         citext: true
 - type: replace
-  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/ccdb
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/ccdb
   value: &cloud_controller_ng_ccdb
     db_scheme: postgres
     address: ((terraform_outputs_cf_ror_db_address))
