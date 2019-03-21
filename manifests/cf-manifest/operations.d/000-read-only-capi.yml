@@ -245,58 +245,6 @@
                 server_cert: "((cc_bridge_cc_uploader_server.certificate))"
                 server_key: "((cc_bridge_cc_uploader_server.private_key))"
 
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/jobs?
-  value:
-    local:
-      number_of_workers: 0 # This stops CC workers starting - they throw errors because DB is r/o
-
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/run_prestart_migrations?
-  value: false # This stops the pre-start job from running migrations which will prevent CC from starting.
-
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=statsd_injector
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=file_server
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=policy-server
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=policy-server-internal
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=cc_uploader
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=routing-api
-
-- type: remove
-  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=policy-server
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/server_cert_domain_san
-  value: "api-ror.((system_domain))"
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/uris
-  value: ["api-ror.((system_domain))"]
-
-- type: replace
-  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/provides?
-  value:
-    cloud_controller: nil
-    cloud_controller_https_endpoint: nil
-    cloud_controller_internal: nil
-    cloud_controller_db: nil
-
-- type: replace
-  path: /variables/-
-  value:
-    name: cc_ror_public_tls
-    type: certificate
-    options:
-      ca: service_cf_internal_ca
-      common_name: "api-ror.((system_domain))"
-      alternative_names:
-        - "api-ror.((system_domain))"
-        - cloud-controller-ng-ror.service.cf.internal
-
 # 001-rename-network-and-deployment-UPSTREAM
 - type: replace
   path: /instance_groups/name=api_ror/networks/name=default/name
@@ -388,3 +336,66 @@
   value:
     name: apps.internal
     internal: true
+
+
+# Actual Changes for this module
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/jobs?
+  value:
+    local:
+      number_of_workers: 0 # This stops CC workers starting - they throw errors because DB is r/o
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/run_prestart_migrations?
+  value: false # This stops the pre-start job from running migrations which will prevent CC from starting.
+
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=statsd_injector
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=file_server
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=policy-server
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=policy-server-internal
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=cc_uploader
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=routing-api
+
+- type: remove
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=policy-server
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/server_cert_domain_san
+  value: "api-ror.((system_domain))"
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=route_registrar/properties/route_registrar/routes/name=api/uris
+  value: ["api-ror.((system_domain))"]
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/provides?
+  value:
+    cloud_controller: nil
+    cloud_controller_https_endpoint: nil
+    cloud_controller_internal: nil
+    cloud_controller_db: nil
+
+- type: replace
+  path: /variables/-
+  value:
+    name: cc_ror_public_tls
+    type: certificate
+    options:
+      ca: service_cf_internal_ca
+      common_name: "api-ror.((system_domain))"
+      alternative_names:
+        - "api-ror.((system_domain))"
+        - cloud-controller-ng-ror.service.cf.internal
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/public_tls/certificate
+  value: "((cc_ror_public_tls.certificate))"
+
+- type: replace
+  path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/public_tls/private_key
+  value: "((cc_ror_public_tls.private_key))"
