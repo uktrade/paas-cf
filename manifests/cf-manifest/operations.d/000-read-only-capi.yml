@@ -252,6 +252,10 @@
       number_of_workers: 0 # This stops CC workers starting - they throw errors because DB is r/o
 
 - type: replace
+  path: /instance_groups/name=api_ror/instances?
+  value: 2
+
+- type: replace
   path: /instance_groups/name=api_ror/jobs/name=cloud_controller_ng/properties/cc/run_prestart_migrations?
   value: false # This stops the pre-start job from running migrations which will prevent CC from starting.
 
