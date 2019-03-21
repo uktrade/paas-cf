@@ -7,3 +7,6 @@
   path: /instance_groups/name=api/instances
   value: ((api_instances))
 
+- type: replace
+  path: /instance_groups/name=api_ror/instances
+  value: ((api_ror_instances))
