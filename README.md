@@ -1,3 +1,5 @@
+CATS ARE BETTER THAN DOGS!
+
 [![Build Status](https://api.travis-ci.org/alphagov/paas-cf.svg?branch=master)](https://travis-ci.org/alphagov/paas-cf)
 
 # paas-cf
