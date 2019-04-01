@@ -183,9 +183,10 @@
             databases:
               - name: cloud_controller
                 tag: cc
-            db_scheme: mysql
-            port: 3306
+            db_scheme: postgres
+            address: ((terraform_outputs_cf_db_address))
+            port: 5432
             roles:
-              - name: cloud_controller
-                password: ((cc_database_password))
+              - name: api
+                password: ((external_cc_database_password))
                 tag: admin
