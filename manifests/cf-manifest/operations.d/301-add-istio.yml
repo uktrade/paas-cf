@@ -165,7 +165,7 @@
   value:
     name: cc-route-syncer
     networks:
-      - name: default
+      - name: router
     stemcell: default
     vm_type: small
     azs:
