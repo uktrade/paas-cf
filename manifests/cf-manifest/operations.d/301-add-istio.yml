@@ -1,0 +1,191 @@
+---
+- type: replace
+  path: /releases/-
+  value:
+    name: istio
+    version: "2"
+    url: "https://bosh.io/d/github.com/cloudfoundry/istio-release?v=2"
+    sha1: "ba25e371adce737ada87d938634b1f870c8db21a"
+
+- type: replace
+  path: /instance_groups/name=istio-control?
+  value:
+    name: istio-control
+    networks:
+      - name: router
+    stemcell: default
+    vm_type: medium
+    azs:
+      - z1
+      - z2
+      - z3
+    instances: 1
+    jobs:
+      - name: pilot-discovery
+        release: istio
+        properties:
+          copilot:
+            server_ca_cert: "((copilot.ca))"
+            client_cert: "((pilot.certificate))"
+            client_key: "((pilot.private_key))"
+          bpm:
+            enable: true
+      - name: copilot
+        release: istio
+        properties:
+          pilot_client_ca_cert: "((pilot.ca))"
+          cloud_controller_client_ca_cert: "((service_cf_internal_ca.certificate))"
+          server_cert: "((copilot.certificate))"
+          server_key: "((copilot.private_key))"
+          bbs:
+            server_ca_cert: "((diego_bbs_client.ca))"
+            client_cert: "((diego_bbs_client.certificate))"
+            client_key: "((diego_bbs_client.private_key))"
+
+- type: replace
+  path: /instance_groups/name=istio-router?
+  value:
+    name: istio-router
+    networks:
+      - name: router
+    stemcell: default
+    vm_type: small
+    azs:
+      - z1
+      - z2
+      - z3
+    instances: 3
+    jobs:
+      - name: envoy
+        release: istio
+        consumes:
+          pilot: {from: pilot}
+        properties: {}
+      - name: silk-daemon
+        properties:
+          ca_cert: ((silk_ca.certificate))
+          client_cert: ((silk_daemon.certificate))
+          client_key: ((silk_daemon.private_key))
+          single_ip_only: true
+        release: silk
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: copilot
+    type: certificate
+    options:
+      ca: service_cf_internal_ca
+      common_name: copilot.service.cf.internal
+      extended_key_usage:
+        - server_auth
+
+- type: replace
+  path: /variables?/-
+  value:
+    name: pilot
+    type: certificate
+    options:
+      ca: service_cf_internal_ca
+      common_name: pilot.service.cf.internal
+      extended_key_usage:
+        - client_auth
+
+- type: replace
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/-
+  value:
+    domain: copilot.service.cf.internal
+    targets:
+      - deployment: cf
+        domain: bosh
+        instance_group: istio-control
+        network: default
+        query: "*"
+
+- type: replace
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/-
+  value:
+    domain: pilot.service.cf.internal
+    targets:
+      - deployment: cf
+        domain: bosh
+        instance_group: istio-control
+        network: default
+        query: "*"
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/app_domains/-
+  value:
+    name: "istio.((system_domain))"
+
+# enable copilot in CAPI
+- type: replace
+  path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/copilot?
+  value:
+    enabled: true
+    host: copilot.service.cf.internal
+    port: 9001
+    client_ca_file: ((service_cf_internal_ca.certificate))
+    client_key_file: ((copilot_client.private_key))
+    client_chain_file: ((copilot_client.certificate))
+    temporary_istio_domains:
+      - "istio.((system_domain))"
+- type: replace
+  path: /variables/-
+  value:
+    name: copilot_client
+    options:
+      ca: service_cf_internal_ca
+      common_name: copilot.service.cf.internal
+      extended_key_usage:
+        - client_auth
+    type: certificate
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=pilot-discovery?
+  value:
+    name: pilot-discovery
+    release: istio
+    provides:
+      pilot: nil
+    properties:
+      copilot:
+        server_ca_cert: "((copilot.ca))"
+        client_cert: "((pilot.certificate))"
+        client_key: "((pilot.private_key))"
+      bpm:
+        enable: true
+
+- type: replace
+  path: /instance_groups/name=diego-cell/jobs/name=silk-cni/properties?/host_tcp_services
+  value: ["169.254.0.2:8080","169.254.0.2:15012","169.254.0.2:15010"]
+
+- type: replace
+  path: /instance_groups/name=cc-route-syncer?
+  value:
+    name: cc-route-syncer
+    networks:
+      - name: default
+    stemcell: default
+    vm_type: small
+    azs:
+      - z1
+      - z2
+      - z3
+    instances: 1
+    jobs:
+      - name: cc_route_syncer
+        release: capi
+        properties:
+          bpm:
+            enable: true
+          ccdb:
+            databases:
+              - name: cloud_controller
+                tag: cc
+            db_scheme: mysql
+            port: 3306
+            roles:
+              - name: cloud_controller
+                password: ((cc_database_password))
+                tag: admin
