@@ -59,7 +59,7 @@
       - name: envoy
         release: istio
         consumes:
-          pilot: {from: pilot}
+          pilot: {from: pilot, ip_addresses: true}
         properties: {}
       - name: silk-daemon
         properties:
