@@ -116,7 +116,7 @@
 - type: replace
   path: /instance_groups/name=api/jobs/name=cloud_controller_ng/properties/app_domains/-
   value:
-    name: "istio.((apps_domain))"
+    name: "istio.((terraform_outputs_cf_apps_domain))"
 
 # enable copilot in CAPI
 - type: replace
@@ -129,7 +129,7 @@
     client_key_file: ((copilot_client.private_key))
     client_chain_file: ((copilot_client.certificate))
     temporary_istio_domains:
-      - "istio.((apps_domain))"
+      - "istio.((terraform_outputs_cf_apps_domain))"
 - type: replace
   path: /variables/-
   value:
