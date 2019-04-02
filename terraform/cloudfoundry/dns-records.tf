@@ -30,6 +30,14 @@ resource "aws_route53_record" "apps_wildcard" {
   records = ["${aws_elb.cf_router.dns_name}"]
 }
 
+resource "aws_route53_record" "cf-istio-router-dns" {
+  zone_id = "${var.apps_dns_zone_id}"
+  name    = "*.istio.${var.apps_dns_zone_name}"
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${aws_elb.cf-istio-router.dns_name}"]
+}
+
 resource "aws_route53_record" "system_apex" {
   zone_id = "${var.system_dns_zone_id}"
   name    = "${var.system_dns_zone_name}."
