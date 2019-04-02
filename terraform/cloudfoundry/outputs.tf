@@ -111,6 +111,9 @@ output "rds_broker_elb_name" {
   value = "${aws_elb.rds_broker.name}"
 }
 
+output "cf_istio_router_elb_name" {
+  value = "${aws_elb.cf-istio-router.name}"
+}
 output "rds_broker_elb_dns_name" {
   value = "${aws_route53_record.rds_broker.fqdn}"
 }
