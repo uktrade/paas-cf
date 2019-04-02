@@ -21,3 +21,12 @@
     network: router
     deployment: ((deployment_name))
     domain: bosh
+
+- type: replace
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/domain=copiliot.service.cf.internal/targets
+  value:
+    - query: '*'
+      instance_group: router
+      network: router
+      deployment: ((deployment_name))
+      domain: bosh
