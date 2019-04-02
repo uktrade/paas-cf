@@ -23,7 +23,7 @@
     domain: bosh
 
 - type: replace
-  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/domain=copiliot.service.cf.internal?/targets
+  path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/domain=copilot.service.cf.internal?/targets
   value:
     - query: '*'
       instance_group: router
