@@ -1,1 +1,1 @@
-manifests/cf-deployment/operations/enable-routing-integrity.yml
+../../../manifests/cf-deployment/operations/enable-routing-integrity.yml
