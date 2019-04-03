@@ -179,6 +179,13 @@
         properties:
           bpm:
             enable: true
+          cc:
+            db_encryption_key: "((cc_db_encryption_key))"
+            database_encryption:
+              current_key_label: "((cc_db_encryption_key_id))"
+                keys:
+                  ((cc_db_encryption_key_id)): "((cc_db_encryption_key))"
+                  ((cc_db_encryption_key_id_old)): "((cc_db_encryption_key_old))"
           ccdb:
             databases:
               - name: cloud_controller
