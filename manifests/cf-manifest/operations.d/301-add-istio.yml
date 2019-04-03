@@ -99,7 +99,7 @@
       - deployment: cf
         domain: bosh
         instance_group: istio-control
-        network: default
+        network: router
         query: "*"
 
 - type: replace
@@ -110,7 +110,7 @@
       - deployment: cf
         domain: bosh
         instance_group: istio-control
-        network: default
+        network: router
         query: "*"
 
 - type: replace

@@ -26,7 +26,7 @@
   path: /addons/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties/aliases/domain=copilot.service.cf.internal?/targets
   value:
     - query: '*'
-      instance_group: router
+      instance_group: istio-control
       network: router
       deployment: ((deployment_name))
       domain: bosh
