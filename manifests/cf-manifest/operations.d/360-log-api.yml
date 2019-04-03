@@ -2,10 +2,13 @@
 
 - type: replace
   path: /instance_groups/name=log-api/vm_extensions?/-
-  value: cf_doppler_elbs
+  value: cf_doppler_log_stream_elbs
 
 - type: remove
-  path: /instance_groups/name=log-api/jobs/name=route_registrar
+  path: /instance_groups/name=log-api/jobs/name=route_registrar/properties/route_registrar/routes/name=loggregator
+
+- type: remove
+  path: /instance_groups/name=log-api/jobs/name=route_registrar/properties/route_registrar/routes/name=doppler
 
 - type: replace
   path: /instance_groups/name=log-api/jobs/name=loggregator_trafficcontroller/properties/system_domain

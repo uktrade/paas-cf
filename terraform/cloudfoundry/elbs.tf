@@ -80,6 +80,50 @@ resource "aws_elb" "cf_doppler" {
   }
 }
 
+resource "aws_elb" "cf_log_stream" {
+  name                      = "${var.env}-cf-log-stream"
+  subnets                   = ["${split(",", var.infra_subnet_ids)}"]
+  idle_timeout              = "${var.elb_idle_timeout}"
+  cross_zone_load_balancing = "true"
+
+  security_groups = [
+    "${aws_security_group.cf_api_elb.id}",
+  ]
+
+  access_logs {
+    bucket        = "${aws_s3_bucket.elb_access_log.id}"
+    bucket_prefix = "cf-log-stream"
+    interval      = 5
+  }
+
+  health_check {
+    target              = "TCP:8088"
+    interval            = "${var.health_check_interval}"
+    timeout             = "${var.health_check_timeout}"
+    healthy_threshold   = "${var.health_check_healthy}"
+    unhealthy_threshold = "${var.health_check_unhealthy}"
+  }
+
+  listener {
+    instance_port      = 8088
+    instance_protocol  = "tcp"
+    lb_port            = 443
+    lb_protocol        = "ssl"
+    ssl_certificate_id = "${data.aws_acm_certificate.system.arn}"
+  }
+}
+
+resource "aws_lb_ssl_negotiation_policy" "cf_log_stream" {
+  name          = "paas-${var.default_elb_security_policy}"
+  load_balancer = "${aws_elb.cf_log_stream.id}"
+  lb_port       = 443
+
+  attribute {
+    name  = "Reference-Security-Policy"
+    value = "${var.default_elb_security_policy}"
+  }
+}
+
 resource "aws_lb_ssl_negotiation_policy" "cf_doppler" {
   name          = "paas-${var.default_elb_security_policy}"
   load_balancer = "${aws_elb.cf_doppler.id}"

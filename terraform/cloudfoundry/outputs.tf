@@ -71,6 +71,10 @@ output "cf_doppler_elb_name" {
   value = "${aws_elb.cf_doppler.name}"
 }
 
+output "cf_log_stream_elb_name" {
+  value = "${aws_elb.cf_log_stream.name}"
+}
+
 output "cf_ssh_proxy_elb_name" {
   value = "${aws_elb.ssh_proxy.name}"
 }

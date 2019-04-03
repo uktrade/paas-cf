@@ -6,6 +6,14 @@ resource "aws_route53_record" "cf_doppler" {
   records = ["${aws_elb.cf_doppler.dns_name}"]
 }
 
+resource "aws_route53_record" "cf_log_stream" {
+  zone_id = "${var.system_dns_zone_id}"
+  name    = "log-stream.${var.system_dns_zone_name}."
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${aws_elb.cf_log_stream.dns_name}"]
+}
+
 resource "aws_route53_record" "cf_ssh_proxy" {
   zone_id = "${var.system_dns_zone_id}"
   name    = "ssh.${var.system_dns_zone_name}."
