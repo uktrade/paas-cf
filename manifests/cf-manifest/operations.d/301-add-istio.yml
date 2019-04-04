@@ -130,6 +130,7 @@
     client_chain_file: ((copilot_client.certificate))
     temporary_istio_domains:
       - "istio.((terraform_outputs_cf_apps_domain))"
+      - "*.istio.((terraform_outputs_cf_apps_domain))"
 - type: replace
   path: /variables/-
   value:
