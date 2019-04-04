@@ -1988,6 +1988,7 @@ jobs:
           params:
             DISABLE_HEALTHCHECK_DB: ((disable_healthcheck_db))
             APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+            ISTIO_APPS_DNS_ZONE_NAME: istio.((apps_dns_zone_name))
           inputs:
             - name: paas-cf
             - name: config
@@ -2028,7 +2029,8 @@ jobs:
                   manifest = YAML.load_file('manifest.yml')
                   manifest['applications'].each do |app|
                     app['routes'] = [
-                      { 'route' => 'healthcheck.${APPS_DNS_ZONE_NAME}' }
+                      { 'route' => 'healthcheck.${APPS_DNS_ZONE_NAME}'
+                        'route' => 'healthcheck.${ISTIO_APPS_DNS_ZONE_NAME}'}
                     ]
                   end
                   File.write('manifest.yml', manifest.to_yaml)
