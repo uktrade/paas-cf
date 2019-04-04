@@ -194,7 +194,7 @@ resource "aws_elb" "cf-istio-router" {
   }
 
   listener {
-    instance_port      = 443
+    instance_port      = 8002
     instance_protocol  = "ssl"
     lb_port            = 443
     lb_protocol        = "ssl"
