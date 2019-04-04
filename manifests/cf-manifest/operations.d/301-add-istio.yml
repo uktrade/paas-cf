@@ -96,7 +96,7 @@
   value:
     domain: copilot.service.cf.internal
     targets:
-      - deployment: cf
+      - deployment: ((deployment_name))
         domain: bosh
         instance_group: istio-control
         network: router
@@ -107,7 +107,7 @@
   value:
     domain: pilot.service.cf.internal
     targets:
-      - deployment: cf
+      - deployment: ((deployment_name))
         domain: bosh
         instance_group: istio-control
         network: router
