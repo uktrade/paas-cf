@@ -49,7 +49,7 @@
     networks:
       - name: router
     stemcell: default
-    vm_type: small
+    vm_type: istio-router
     azs:
       - z1
       - z2
