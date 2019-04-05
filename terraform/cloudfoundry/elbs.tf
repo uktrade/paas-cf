@@ -198,7 +198,7 @@ resource "aws_elb" "cf-istio-router" {
     instance_protocol  = "ssl"
     lb_port            = 443
     lb_protocol        = "ssl"
-    ssl_certificate_id = "${aws_acm_certificate_validation.apps.certificate_arn}"
+    ssl_certificate_id = "${aws_acm_certificate_validation.istio_apps.certificate_arn}"
   }
 
   listener {
