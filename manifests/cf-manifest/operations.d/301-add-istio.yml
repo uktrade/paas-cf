@@ -14,7 +14,7 @@
     networks:
       - name: router
     stemcell: default
-    vm_type: medium
+    vm_type: istio-control
     azs:
       - z1
       - z2
@@ -189,7 +189,7 @@
                 ((cc_db_encryption_key_id_old)): "((cc_db_encryption_key_old))"
           ccdb:
             databases:
-              - name: cloud_controller
+              - name: api
                 tag: cc
             db_scheme: postgres
             address: ((terraform_outputs_cf_db_address))

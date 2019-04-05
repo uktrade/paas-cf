@@ -190,6 +190,20 @@ vm_types:
     - ((terraform_outputs_cf_router_elb_name))
     - ((terraform_outputs_cf_router_system_domain_elb_name))
 
+- name: istio-control
+  cloud_properties:
+    instance_type: c4.large
+    ephemeral_disk:
+      size: 10240
+      type: gp2
+    security_groups:
+      - ((terraform_outputs_default_security_group))
+      - ((terraform_outputs_cf_rds_client_security_group))
+      - ((terraform_outputs_cloud_controller_security_group))
+    elbs:
+      - ((terraform_outputs_cf_router_elb_name))
+      - ((terraform_outputs_cf_router_system_domain_elb_name))
+
 - name: cell
   cloud_properties:
     instance_type: ((cell_instance_type))
