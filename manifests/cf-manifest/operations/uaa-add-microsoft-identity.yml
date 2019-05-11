@@ -1,0 +1,22 @@
+---
+
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/login/oauth?/providers/microsoft-identity
+  value:
+    type: oidc1.0
+    authUrl: https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize
+    tokenUrl: https://login.microsoftonline.com/organizations/oauth2/v2.0/token
+    tokenKeyUrl: https://login.microsoftonline.com/organizations/discovery/v2.0/keys
+    issuer: https://login.microsoftonline.com/((microsoft_identity_tenantid))/v2.0
+    redirectUrl: https://login.((system_domain))/uaa
+    scopes:
+      - openid
+      - email
+    linkText: PaaS Miki Microsoft Identity login
+    showLinkText: true
+    addShadowUserOnLogin: true
+    relyingPartyId: ((microsoft_identity_oauth_client_id))
+    relyingPartySecret: ((microsoft_identity_oauth_client_secret))
+    skipSslValidation: false
+    # attributeMappings:
+    #   user_name: email
