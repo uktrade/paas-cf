@@ -174,6 +174,7 @@ prod: globals ## Set Environment to Production
 	$(eval export DEPLOY_ENV=prod)
 	$(eval export AIVEN_PASSWORD_STORE_HIGH_DIR?=${HOME}/.paas-pass-high)
 	$(eval export AWS_DEFAULT_REGION=eu-west-1)
+	$(eval export ANALYTICS_TRACKING_ID=000000)
 	@true
 
 .PHONY: prod-lon
@@ -192,6 +193,7 @@ prod-lon: globals ## Set Environment to prod-lon
 	$(eval export DEPLOY_ENV=prod-lon)
 	$(eval export AIVEN_PASSWORD_STORE_HIGH_DIR?=${HOME}/.paas-pass-high)
 	$(eval export AWS_DEFAULT_REGION=eu-west-2)
+	$(eval export ANALYTICS_TRACKING_ID=000000)
 	@true
 
 .PHONY: bosh-cli
@@ -321,5 +323,3 @@ show-tenant-comms-addresses:
 	$(eval export API_TOKEN=`cf oauth-token | cut -f 2 -d ' '`)
 	$(eval export API_ENDPOINT=https://api.${SYSTEM_DNS_ZONE_NAME})
 	@cd tools/user_emails/ && go build && API_TOKEN=$(API_TOKEN) ./user_emails
-
-

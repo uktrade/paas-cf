@@ -2662,6 +2662,7 @@ jobs:
             NOTIFY_API_KEY: ((notify_api_key))
             NOTIFY_WELCOME_TEMPLATE_ID: 1859ce68-f133-4218-ac6e-a8ef32a41292
             AWS_REGION: ((aws_region))
+            ANALYTICS_TRACKING_ID: ((analytics_tracking_id))
           run:
             path: sh
             args:
@@ -2687,6 +2688,7 @@ jobs:
                     NOTIFY_WELCOME_TEMPLATE_ID: "${NOTIFY_WELCOME_TEMPLATE_ID}"
                     SESSION_SECRET: (( concat "session-" uaa_clients_paas_admin_secret ))
                     AWS_REGION: "$AWS_REGION"
+                    ANALYTICS_TRACKING_ID: "${ANALYTICS_TRACKING_ID}"
                 EOF
 
                 spruce merge \
