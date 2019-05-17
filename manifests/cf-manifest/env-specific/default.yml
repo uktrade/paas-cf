@@ -1,8 +1,8 @@
 ---
 cell_instances: 3
-router_instances: 2
+router_instances: 3
 api_instances: 2
-doppler_instances: 6
+doppler_instances: 2
 log_api_instances: 2
-cc_hourly_rate_limit: 10000
+cc_hourly_rate_limit: 55000
 paas_region_name: dev
