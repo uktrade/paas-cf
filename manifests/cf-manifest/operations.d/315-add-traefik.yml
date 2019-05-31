@@ -3,8 +3,8 @@
   path: /releases/-
   value:
     name: traefik
-    sha1: 0befd0d0c63b6ba457e00867bdfd5a9af57e7c01
-    url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.6.0-ubuntu-xenial-250.48-20190520-233224-508752875-20190520233225.tgz
+    sha1: e5d3b97a64b09c32ac759ce777f1ee001bbd7816
+    url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.6.0/traefik-1.6.0.tgz
     version: 1.6.0
 
 - type: replace
@@ -12,7 +12,8 @@
   value:
     name: traefik
     azs: [z1, z2, z3]
-    instances: 3
+    instances: ((traefik_instances))
+    vm_type: medium
     jobs:
       - name: traefik
         release: traefik
@@ -25,31 +26,31 @@
               cert: ((traefik_tls))
           bpm:
             enabled: true
-      - name: bpm
-        release: bpm
-      - name: smoke-tests
-        release: traefik
+      # - name: smoke-tests
+      #   release: traefik
     stemcell: default
-    persistent_disk_type: default
+    persistent_disk_type: 10GB
     env:
       bosh: { swap_size: 0 }
     networks:
       - name: ((network_name))
 
 - type: replace
-  path: /variables/name=traefikCA?
+  path: /variables/-
   value:
+    name: traefikCA
     type: certificate
     options:
       is_ca: true
       common_name: traefikCA
 
 - type: replace
-  path: /variables/name=traefik_tls?
+  path: /variables/-
   value:
+    name: traefik_tls
     type: certificate
     options:
-      ca: ((traefikCA))
+      ca: traefikCA
       common_name: traefik
       alternative_names:
         - traefik
