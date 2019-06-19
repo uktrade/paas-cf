@@ -128,6 +128,10 @@ func Main() error {
 		S3BucketsGauge(logger, s3, 1*time.Hour),
 		CustomDomainCDNMetricsCollector(logger, cfs, cloudWatch, 10*time.Minute),
 	}
+	githubVersionRepos, ok := os.LookupEnv("GITHUB_VERSION_REPOS")
+	if ok {
+		gauges = append(gauges, GitVersionsGauge(githubVersionRepos, time.Hour))
+	}
 	for _, addr := range strings.Split(os.Getenv("TLS_DOMAINS"), ",") {
 		gauges = append(gauges, TLSValidityGauge(logger, tlsChecker, strings.TrimSpace(addr), 15*time.Minute))
 	}
