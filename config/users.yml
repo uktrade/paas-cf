@@ -4,6 +4,12 @@
   deploy_envs: ['prod', 'prod-lon', 'stg-lon', 'andyhunt']
   cf_admin: true
 
+- email: "andy.hunt@digital.cabinet-office.gov.uk"
+  origin: "microsoft"
+  username: "00fced8a-f3f7-42bf-aa17-8abde1d10b72" 
+  deploy_envs: ['prod', 'prod-lon', 'stg-lon', 'andyhunt']
+  cf_admin: true
+
 - email: "chris.farmiloe@digital.cabinet-office.gov.uk"
   origin: "google"
   deploy_envs: ['prod', 'prod-lon', 'stg-lon']
