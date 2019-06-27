@@ -33,6 +33,19 @@
               cross_zone_load_balancing: false
             grafana:
               cross_zone_load_balancing: false
+      - name: oauth2-proxy
+        release: oauth2-proxy
+        properties:
+          address: http://0.0.0.0:8080
+          upstream: http://127.0.0.1:8081
+          provider: oidc
+          client_id: ((oauth-proxy-client-id))
+          client_secret: ((oauth-proxy-client-secret))
+          cookie_secret: ((oauth-proxy-cookie-secret))
+          oidc_issuer_url: https://opslogin.fr.cloud.gov/oauth/token
+          email_domain: gsa.gov
+          browser_xss_filter: True
+          content_type_nosniff: True
 
 - type: replace
   path: /instance_groups/-
