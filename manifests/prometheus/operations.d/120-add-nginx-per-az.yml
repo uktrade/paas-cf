@@ -2,9 +2,9 @@
   path: /releases/-
   value:
     name: oauth2-proxy
-      version: 0.1.1
-      url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.1.1.tgz
-      sha1: d7cc49ac7aedb263aa7f380949d532d9e4762811
+    version: 0.1.1
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.1.1.tgz
+    sha1: d7cc49ac7aedb263aa7f380949d532d9e4762811
 
 - type: remove
   path: /instance_groups/name=nginx
@@ -30,28 +30,25 @@
         properties:
           nginx:
             alertmanager:
-              auth_users:
-                - name: admin
-                  password: ((alertmanager_password))
+              http_port: 8081
+              server_name: prometheus.((domain))
               cross_zone_load_balancing: false
             prometheus:
-              auth_users:
-                - name: admin
-                  password: ((prometheus_password))
+              http_port: 8081
               cross_zone_load_balancing: false
+              server_name: alertmanager.((domain))
             grafana:
+              http_port: 3000
               cross_zone_load_balancing: false
       - name: oauth2-proxy
         release: oauth2-proxy
         properties:
           address: http://0.0.0.0:8080
           upstream: http://127.0.0.1:8081
-          provider: oidc
-          client_id: ((oauth-proxy-client-id))
-          client_secret: ((oauth-proxy-client-secret))
-          cookie_secret: ((oauth-proxy-cookie-secret))
-          oidc_issuer_url: https://opslogin.fr.cloud.gov/oauth/token
-          email_domain: gsa.gov
+          provider: github
+          github-org: "alphagov"
+          github-team: "Government PaaS - People"
+          email_domain: digital.cabinet-office.gov.uk
           browser_xss_filter: True
           content_type_nosniff: True
 
