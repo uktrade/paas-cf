@@ -3,37 +3,75 @@
   path: /releases/-
   value:
     name: traefik
-    sha1: e5d3b97a64b09c32ac759ce777f1ee001bbd7816
-    url: https://github.com/gstackio/traefik-boshrelease/releases/download/v1.6.0/traefik-1.6.0.tgz
-    version: 1.6.0
+    version: 0.0.1562076258
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/traefik-0.0.1562076258.tgz
+    sha1: 421dea4877a009bc028188d3313ed7aef1ec2df5
 
 - type: replace
-  path: /instance_groups/-
+  path: /instance_groups/name=router/jobs/-
   value:
     name: traefik
-    azs: [z1, z2, z3]
-    instances: ((traefik_instances))
-    vm_type: medium
-    jobs:
-      - name: traefik
-        release: traefik
-        properties:
-          traefik:
-            log_level: INFO
-            access_logs: { enabled: true }
-            http: { enabled: true }
-            tls:
-              cert: ((traefik_tls))
-          bpm:
-            enabled: true
-      # - name: smoke-tests
-      #   release: traefik
-    stemcell: default
-    persistent_disk_type: 10GB
-    env:
-      bosh: { swap_size: 0 }
-    networks:
-      - name: ((network_name))
+    release: traefik
+    properties:
+      bpm:
+        enabled: true
+      traefik:
+        log_level: DEBUG
+        access_logs: { enabled: true }
+        http:
+          enabled: true
+          port: 83
+          redirect_to_https: true
+        tls:
+          cert:
+            certificate: "((router_ssl.certificate))"
+            private_key: "((router_ssl.private_key))"
+          enabled: true
+        additionalEntryPoints: |
+          [entryPoints.healthcheck]
+            address = ":82"
+        file:
+          enabled: true
+          rules: |
+            [file]
+            [frontends]
+              [frontends.defaultFrontend]
+              backend = "gorouter"
+              passHostHeader = true
+              entrypoints = ["https"]
+              priority = 1
+
+              [frontends.defaultFrontend.routes]
+                [frontends.defaultFrontend.routes.catchAll]
+                rule = "HostRegexp:{catchall:.*}"
+
+              [frontends.defaultFrontend.headers]
+              STSPreload = true
+              STSIncludeSubdomains = true
+              forceSTSHeader = true
+
+              [frontends.healthcheck]
+              backend = "gorouterHealthcheck"
+              entrypoints = ["healthcheck"]
+
+            [backends]
+              [backends.gorouter]
+                [backends.gorouter.healthcheck]
+                path = "/health"
+                port = 8080
+                interval = "5s"
+                scheme = "http"
+
+                [backends.gorouter.servers.server1]
+                url = "http://127.0.0.1:80"
+
+              [backends.gorouterHealthcheck]
+                [backends.gorouterHealthcheck.servers.server1]
+                url = "http://127.0.0.1:8080"
+  # - name: smoke-tests
+  #   release: traefik
+
+  # missing external healthcheck for go routers
 
 - type: replace
   path: /variables/-
@@ -45,17 +83,13 @@
       common_name: traefikCA
 
 - type: replace
-  path: /variables/-
-  value:
-    name: traefik_tls
-    type: certificate
-    options:
-      ca: traefikCA
-      common_name: traefik
-      alternative_names:
-        - traefik
-        - "*.traefik"
-
-- type: replace
   path: /features?/use_dns_addresses
   value: true
+
+- type: replace
+  path: /instance_groups/name=router/vm_extensions?/-
+  value: cf_router_system_domain_target_groups
+
+- type: replace
+  path: /instance_groups/name=router/vm_extensions?/-
+  value: cf_router_system_domain_sg

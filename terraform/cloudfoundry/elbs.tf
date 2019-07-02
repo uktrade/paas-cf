@@ -39,6 +39,108 @@ resource "aws_elb" "cf_router_system_domain" {
   }
 }
 
+resource "aws_lb" "cf_router_system_domain" {
+  name               = "${var.env}-cf-router-system-domain-nlb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = ["${split(",", var.infra_subnet_ids)}"]
+}
+
+resource "aws_lb_target_group" "cf_router_system_domain_https" {
+  name     = "${var.env}-system-domain-https-tg"
+  port     = 443
+  protocol = "TLS"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    port     = 82
+    protocol = "HTTP"
+    path = "/health"
+    matcher = "200-299"
+  }
+}
+
+resource "aws_lb_target_group" "cf_router_system_domain_http" {
+  name     = "${var.env}-system-domain-http-tg"
+  port     = 83
+  protocol = "TCP"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    port     = 82
+    protocol = "HTTP"
+    path = "/health"
+    matcher = "200-299"
+  }
+}
+
+resource "aws_lb_listener" "cf_router_system_domain_https" {
+  load_balancer_arn = "${aws_lb.cf_router_system_domain.arn}"
+  port              = "443"
+  protocol          = "TLS"
+
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = "${data.aws_acm_certificate.system.arn}"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.cf_router_system_domain_https.arn}"
+  }
+}
+
+resource "aws_lb_listener" "cf_router_system_domain_http" {
+  load_balancer_arn = "${aws_lb.cf_router_system_domain.arn}"
+  port              = "80"
+  protocol          = "TCP"
+
+    default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.cf_router_system_domain_http.arn}"
+  }
+}
+
+resource "aws_security_group" "cf_router_system_domain" {
+  name        = "${var.env}-cf-router-ingress"
+  description = "Allow HTTPS - Applied to instances without public ips - Used to preserve LB source ips"
+  vpc_id      = "${var.vpc_id}"
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 83
+    to_port     = 83
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-cf-router-ingress"
+  }
+}
+output "cf_router_system_domain_security_group" {
+  value = "${aws_security_group.cf_router_system_domain.name}"
+}
+
+output "cf_router_system_domain_https_target_group_name" {
+  value = "${aws_lb_target_group.cf_router_system_domain_https.name}"
+}
+
+output "cf_router_system_domain_http_target_group_name" {
+  value = "${aws_lb_target_group.cf_router_system_domain_http.name}"
+}
+
 resource "aws_lb_ssl_negotiation_policy" "cf_router_system_domain" {
   name          = "paas-${random_pet.elb_cipher.keepers.default_elb_security_policy}-${random_pet.elb_cipher.id}"
   load_balancer = "${aws_elb.cf_router_system_domain.id}"

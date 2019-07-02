@@ -35,7 +35,7 @@ resource "aws_route53_record" "system_wildcard" {
   name    = "*.${var.system_dns_zone_name}"
   type    = "CNAME"
   ttl     = "60"
-  records = ["${aws_elb.cf_router_system_domain.dns_name}"]
+  records = ["${aws_lb.cf_router_system_domain.dns_name}"]
 }
 
 resource "aws_route53_record" "apps_wildcard" {
