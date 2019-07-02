@@ -48,6 +48,8 @@
           provider: github
           github-org: "alphagov"
           github-team: "Government PaaS - People"
+          client_id: ((oauth-proxy-client-id))
+          client_secret: ((oauth-proxy-client-secret))
           email_domain: digital.cabinet-office.gov.uk
           browser_xss_filter: True
           content_type_nosniff: True
