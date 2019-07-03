@@ -2,9 +2,9 @@
   path: /releases/-
   value:
     name: oauth2-proxy
-    version: 0.0.1562161452
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562161452.tgz
-    sha1: 5e14a9218abf0a5bb3d17d3c045c151396beb8e6
+    version: 0.0.1562163032
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562163032.tgz
+    sha1: e0a0f456d249b05a666e1c579825a5b42cba9d7f
 
 - type: remove
   path: /instance_groups/name=nginx
