@@ -2,9 +2,9 @@
   path: /releases/-
   value:
     name: oauth2-proxy
-    version: 0.0.1562167784
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562167784.tgz
-    sha1: b0edc11733118fe359bfad5f7f446456828942d5
+    version: 0.0.1562169186
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562169186.tgz
+    sha1: 7b5201ec6b90e13a86b188903b45eff5d001143c
 
 
 - type: remove
