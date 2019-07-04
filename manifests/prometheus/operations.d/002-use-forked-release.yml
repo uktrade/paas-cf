@@ -1,5 +1,5 @@
 - type: replace
-  path: /releases/prometheus/-
+  path: /releases/-
   value:
     name: prometheus
     version: 0.0.1562235776
