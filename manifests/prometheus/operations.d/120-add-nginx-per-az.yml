@@ -30,6 +30,7 @@
         release: prometheus
         properties:
           nginx:
+            server_names_hash_bucket_size: 256
             alertmanager:
               http_port: 8081
               server_name: prometheus-1.((system_domain))
