@@ -1,3 +1,7 @@
+---
+- type: remove
+  path: /releases/name=prometheus
+
 - type: replace
   path: /releases/-
   value:
