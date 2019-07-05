@@ -3,9 +3,9 @@
   path: /releases/-
   value:
     name: traefik
-    version: 0.0.1562076258
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/traefik-0.0.1562076258.tgz
-    sha1: 421dea4877a009bc028188d3313ed7aef1ec2df5
+    version: 0.0.1562331289
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/traefik-0.0.1562331289.tgz
+    sha1: 47e1eb416f4f03eff05205241566ec1fc525f774
 
 - type: replace
   path: /instance_groups/name=router/jobs/-
@@ -16,6 +16,7 @@
       bpm:
         enabled: true
       traefik:
+        debug: true
         log_level: DEBUG
         access_logs: { enabled: true }
         http:
