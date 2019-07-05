@@ -6,6 +6,6 @@
   path: /releases/-
   value:
     name: prometheus
-    version: 0.0.1562311275
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/prometheus-0.0.1562311275.tgz
-    sha1: b18c9461134748d25a8aabc50d6be3bdbb0fcbde
+    version: 0.0.1562316280
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/prometheus-0.0.1562316280.tgz
+    sha1: 32c386904f5fa335a925b026c8ff47fba08efbaf

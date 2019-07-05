@@ -10,7 +10,3 @@
 - type: replace
   path: /instance_groups/name=firehose/jobs/name=firehose_exporter/properties/firehose_exporter/doppler/idle_timeout?
   value: 5m
-
-- type: replace
-  path: /instance_groups/name=firehose/jobs/name=firehose_exporter/properties/firehose_exporter/doppler/url?
-  value: wss://doppler.((system_domain)):((traffic_controller_external_port))
