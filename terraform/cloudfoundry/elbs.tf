@@ -46,35 +46,50 @@ resource "aws_lb" "cf_router_system_domain" {
   subnets            = ["${split(",", var.infra_subnet_ids)}"]
 }
 
-resource "aws_lb_target_group" "cf_router_system_domain_https" {
-  name     = "${var.env}-system-domain-https-tg"
+resource "aws_lb" "cf_router_app_domain" {
+  name               = "${var.env}-cf-router-app-domain-nlb"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = ["${split(",", var.infra_subnet_ids)}"]
+}
+
+resource "aws_lb_target_group" "cf_router_system_domain_tls" {
+  name     = "${var.env}-system-tls-tg"
   port     = 443
   protocol = "TLS"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
     port     = 82
-    protocol = "HTTP"
-    path = "/health"
-    matcher = "200-299"
+    protocol = "TCP"
   }
 }
 
-resource "aws_lb_target_group" "cf_router_system_domain_http" {
-  name     = "${var.env}-system-domain-http-tg"
+resource "aws_lb_target_group" "cf_router_app_domain_tls" {
+  name     = "${var.env}-app-tls-tg"
+  port     = 443
+  protocol = "TLS"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    port     = 82
+    protocol = "TCP"
+  }
+}
+
+resource "aws_lb_target_group" "cf_router_app_domain_tcp" {
+  name     = "${var.env}-app-tcp-tg"
   port     = 83
   protocol = "TCP"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
     port     = 82
-    protocol = "HTTP"
-    path = "/health"
-    matcher = "200-299"
+    protocol = "TCP"
   }
 }
 
-resource "aws_lb_listener" "cf_router_system_domain_https" {
+resource "aws_lb_listener" "cf_router_system_domain_tls" {
   load_balancer_arn = "${aws_lb.cf_router_system_domain.arn}"
   port              = "443"
   protocol          = "TLS"
@@ -84,18 +99,32 @@ resource "aws_lb_listener" "cf_router_system_domain_https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.cf_router_system_domain_https.arn}"
+    target_group_arn = "${aws_lb_target_group.cf_router_system_domain_tls.arn}"
   }
 }
 
-resource "aws_lb_listener" "cf_router_system_domain_http" {
-  load_balancer_arn = "${aws_lb.cf_router_system_domain.arn}"
+resource "aws_lb_listener" "cf_router_system_domain_tcp" {
+  load_balancer_arn = "${aws_lb.cf_router_app_domain.arn}"
   port              = "80"
   protocol          = "TCP"
 
     default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.cf_router_system_domain_http.arn}"
+    target_group_arn = "${aws_lb_target_group.cf_router_app_domain_tcp.arn}"
+  }
+}
+
+resource "aws_lb_listener" "cf_router_app_domain_tls" {
+  load_balancer_arn = "${aws_lb.cf_router_app_domain.arn}"
+  port              = "443"
+  protocol          = "TLS"
+
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = "${aws_acm_certificate.apps.arn}"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.cf_router_app_domain_tls.arn}"
   }
 }
 
@@ -133,12 +162,16 @@ output "cf_router_system_domain_security_group" {
   value = "${aws_security_group.cf_router_system_domain.name}"
 }
 
-output "cf_router_system_domain_https_target_group_name" {
-  value = "${aws_lb_target_group.cf_router_system_domain_https.name}"
+output "cf_router_system_domain_tls_target_group_name" {
+  value = "${aws_lb_target_group.cf_router_system_domain_tls.name}"
 }
 
-output "cf_router_system_domain_http_target_group_name" {
-  value = "${aws_lb_target_group.cf_router_system_domain_http.name}"
+output "cf_router_app_domain_tcp_target_group_name" {
+  value = "${aws_lb_target_group.cf_router_app_domain_tcp.name}"
+}
+
+output "cf_router_app_domain_tls_target_group_name" {
+  value = "${aws_lb_target_group.cf_router_app_domain_tls.name}"
 }
 
 resource "aws_lb_ssl_negotiation_policy" "cf_router_system_domain" {

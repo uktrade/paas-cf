@@ -186,8 +186,6 @@ vm_types:
     ephemeral_disk:
       size: 10240
       type: gp2
-    elbs:
-      - ((terraform_outputs_cf_router_elb_name))
 
 - name: cell
   cloud_properties:
@@ -238,11 +236,12 @@ vm_extensions:
     lb_target_groups:
     - ((terraform_outputs_cf_loggregator_rlp_target_group_name))
 
-- name: cf_router_system_domain_target_groups
+- name: cf_router_target_groups
   cloud_properties:
     lb_target_groups:
-    - ((terraform_outputs_cf_router_system_domain_https_target_group_name))
-    - ((terraform_outputs_cf_router_system_domain_http_target_group_name))
+    - ((terraform_outputs_cf_router_system_domain_tls_target_group_name))
+    - ((terraform_outputs_cf_router_app_domain_tcp_target_group_name))
+    - ((terraform_outputs_cf_router_app_domain_tls_target_group_name))
 
 - name: cf_router_system_domain_sg
   cloud_properties:

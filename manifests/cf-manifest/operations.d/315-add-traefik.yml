@@ -88,7 +88,7 @@
 
 - type: replace
   path: /instance_groups/name=router/vm_extensions?/-
-  value: cf_router_system_domain_target_groups
+  value: cf_router_target_groups
 
 - type: replace
   path: /instance_groups/name=router/vm_extensions?/-
