@@ -2,9 +2,9 @@
   path: /releases/-
   value:
     name: oauth2-proxy
-    version: 0.0.1562169186
-    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562169186.tgz
-    sha1: 7b5201ec6b90e13a86b188903b45eff5d001143c
+    version: 0.0.1562339718
+    url: https://s3-eu-west-1.amazonaws.com/gds-paas-build-releases/oauth2-proxy-0.0.1562339718.tgz
+    sha1: 019745e53ee21a580e45920b795df47929766b98
 
 
 - type: remove
@@ -33,12 +33,12 @@
             server_names_hash_bucket_size: 256
             alertmanager:
               http_port: 9090
-              server_name: prometheus-1.((system_domain))
+              server_name: alertmanager-1.((system_domain))
               cross_zone_load_balancing: false
             prometheus:
               http_port: 9090
               cross_zone_load_balancing: false
-              server_name: alertmanager-1.((system_domain))
+              server_name: prometheus-1.((system_domain))
             grafana:
               http_port: 3000
               cross_zone_load_balancing: false
