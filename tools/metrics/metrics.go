@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
@@ -38,6 +39,16 @@ type MetricReadCloser interface {
 }
 
 type MetricTags []MetricTag
+
+func(ts MetricTags) ToMap() map[string]string {
+	m := map[string]string{}
+	for _, t := range ts {
+		m[t.Label] = t.Value
+	}
+
+	return m
+}
+
 type MetricTag struct {
 	Label string
 	Value string
@@ -77,6 +88,14 @@ func (m Metric) String() string {
 		m.Unit,
 		m.Tags.String(),
 	)
+}
+
+func (m Metric) Equals(met Metric) bool {
+	mTags := m.Tags.ToMap()
+	metTags := m.Tags.ToMap()
+	tagsEqual := reflect.DeepEqual(mTags, metTags)
+
+	return (m.Name == met.Name) && (m.Kind == met.Kind) && tagsEqual
 }
 
 type PollFunc func(MetricWriter) error
