@@ -150,9 +150,6 @@
     scope: openid,password.write,scim.read,scim.write,scim.invite,uaa.user
     secret: ((secrets_uaa_clients_login_secret))
 
-- type: remove
-  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/routing_api_client
-
 - type: replace
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/cc-service-dashboards/override?
   value: true
@@ -170,6 +167,18 @@
 
 - type: replace
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/cc_service_key_client/override?
+  value: true
+
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/routing_api_client/override?
+  value: true
+
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/tcp_router/override?
+  value: true
+
+- type: replace
+  path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/tcp_emitter/override?
   value: true
 
 - type: replace
@@ -247,6 +256,9 @@
     - cloud_controller.admin_read_only
     - doppler.firehose
     - network.admin
+    - routing.router_groups.read
+    - routing.router_groups.write
+
 
 - type: replace
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb/databases/0

@@ -137,6 +137,10 @@ variable "apps_dns_zone_name" {
   description = "Amazon Route53 DNS zone name for hosted apps. Differs per account."
 }
 
+variable "tls_apps_dns_zone_name" {
+  description = "Amazon Route53 DNS zone name for hosted apps using the TCP router. Differs per account."
+}
+
 variable "prometheus_azs" {
   description = "Availability zones for Prometheus instances"
   default     = ["z1", "z2"]

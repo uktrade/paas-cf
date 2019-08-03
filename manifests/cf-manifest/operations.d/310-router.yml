@@ -3,6 +3,9 @@
 - type: remove
   path: /instance_groups/name=router/vm_extensions
 
+- type: remove
+  path: /instance_groups/name=tcp-router/vm_extensions
+
 - type: replace
   path: /instance_groups/name=router/jobs/-
   value:
@@ -24,9 +27,6 @@
         ssl_pem: "((router_ssl.certificate))((router_ssl.private_key))"
         enable_http_redirect_frontend: true
         enable_proxy_frontend: true
-
-- type: remove
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/routing_api
 
   # Upstream uses application_ca and service_cf_internal_ca
   # We want to use these but also rotate them
@@ -67,3 +67,7 @@
 - type: replace
   path: /instance_groups/name=router/vm_extensions?/-
   value: cf_router_target_groups
+
+- type: replace
+  path: /instance_groups/name=tcp-router/vm_extensions?/-
+  value: cf_tcp_router_target_groups

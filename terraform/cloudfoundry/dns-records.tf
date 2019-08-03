@@ -1,3 +1,11 @@
+resource "aws_route53_record" "tls_apps" {
+  zone_id = "${var.apps_dns_zone_id}"
+  name    = "${var.tls_apps_dns_zone_name}"
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${aws_lb.cf_router_tls.dns_name}"]
+}
+
 resource "aws_route53_record" "cf_loggregator_rlp_log_api" {
   zone_id = "${var.system_dns_zone_id}"
   name    = "log-api.${var.system_dns_zone_name}."

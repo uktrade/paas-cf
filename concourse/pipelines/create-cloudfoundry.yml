@@ -39,8 +39,8 @@ meta:
     terraform: &terraform-image-resource
       type: docker-image
       source:
-        repository: governmentpaas/terraform
-        tag: 4467c23cef4a5d87d531b88700300b222fbf2916
+        repository: tlwr/terraform
+        tag: latest
     curl-ssl: &curl-ssl-image-resource
       type: docker-image
       source:
@@ -229,7 +229,7 @@ resources:
       initial_content_text: |
         {
             "version": 3,
-            "terraform_version": "0.11.1",
+            "terraform_version": "0.11.14",
             "serial": 0,
             "modules": [
                 {
@@ -722,6 +722,7 @@ jobs:
           params:
             SKIP_SSL_VALIDATION: true
             APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+            TLS_APPS_DNS_ZONE_NAME: ((tls_apps_dns_zone_name))
             SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
             CONCOURSE_WEB_USERNAME: admin
             DEPLOY_ENV: ((deploy_env))
@@ -798,6 +799,7 @@ jobs:
           params:
             SKIP_SSL_VALIDATION: true
             APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+            TLS_APPS_DNS_ZONE_NAME: ((tls_apps_dns_zone_name))
             SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
             CONCOURSE_WEB_USERNAME: admin
             DEPLOY_ENV: ((deploy_env))
@@ -924,6 +926,7 @@ jobs:
             TF_VAR_env: ((deploy_env))
             TF_VAR_system_dns_zone_name: ((system_dns_zone_name))
             TF_VAR_apps_dns_zone_name: ((apps_dns_zone_name))
+            TF_VAR_tls_apps_dns_zone_name: ((tls_apps_dns_zone_name))
             AWS_DEFAULT_REGION: ((aws_region))
           run:
             path: sh
@@ -1432,6 +1435,7 @@ jobs:
             AWS_ACCOUNT: ((aws_account))
             SYSTEM_DNS_ZONE_NAME: ((system_dns_zone_name))
             APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+            TLS_APPS_DNS_ZONE_NAME: ((tls_apps_dns_zone_name))
             DEPLOY_ENV: ((deploy_env))
             BOSH_URL: https://((bosh_fqdn)):25555
             ENABLE_ALERT_NOTIFICATIONS: ((ENABLE_ALERT_NOTIFICATIONS))
@@ -1713,6 +1717,7 @@ jobs:
             - name: config
           params:
             APPS_DNS_ZONE_NAME: ((apps_dns_zone_name))
+            TLS_APPS_DNS_ZONE_NAME: ((tls_apps_dns_zone_name))
           run:
             path: sh
             args:

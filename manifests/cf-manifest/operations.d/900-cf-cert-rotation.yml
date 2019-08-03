@@ -88,6 +88,18 @@
   path: /instance_groups/name=api/jobs/name=policy-server-internal/properties/ca_cert
   value: ((network_policy_ca.certificate))((network_policy_ca_old.certificate))
 
+- type: replace
+  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/locket/ca_cert
+  value: ((service_cf_internal_ca.certificate))((service_cf_internal_ca_old.certificate))
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/mtls_ca
+  value: ((routing_api_ca.certificate))((routing_api_ca_old.certificate))
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=routing-api/properties/uaa/ca_cert
+  value: ((uaa_ca.certificate))((uaa_ca_old.certificate))
+
 
 # INSTANCE GROUPS / CC WORKER
 
@@ -379,6 +391,17 @@
   value: ((application_ca.certificate))((application_ca_old.certificate))
 
 
+# INSTANCE GROUPS / TCP ROUTER
+
+- type: replace
+  path: /instance_groups/name=tcp-router/jobs/name=tcp_router/properties/uaa/ca_cert
+  value: ((uaa_ca.certificate))((uaa_ca_old.certificate))
+
+- type: replace
+  path: /instance_groups/name=tcp-router/jobs/name=loggr-udp-forwarder/properties/loggregator/tls/ca
+  value: ((loggregator_ca.certificate))((loggregator_ca_old.certificate))
+
+
 # INSTANCE GROUPS / UAA
 
 - type: replace
@@ -503,5 +526,14 @@
     name: metric_store_ca_old
     options:
       common_name: metric-store
+      is_ca: true
+    type: certificate
+
+- type: replace
+  path: /variables/-
+  value:
+    name: routing_api_ca_old
+    options:
+      common_name: routing_api
       is_ca: true
     type: certificate

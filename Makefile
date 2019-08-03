@@ -86,6 +86,7 @@ lint_yaml:
 lint_terraform: dev ## Lint the terraform files.
 	$(eval export TF_VAR_system_dns_zone_name=$SYSTEM_DNS_ZONE_NAME)
 	$(eval export TF_VAR_apps_dns_zone_name=$APPS_DNS_ZONE_NAME)
+	$(eval export TF_VAR_tls_apps_dns_zone_name=$TLS_APPS_DNS_ZONE_NAME)
 	@terraform/scripts/lint.sh
 
 lint_shellcheck:
@@ -150,6 +151,7 @@ dev: globals ## Set Environment to DEV
 	$(eval export ENABLE_AUTODELETE=true)
 	$(eval export SYSTEM_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipeline.digital)
 	$(eval export APPS_DNS_ZONE_NAME=${DEPLOY_ENV}.dev.cloudpipelineapps.digital)
+	$(eval export TLS_APPS_DNS_ZONE_NAME=${DEPLOY_ENV}-tls.dev.cloudpipelineapps.digital)
 	$(eval export ALERT_EMAIL_ADDRESS?=govpaas-alerting-dev@digital.cabinet-office.gov.uk)
 	$(eval export NEW_ACCOUNT_EMAIL_ADDRESS?=the-multi-cloud-paas-team+dev@digital.cabinet-office.gov.uk)
 	$(eval export ENABLE_ALERT_NOTIFICATIONS ?= false)

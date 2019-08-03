@@ -14,6 +14,7 @@ generator = SecretGenerator.new(
   "external_uaa_database_password" => :simple,
   "external_silk_controller_database_password" => :simple,
   "external_policy_server_database_password" => :simple,
+  "external_routing_api_database_password" => :simple,
 )
 
 option_parser = OptionParser.new do |opts|

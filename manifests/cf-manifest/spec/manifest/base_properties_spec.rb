@@ -65,9 +65,9 @@ RSpec.describe "base properties" do
       expect(cloud_controller_ng_properties["system_domain"]).to eq(terraform_fixture_value(:cf_root_domain))
     end
     it "sets the app domains" do
-      expect(cloud_controller_ng_properties["app_domains"]).to match_array([
-        terraform_fixture_value(:cf_apps_domain),
-      ])
+      expect(cloud_controller_ng_properties["app_domains"]).to include(
+        terraform_fixture_value(:cf_apps_domain)
+      )
     end
 
     shared_examples "a component with an AWS connection" do

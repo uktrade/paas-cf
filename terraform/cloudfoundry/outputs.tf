@@ -42,6 +42,10 @@ output "cf_apps_domain" {
   value = "${var.apps_dns_zone_name}"
 }
 
+output "cf_tls_apps_domain" {
+  value = "${var.tls_apps_dns_zone_name}"
+}
+
 output "cf_rds_client_security_group" {
   value = "${aws_security_group.cf_rds_client.name}"
 }

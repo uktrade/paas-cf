@@ -21,7 +21,9 @@ class UaaSyncAdminUsers
     "scim.write",
     "scim.invite",
     "doppler.firehose",
-    "network.admin"
+    "network.admin",
+    "routing.router_groups.read",
+    "routing.router_groups.write",
   ].freeze
 
   HOURS_TO_KEEP_TEST_USERS = 2
