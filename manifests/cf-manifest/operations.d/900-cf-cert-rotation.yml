@@ -277,7 +277,7 @@
 # INSTANCE GROUPS / METRIC STORE
 
 - type: replace
-  path: /instance_groups/name=metric-store/jobs/name=prom_scraper/properties/loggregator_agent?/ca_cert
+  path: /instance_groups/name=metric-store/jobs/name=prom_scraper/properties?/loggregator_agent?/tls?/ca_cert
   value: ((loggregator_ca.certificate))((loggregator_ca_old.certificate))
 
 - type: replace
