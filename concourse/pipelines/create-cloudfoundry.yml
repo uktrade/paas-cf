@@ -3243,6 +3243,7 @@ jobs:
             - name: paas-cf
             - name: config
             - name: cf-vars-store
+            - name: logit-secrets
           run:
             path: sh
             args:
@@ -3252,6 +3253,8 @@ jobs:
               - |
                 VAL_FROM_YAML=$(pwd)/paas-cf/concourse/scripts/val_from_yaml.rb
                 METRICS_SECRET=$($VAL_FROM_YAML secrets_uaa_clients_paas_metrics_secret cf-vars-store/cf-vars-store.yml)
+                LOGIT_ELASTICSEARCH_URL=$($VAL_FROM_YAML meta.logit.elasticsearch_url logit-secrets/logit-secrets.yml)
+                LOGIT_ELASTICSEARCH_API_KEY=$($VAL_FROM_YAML meta.logit.elasticsearch_api_key logit-secrets/logit-secrets.yml)
 
                 . ./config/config.sh
                 echo | cf login -a "${API_ENDPOINT}" -u "${CF_ADMIN}" -p "${CF_PASS}" -o admin -s monitoring
@@ -3277,7 +3280,9 @@ jobs:
                     'AWS_ACCESS_KEY_ID' => '${METRICS_AWS_ACCESS_KEY_ID}',
                     'AWS_SECRET_ACCESS_KEY' => '${METRICS_AWS_SECRET_ACCESS_KEY}',
                     'AIVEN_API_TOKEN' => '${AIVEN_API_TOKEN}',
-                    'AIVEN_PROJECT' => '${AIVEN_PROJECT}'
+                    'AIVEN_PROJECT' => '${AIVEN_PROJECT}',
+                    'LOGIT_ELASTICSEARCH_URL' => '${LOGIT_ELASTICSEARCH_URL}',
+                    'LOGIT_ELASTICSEARCH_API_KEY' => '${LOGIT_ELASTICSEARCH_API_KEY}'
                   }
                   manifest = YAML.load_file('manifest.yml')
                   manifest['applications'].each { |app|
