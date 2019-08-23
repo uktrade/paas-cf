@@ -13,7 +13,7 @@
 
 - type: replace
   path: /instance_groups/name=metric-store/persistent_disk_type
-  value: 100GB
+  value: metrics
 
   # The default exclude for prom_scraper is job=smoke_tests
   # We do not run smoke tests on bosh vms, so it is okay to override this

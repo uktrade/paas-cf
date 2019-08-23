@@ -134,3 +134,13 @@
 - type: replace
   path: /instance_groups/name=metric-store/vm_type
   value: small
+
+- type: replace
+  path: /instance_groups/name=tcp-router/vm_type
+  value: small
+
+# Make disks smaller
+
+- type: replace
+  path: /instance_groups/name=metric-store/persistent_disk_type
+  value: metrics-slim

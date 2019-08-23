@@ -28,6 +28,17 @@ disk_types:
   cloud_properties:
     type: gp2
 
+- name: metrics-slim
+  disk_size: 102400
+  cloud_properties:
+    type: io1
+    iops: 1000
+- name: metrics
+  disk_size: 204800
+  cloud_properties:
+    type: io1
+    iops: 2000
+
 networks:
 - name: cf
   subnets:
