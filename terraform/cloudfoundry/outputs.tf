@@ -71,6 +71,14 @@ output "cf_doppler_elb_name" {
   value = "${aws_elb.cf_doppler.name}"
 }
 
+output "cf_doppler_nlb_name" {
+  value = "${aws_lb.cf_doppler_nlb.name}"
+}
+
+output "cf_doppler_security_group" {
+  value = "${aws_security_group.doppler.name}"
+}
+
 output "cf_ssh_proxy_elb_name" {
   value = "${aws_elb.ssh_proxy.name}"
 }

@@ -61,9 +61,7 @@ resource "aws_elb" "cf_doppler" {
   idle_timeout              = "${var.elb_idle_timeout}"
   cross_zone_load_balancing = "true"
 
-  security_groups = [
-    "${aws_security_group.cf_api_elb.id}",
-  ]
+  security_groups = ["${aws_security_group.cf_api_elb.id}"]
 
   access_logs {
     bucket        = "${aws_s3_bucket.elb_access_log.id}"
@@ -97,6 +95,56 @@ resource "aws_lb_ssl_negotiation_policy" "cf_doppler" {
     name  = "Reference-Security-Policy"
     value = "${random_pet.elb_cipher.keepers.default_elb_security_policy}"
   }
+}
+
+resource "aws_lb" "cf_doppler_nlb" {
+  load_balancer_type = "network"
+
+  name                             = "${var.env}-cf-doppler-nlb"
+  subnets                          = ["${split(",", var.infra_subnet_ids)}"]
+  security_groups                  = ["${aws_security_group.cf_api_elb.id}"]
+  enable_cross_zone_load_balancing = "true"
+
+  access_logs {
+    bucket        = "${aws_s3_bucket.elb_access_log.id}"
+    bucket_prefix = "cf-doppler-nlb"
+    interval      = 5
+  }
+}
+
+resource "aws_lb_listener" "cf_doppler_nlb" {
+  load_balancer_arn = "${aws_lb.cf_doppler_nlb.arn}"
+  port              = 443
+  protocol          = "TLS"
+  ssl_policy        = "${aws_lb_ssl_negotiation_policy.cf_doppler.name}"
+  certificate_arn   = "${data.aws_acm_certificate.system.arn}"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.cf_doppler_nlb.arn}"
+  }
+}
+
+resource "aws_lb_target_group" "cf_doppler_nlb" {
+  name     = "${var.env}-cf-doppler-nlb"
+  port     = 8081
+  protocol = "HTTPS"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    interval            = "${var.health_check_interval}"
+    timeout             = "${var.health_check_timeout}"
+    healthy_threshold   = "${var.health_check_healthy}"
+    unhealthy_threshold = "${var.health_check_unhealthy}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "cf_doppler_nlb_target_group_name" {
+  value = "${aws_lb_target_group.cf_doppler_nlb.name}"
 }
 
 resource "aws_elb" "cf_router" {

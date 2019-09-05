@@ -143,3 +143,32 @@ resource "aws_security_group" "service_brokers" {
     create_before_destroy = true
   }
 }
+
+resource "aws_security_group" "doppler" {
+  name_prefix = "${var.env}-cf-doppler"
+  description = "Security group for Doppler instances. Allows HTTPS on 443 from the world."
+  vpc_id      = "${var.vpc_id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    Name = "${var.env}-cf-doppler"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}

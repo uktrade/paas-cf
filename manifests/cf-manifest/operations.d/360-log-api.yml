@@ -2,7 +2,7 @@
 
 - type: replace
   path: /instance_groups/name=log-api/vm_extensions?/-
-  value: cf_doppler_elbs
+  value: cf_doppler_nlbs
 
 - type: replace
   path: /instance_groups/name=log-api/vm_extensions?/-
